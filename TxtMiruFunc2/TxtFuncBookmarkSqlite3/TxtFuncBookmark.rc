@@ -1,0 +1,398 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include <windows.h>
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 日本語 (日本) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_BOOKLIST DIALOGEX 0, 0, 534, 232
+STYLE DS_SETFONT | DS_3DLOOK | DS_CENTER | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_WINDOWEDGE | WS_EX_APPWINDOW
+CAPTION "お気に入り／栞"
+FONT 10, "MS UI Gothic", 0, 0, 0x0
+BEGIN
+END
+
+IDD_TAG DIALOGEX 0, 0, 309, 42
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "フォルダ"
+FONT 10, "MS UI Gothic", 0, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_EDIT_TAG,30,7,272,12,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,194,22,50,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,252,22,50,14
+    LTEXT           "名前",IDC_STATIC,7,9,17,8
+END
+
+IDD_BOOK DIALOGEX 0, 0, 337, 180
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "アイテム"
+FONT 10, "MS UI Gothic", 0, 0, 0x0
+BEGIN
+    COMBOBOX        IDC_COMBO_FOLDER,119,7,211,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_TITLE,119,27,211,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_URL,119,42,200,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BUTTON_URL,320,42,10,12
+    EDITTEXT        IDC_EDIT_AUTHOR,119,57,211,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "画像を選択",IDC_BUTTON_IMAGE,84,78,74,15
+    PUSHBUTTON      "URLからタイトル/作者を取得",IDC_BUTTON_GETINFO,166,78,104,15
+    LTEXT           "タイトル",IDC_STATIC,87,27,24,8
+    LTEXT           "URL",IDC_STATIC,87,43,17,8
+    LTEXT           "作者",IDC_STATIC,87,58,17,8
+    CONTROL         "",IDC_STATIC_IMG,"Static",SS_BITMAP,7,7,74,66
+    DEFPUSHBUTTON   "OK",IDOK,223,97,50,15
+    PUSHBUTTON      "キャンセル",IDCANCEL,280,97,50,15
+    PUSHBUTTON      ">>その他",IDC_BUTTON_SP,15,97,37,17
+    CONTROL         "",IDC_STATIC_SPBAR,"Static",SS_BLACKFRAME | NOT WS_VISIBLE,7,116,323,58
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME,7,118,323,1
+    PUSHBUTTON      "すべての栞一覧",IDC_BUTTON_SIORI,15,124,66,17
+    PUSHBUTTON      "最近読んだページ",IDC_BUTTON_LATEST,87,124,66,17
+    EDITTEXT        IDC_EDIT_NUM,206,125,69,16,ES_AUTOHSCROLL | ES_NUMBER
+    PUSHBUTTON      "よく読むページ",IDC_BUTTON_READ,87,146,66,17
+    LTEXT           "最大ページ数",IDC_STATIC,159,128,42,8
+    LTEXT           "フォルダ",IDC_STATIC,87,8,24,8
+END
+
+IDD_LINK DIALOG 0, 0, 186, 95
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_TOOLWINDOW | WS_EX_WINDOWEDGE
+CAPTION "見出し&栞"
+FONT 10, "Ms Shell Dlg"
+BEGIN
+    CONTROL         "",IDC_LINK_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_OWNERDRAWFIXED | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,6,6,147,75
+END
+
+IDD_FILESEARCH DIALOGEX 0, 0, 351, 189
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "ファイルの検索"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_LINK_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,74,337,86
+    PUSHBUTTON      "開く",IDOPEN,7,168,50,14
+    CONTROL         "正規表現(&E)",IDC_USE_REGEXP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,60,60,57,10
+    LTEXT           "パターン",IDC_STATIC,13,11,26,8
+    LTEXT           "拡張子",IDC_STATIC,13,25,32,8
+    LTEXT           "ディレクトリ",IDC_STATIC,13,40,34,8
+    DEFPUSHBUTTON   "検索",IDOK,294,7,50,14
+    PUSHBUTTON      "中断",IDC_ABORT,294,7,50,14
+    PUSHBUTTON      "閉じる",IDCANCEL,294,168,50,14
+    COMBOBOX        IDC_SEARCH_TEXT,59,7,220,105,CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_SEARCH_FILE,59,24,220,105,CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_SEARCH_PATH,59,41,220,105,CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP,WS_EX_ACCEPTFILES
+END
+
+IDD_RUBY DIALOGEX 0, 0, 200, 170
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "ルビ一覧"
+FONT 10, "MS UI Gothic", 0, 0, 0x0
+BEGIN
+    CONTROL         "",IDC_LIST_RUBY,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,25,295,144
+    EDITTEXT        IDC_EDIT_FILTER,7,7,196,14,ES_MULTILINE | ES_AUTOHSCROLL
+END
+
+IDD_SEARCH DIALOGEX 0, 0, 234, 62
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "検索"
+FONT 9, "Ms Shell Dlg", 0, 0, 0x0
+BEGIN
+    COMBOBOX        IDC_COMBO_SEARCH,28,7,145,105,CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "上検索(&P)",IDPREVSEARCH,177,7,50,14
+    DEFPUSHBUTTON   "下検索(&N)",IDOK,177,23,50,14
+    CONTROL         "見つからなければ戻って検索(&V)",IDC_CHECK_LOOP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,26,25,134,11
+    CONTROL         "正規表現(&E)",IDC_USE_REGEXP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,26,41,134,11
+    PUSHBUTTON      "ｷｬﾝｾﾙ",IDCANCEL,177,41,50,14
+    LTEXT           "検索：",IDC_STATIC,4,8,23,12
+END
+
+IDD_COVERINFO DIALOGEX 0, 0, 246, 51
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD | WS_SYSMENU
+EXSTYLE WS_EX_CONTROLPARENT | WS_EX_COMPOSITED
+FONT 10, "MS Shell Dlg", 400, 0, 0x80
+BEGIN
+    EDITTEXT        IDC_EDIT_TITLE,0,4,246,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+    EDITTEXT        IDC_EDIT_URL,0,20,246,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+    EDITTEXT        IDC_EDIT_AUTHOR,0,36,246,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_APP                 ICON                    "TxtMiru.ico"
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include <windows.h>\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_BOOKLIST, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 231
+    END
+
+    IDD_TAG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 302
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 35
+    END
+
+    IDD_BOOK, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 330
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 173
+    END
+
+    IDD_LINK, DIALOG
+    BEGIN
+    END
+
+    IDD_FILESEARCH, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 344
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 182
+    END
+
+    IDD_RUBY, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 169
+    END
+
+    IDD_SEARCH, DIALOG
+    BEGIN
+    END
+
+    IDD_COVERINFO, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 44
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU_POPUP_TAG MENU
+BEGIN
+    POPUP ""
+    BEGIN
+        MENUITEM "追加",                          IDM_TAG_ADD
+        MENUITEM "変更",                          IDM_TAG_MODIFY
+        MENUITEM "削除",                          IDM_TAG_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "上へ",                          IDM_TAG_UP
+        MENUITEM "下へ",                          IDM_TAG_DOWN
+        MENUITEM SEPARATOR
+        MENUITEM "キャンセル",                       IDM_CANCEL
+    END
+END
+
+IDR_MENU_POPUP_BOOK MENU
+BEGIN
+    POPUP ""
+    BEGIN
+        MENUITEM "開く",                          IDM_BOOK_OPEN
+        MENUITEM SEPARATOR
+        MENUITEM "更新チェック",                      IDM_UPDATECHECK
+        MENUITEM "全てのアイテムをチェック",                IDM_UPDATECHECKALL
+        MENUITEM SEPARATOR
+        MENUITEM "追加",                          IDM_BOOK_ADD
+        MENUITEM "変更",                          IDM_BOOK_MODIFY
+        MENUITEM "削除",                          IDM_BOOK_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "上へ",                          IDM_BOOK_UP
+        MENUITEM "下へ",                          IDM_BOOK_DOWN
+        MENUITEM SEPARATOR
+        MENUITEM "プロパティ",                       IDM_PROPERTY
+        MENUITEM "ファイルのあるフォルダを開く",              IDM_FOLDER_OPEN
+        MENUITEM SEPARATOR
+        MENUITEM "キャンセル",                       IDM_CANCEL
+    END
+END
+
+IDR_MENU_POPUP_SUBTITLE MENU
+BEGIN
+    POPUP ""
+    BEGIN
+        MENUITEM "開く",                          IDM_SUBTITLE_OPEN
+        MENUITEM "既読にする",                       IDM_SUBTITLE_READ
+        MENUITEM "未読にする",                       IDM_SUBTITLE_NOREAD
+        MENUITEM "キャッシュを作成する",                  IDM_MAKECACHE
+        MENUITEM SEPARATOR
+        MENUITEM "キャンセル",                       IDM_CANCEL
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_BOOK AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_FILESEARCH AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_RUBY AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_COVERINFO AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_BMH_TITLE           "タイトル"
+    IDS_BMH_URL             "URL"
+    IDS_BMH_AUTHOR          "作者"
+    IDS_BMH_READCNT         "既読"
+    IDS_BMH_TOTAL           "トータル"
+    IDS_BMH_VISIT_DATE      "最終訪問日"
+    IDS_BMH_READPAGE        "既読ページ"
+    IDS_BMH_TOTALPAGE       "ページ"
+    IDS_DELETE_TAG          "「%1!s!」を削除します。よろしいですか？"
+    IDS_DELETE_TAG_MULTI    "選択した %1!d! 件の項目を削除します。よろしいですか？"
+    IDS_DELETE_BOOK         "「%1!s!」を削除します。よろしいですか？"
+    IDS_DELETE_BOOK_MULTI   "選択した %1!d! 件の項目を削除します。よろしいですか？"
+    IDS_IMAGE_NOSUPPORT     "「%1!s!」はサポートされていない形式です"
+    IDS_COVERFILE           "全ての画像ファイル"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_TITLE_LATEST        "最近読んだページ"
+    IDS_TITLE_VISIT         "よく読むページ"
+    IDS_DELETE_SIORI        "栞を削除します。よろしいですか？"
+    IDS_BMH_SEARCH_RESULT   "一致したテキスト"
+    IDS_FILESEARCH_TITLE    "ファイルの検索"
+    IDS_FILESEARCH_RUNNING  "検索中... %1!s!"
+    IDS_TITLE_TEXT          "テキスト"
+    IDS_TITLE_RUBY          "ルビ"
+    IDS_SEARCH_NOT_FOUND    "文字列が見つかりません。"
+    IDS_TITLE_AUTOSCROLL    "ページに合わせて見出し行を自動選択"
+    IDS_FILTER_TEXT         "ルビ一覧をフィルタ"
+    IDS_ERROR_MAKECACHE     "キャッシュの作成に失敗しました。"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_TIPS_TAG_ADD        "フォルダの追加"
+    IDS_TIPS_TAG_MODIFY     "フォルダを編集"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_URLFILE             "全てのファイル(*.*)"
+    IDS_ERROR_SUBTITLE      "項目を選択してください"
+    IDS_LIST_PAGE           " ページ %1!d!"
+    IDS_TOPPAGE             "表紙"
+    IDS_IDGOTOPAGE          "選択した行に移動"
+    IDS_IDADDBOOKMARK       "栞の追加"
+    IDS_IDDELBOOKMARK       "栞の削除"
+    IDS_IDLINKSTAY          "ウインドウを常に表示"
+    IDS_IDBOOKMARK          "栞一覧表示"
+    IDS_IDSUBTITLE          "タイトル一覧表示"
+    IDS_TITLE_PAGE_NAME     "名称"
+    IDS_TAG_FAVORITE        "お気に入り"
+    IDS_TITLE_SIORI         "すべての栞一覧"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_TIPS_TAG_DELETE     "フォルダを削除"
+    IDS_TIPS_TAG_UP         "フォルダを上に移動"
+    IDS_TIPS_TAG_DOWN       "フォルダを下に移動"
+    IDS_TIPS_BOOK_OPEN      "選択したファイルを開きます"
+    IDS_TIPS_BOOK_ADD       "お気に入りに追加"
+    IDS_TIPS_BOOK_MODIFY    "お気に入りを編集"
+    IDS_TIPS_BOOK_DELETE    "お気に入りから削除"
+    IDS_TIPS_BOOK_UPDATE    "選択したファイルの更新をチェックします"
+    IDS_TIPS_BOOK_UPDATE_ALL "全てファイルの更新をチェックします"
+    IDS_TIPS_BOOK_UP        "選択したファイルを上に移動"
+    IDS_TIPS_BOOK_DOWN      "選択したファイルを下に移動"
+    IDS_TIPS_SUBTITLE_OPEN  "ファイルを開きます"
+    IDS_ERROR_FOLDER        "フォルダを選択してください"
+    IDS_ERROR_BOOK          "項目を選択してください"
+END
+
+#endif    // 日本語 (日本) resources
+/////////////////////////////////////////////////////////////////////////////
+
+

@@ -1,0 +1,60 @@
+/////////////////////////////////////////////////////////////////////////////
+// 日本語 (日本) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+
+#include "VersionNo.h"
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+1 VERSIONINFO
+ FILEVERSION FILEVER
+ PRODUCTVERSION PRODUCTVER
+ FILEFLAGSMASK 0x22L
+#ifdef _DEBUG
+ FILEFLAGS 0x21L
+#else
+ FILEFLAGS 0x20L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "0800C42E"
+        BEGIN
+            VALUE "Comments", "https://sites.google.com/site/gearsns/TxtMiru"
+            VALUE "CompanyName", "Gears"
+            VALUE "FileDescription", "縦書きテキストビューア"
+            VALUE "FileVersion", STRFILEVER
+            VALUE "InternalName", "TxtMiru2"
+            VALUE "LegalCopyright", "Copyright (C) 2019 Gears"
+            VALUE "OriginalFilename", "TxtMiru2.EXE"
+            VALUE "ProductName", "TxtMiru"
+            VALUE "ProductVersion", STRPRODUCTVER
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x800, 50222
+    END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_TEXTFILE            "テキストファイル(*.txt)\0*.txt\0HTMLファイル(*.html)\0*.htm;*.html\0全てのファイル(*.*)\0*.*\0"
+    IDS_BOOKMARKFILE        "栞ファイル(*.siori)\0*.siori\0"
+END
+
+#endif    // 日本語 (日本) resources
+/////////////////////////////////////////////////////////////////////////////

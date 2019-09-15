@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29001.49
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TxtMiru2", "TxtMiru2.vcxproj", "{931884F5-6C53-412B-9CFD-12978D821B7F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{931884F5-6C53-412B-9CFD-12978D821B7F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{931884F5-6C53-412B-9CFD-12978D821B7F}.Debug|Win32.Build.0 = Debug|Win32
+		{931884F5-6C53-412B-9CFD-12978D821B7F}.Release|Win32.ActiveCfg = Release|Win32
+		{931884F5-6C53-412B-9CFD-12978D821B7F}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D5E6CEB0-A703-427E-A337-1747D395ECD4}
+	EndGlobalSection
+EndGlobal

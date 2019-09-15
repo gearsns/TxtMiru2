@@ -1,0 +1,404 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "windows.h"
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 日本語 (日本) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// IMAGE
+//
+
+IDR_PNGLOADING          IMAGE                   ".\\loading.png"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU MENU
+BEGIN
+    POPUP "ファイル(&F)"
+    BEGIN
+        MENUITEM "開く(&O)",                      IDOPEN
+        MENUITEM "URLから開く(&U)",                 IDURLOPEN
+        MENUITEM "クリップボードから開く(&L)",             IDOPENCLIPBOARD
+        MENUITEM "ブラウザで表示中のページを開く(B)",          IDOPENBROWSER
+        MENUITEM "フォルダを開く(D)",                  IDOPENFOLDER
+        MENUITEM "青空文庫",                        IDBMAOZORA
+        MENUITEM "読み直し",                        IDRELOAD
+        MENUITEM SEPARATOR
+        MENUITEM "画像に保存(&S)",                   IDSAVE
+        MENUITEM SEPARATOR
+        MENUITEM "文章情報(&I)",                    IDSHOWDOCINFO
+        MENUITEM "プロパティ(&P)",                   IDSHOWPROPERTY
+        MENUITEM SEPARATOR
+        MENUITEM "名前を付けて栞を保存",                  IDBOOKMARKSAVEAS
+        MENUITEM "栞の自動保存",                      IDBOOKMARKAUTOSAVE
+        MENUITEM SEPARATOR
+        MENUITEM "最近使ったファイル(&F)",               IDRECENTFILE
+        MENUITEM SEPARATOR
+        MENUITEM "終了(&X)",                      IDCLOSE
+    END
+    POPUP "編集(&E)"
+    BEGIN
+        MENUITEM "外部プログラム1で開く",                 IDOPENFILEEXE
+        MENUITEM "外部プログラム2で開く",                 IDOPENFILEEXE1
+        MENUITEM "外部プログラム3で開く",                 IDOPENFILEEXE2
+        MENUITEM "コピー(&C)",                     IDCOPY
+        MENUITEM SEPARATOR
+        MENUITEM "コピー時、ルビを優先",                  IDBACKPAGE
+    END
+    POPUP "表示(&V)"
+    BEGIN
+        MENUITEM "水平スクロールバーの表示(&H)",            IDVISIBLEHSCROLLBAR
+        MENUITEM "垂直スクロールバーの表示(&V)",            IDVISIBLEVSCROLLBAR
+        MENUITEM "メニュー・スクロールバーを自動的に隠す(&A)",     IDAUTOHIDEMENU
+        MENUITEM SEPARATOR
+        POPUP "ページ表示"
+        BEGIN
+            MENUITEM "常に２ページで表示(&2)",               IDRPAGEMODENORMAL
+            MENUITEM "画面比率で切り替え(&A)",               IDPPAGEMODEAUTO
+            MENUITEM "シングルページ(両端揃え)(&E)",           IDPPAGEMODESINGLE
+            MENUITEM "シングルページ(中央寄せ)(&C)",           IDPPAGEMODESINGLECENTER
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "見出し＆栞一覧を表示(L)",               IDSUBTITLEBOOKMARK
+        MENUITEM "お気に入り(&A)",                   IDFAVORITE
+        MENUITEM "ルビ一覧を表示(&R)",                 IDRUBYLIST
+        MENUITEM SEPARATOR
+        MENUITEM "全画面表示",                       IDFULLSCREEN
+        MENUITEM SEPARATOR
+        MENUITEM "次のページへ(&N)",                  IDNEXTPAGE
+        MENUITEM "前のページへ(&P)",                  IDPREVPAGE
+        MENUITEM "先頭ページへ(&T)",                  IDTOPPAGE
+        MENUITEM "最終ページへ(&E)",                  IDENDPAGE
+        MENUITEM "ページを指定して移動(&M)",              IDGOTOPAGE
+        MENUITEM SEPARATOR
+        MENUITEM "(履歴)前のページへ戻る",                IDBACKPAGE
+        MENUITEM "(履歴)次のページへ進む",                IDFORWARDPAGE
+        MENUITEM SEPARATOR
+        MENUITEM "前のファイルへ戻る",                   IDPREVFILE
+        MENUITEM "次のファイルへ進む",                   IDNEXTFILE
+        MENUITEM SEPARATOR
+        MENUITEM "選択モード",                       IDSELECTIONMODE, CHECKED
+        MENUITEM SEPARATOR
+        POPUP "Pre-Parser"
+        BEGIN
+            MENUITEM "リフレッシュ(&R)",                  IDREFRESHPREPARSERLIST
+            MENUITEM "デフォルト(&D)",                   IDPREPARSER_DEF, CHECKED
+        END
+    END
+    POPUP "検索(&S)"
+    BEGIN
+        MENUITEM "検索(&F)",                      IDSEARCH
+        MENUITEM "次を検索(&N)",                    IDSEARCHNEXT
+        MENUITEM "前を検索(&P)",                    IDSEARCHPREV
+        MENUITEM SEPARATOR
+        MENUITEM "ファイルから検索(&D)",                IDSEARCHFILES
+    END
+    POPUP "栞(&B)"
+    BEGIN
+        MENUITEM "栞の一覧(&L)",                    IDBOOKMARK
+        MENUITEM SEPARATOR
+        MENUITEM "栞の追加(&A)",                    IDADDBOOKMARK
+        MENUITEM SEPARATOR
+        MENUITEM "栞1へ移動(&1)",                   IDGOBOOKMARK1
+        MENUITEM "栞2へ移動(&2)",                   IDGOBOOKMARK2
+        MENUITEM "栞3へ移動(&3)",                   IDGOBOOKMARK3
+        MENUITEM "栞4へ移動(&4)",                   IDGOBOOKMARK4
+        MENUITEM "栞5へ移動(&5)",                   IDGOBOOKMARK5
+        MENUITEM "栞6へ移動(&6)",                   IDGOBOOKMARK6
+        MENUITEM "栞7へ移動(&7)",                   IDGOBOOKMARK7
+        MENUITEM "栞8へ移動(&8)",                   IDGOBOOKMARK8
+        MENUITEM "栞9へ移動(&9)",                   IDGOBOOKMARK9
+        MENUITEM "栞10へ移動(&0)",                  IDGOBOOKMARK0
+    END
+    POPUP "ルーペ(&L)"
+    BEGIN
+        MENUITEM "ルーペを表示する",                    IDLUPE
+        MENUITEM SEPARATOR
+        MENUITEM "カーソル位置を拡大する",                 IDLUPEWINDOWPOS
+        POPUP "拡大率"
+        BEGIN
+            MENUITEM "100%",                        IDLUPE100
+            MENUITEM "150%",                        IDLUPE150
+            MENUITEM "200%",                        IDLUPE200
+            MENUITEM "400%",                        IDLUPE400
+        END
+    END
+    POPUP "ツール(&T)"
+    BEGIN
+        MENUITEM "設定(&S)",                      IDCONFIG
+        MENUITEM "レイアウト設定",                     IDLAYOUTSET
+        POPUP "スタイル(&Y)"
+        BEGIN
+            MENUITEM "初期設定",                        IDINITSTYLE
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "DBの最適化",                      IDBMDBTOOL
+        MENUITEM "インポート",                       IDBMDBIMPORT
+        MENUITEM "キャッシュ管理",                     IDBMCACHE
+    END
+    POPUP "ヘルプ(&H)"
+    BEGIN
+        MENUITEM "ヘルプ(&H)",                     IDTXTMIRUHELP
+        MENUITEM SEPARATOR
+        MENUITEM "TxtMiruについて",                 IDVERSION
+    END
+END
+
+IDR_MENU_POPUP MENU
+BEGIN
+    POPUP ""
+    BEGIN
+        MENUITEM "コピー(&C)",                     IDCOPY
+        MENUITEM "選択モード",                       IDSELECTIONMODE
+        MENUITEM SEPARATOR
+        MENUITEM "次のページへ(&N)",                  IDNEXTPAGE
+        MENUITEM "前のページへ(&P)",                  IDPREVPAGE
+        MENUITEM SEPARATOR
+        MENUITEM "見出し＆栞一覧を表示(&L)",              IDSUBTITLEBOOKMARK
+        MENUITEM "栞の追加(&A)",                    IDADDBOOKMARK
+        MENUITEM SEPARATOR
+        MENUITEM "お気に入り(&A)",                   IDFAVORITE
+        MENUITEM SEPARATOR
+        MENUITEM "文章情報(&I)",                    IDSHOWDOCINFO
+        MENUITEM "プロパティ(&P)",                   IDSHOWPROPERTY
+        MENUITEM SEPARATOR
+        MENUITEM "外部プログラム1で開く",                 IDOPENFILEEXE
+        MENUITEM "全画面表示",                       IDFULLSCREEN
+        MENUITEM SEPARATOR
+        MENUITEM "キャンセル",                       IDCANCEL
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_HTMLPROPERTY DIALOG 0, 0, 263, 73
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "プロパティ"
+FONT 8, "Ms Shell Dlg"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,107,57,50,14
+    LTEXT           "タイトル",IDC_STATIC,6,6,23,8
+    LTEXT           "アドレス",IDC_STATIC,6,22,22,8
+    LTEXT           "更新日時",IDC_STATIC,6,39,30,8
+    EDITTEXT        IDC_TITLE,47,6,210,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+    EDITTEXT        IDC_ADDRESS,47,22,210,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+    EDITTEXT        IDC_UPDATEDATE,47,39,210,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+END
+
+IDD_OPENURL DIALOG 0, 0, 301, 20
+STYLE DS_SETFONT | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_TOOLWINDOW | WS_EX_WINDOWEDGE
+FONT 10, "Ms Shell Dlg"
+BEGIN
+    EDITTEXT        IDC_EDIT_URL,20,3,233,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "開く",IDOK,255,3,21,14
+    PUSHBUTTON      "中止",IDCANCEL,277,3,21,14
+    LTEXT           "URL",IDC_STATIC,4,6,14,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_APP                 ICON                    "TxtMiru.ico"
+
+IDI_SIORI               ICON                    "Siori.ico"
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""windows.h""\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#include ""res/TxtMiru.rc2""\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_SEARCH AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_NOFILE              "なし"
+    IDS_DOC_CLIPBOARD       "クリップボード"
+    IDS_SEARCH_NOT_FOUND    "文字列が見つかりません。"
+    IDS_SAVEASBOOKMARKFILE  "名前を付けて栞を保存"
+    IDS_OPENFILE            "ファイルを開く"
+    IDS_ERROR_OPEN_ARCFILE  "書庫ファイル(%1!s!)の読み込みに失敗しました。"
+    IDS_ERROR_ARC_NOSUPPORT "書庫ファイル(%1!s!)の形式はサポート対象外です。"
+    IDS_ERROR_FILENOTFOUND  "書庫ファイル(%1!s!)が見つかりませんでした。"
+    IDS_ERROR_ARC_NOTFOUND  "アーカイバ DLL(%2!s!)が見つかりませんでした。"
+    IDS_ERROR_ARC_RUNNING   "アーカイバ DLL(%2!s!)が動作中です。"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_ERROR_ARC           "書庫ファイル(%1!s!)の読み込みに失敗しました。"
+    IDS_DOC_TEXT            "テキスト"
+    IDS_CANNOT_FOUND_WORKPATH "一時作業フォルダが見つかりませんでした。"
+    IDS_ERROR_DLL_LOAD      "%1!s!の読み込みに失敗しました。"
+    IDS_ERROR_ARC_NOENTRY   "書庫ファイル内にテキストファイルが見つかりませんでした。\n(%1!s!)"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_READFILE            "ファイルを開く"
+    IDS_READCLIPBOAD        "クリップボードから開く"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_RELOAD              "読み直し"
+    IDS_URLOPEN             "URLから開く"
+    IDS_NEXTPAGE            "次のページへ"
+    IDS_PREVPAGE            "前のページへ"
+    IDS_FIRSTPAGE           "先頭ページへ"
+    IDS_ENDPAGE             "最終ページへ"
+    IDS_GOTOPAGE            "ページを指定して移動"
+    IDS_NEXTFILE            "次のファイルへ進む"
+    IDS_PREVFILE            "前のファイルへ戻る"
+    IDS_OPENBROWSER         "ブラウザで表示中のページを開く"
+    IDS_ADDBOOKMARK         "栞の追加"
+    IDS_GOTOBOOKMARK1       "栞1へ移動"
+    IDS_GOTOBOOKMARK2       "栞2へ移動"
+    IDS_GOTOBOOKMARK3       "栞3へ移動"
+    IDS_GOTOBOOKMARK4       "栞4へ移動"
+    IDS_GOTOBOOKMARK5       "栞5へ移動"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_GOTOBOOKMARK6       "栞6へ移動"
+    IDS_GOTOBOOKMARK7       "栞7へ移動"
+    IDS_GOTOBOOKMARK8       "栞8へ移動"
+    IDS_GOTOBOOKMARK9       "栞9へ移動"
+    IDS_GOTOBOOKMARK0       "栞10へ移動"
+    IDS_SHOWBOOKMARK        "栞の一覧"
+    IDS_SHOW_HSCROLLBAR     "水平スクロールバーを表示"
+    IDS_SHOW_VSCROLLBAR     "垂直スクロールバーを表示"
+    IDS_HIDE_HSCROLLBAR     "水平スクロールバーを隠す"
+    IDS_HIDE_VSCROLLBAR     "垂直スクロールバーを隠す"
+    IDS_TOGGLE_HSCROLLBAR   "水平スクロールバーの表示を切り替える"
+    IDS_TOGGLE_VSCROLLBAR   "垂直スクロールバーの表示を切り替える"
+    IDS_FULLSCREEN          "全画面表示"
+    IDS_SHOWSUBTITLE        "見出し一覧を表示"
+    IDS_SHOWSUBTITLEBOOKMARK "見出し＆栞一覧を表示"
+    IDS_FAVORITE            "お気に入り"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_COPY                "コピー"
+    IDS_SEARCH              "検索"
+    IDS_SEARCHNEXT          "次を検索"
+    IDS_SEARCHPREV          "前を検索"
+    IDS_FORWARDPAGE         "次のページ(履歴)"
+    IDS_BACKPAGE            "前のページ(履歴)"
+    IDS_CONFIG              "設定"
+    IDS_SHOW_HELP           "ヘルプを表示"
+    IDS_SHOW_VERSION        "バージョンを表示"
+    IDS_EXIT                "終了"
+    IDS_LAYOUTSET           "レイアウト設定"
+    IDS_SHOWPROPERTY        "プロパティの表示"
+    IDS_SHOWDOCINFO         "文章情報の表示"
+    IDS_TOGGLE_LUPE         "ルーペ表示切替"
+    IDS_SHOW_LUPE           "ルーペを表示"
+    IDS_HIDE_LUPE           "ルーペを隠す"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_LUPE100             "ルーペ拡大率 100%"
+    IDS_LUPE150             "ルーペ拡大率 150%"
+    IDS_LUPE200             "ルーペ拡大率 200%"
+    IDS_LUPE400             "ルーペ拡大率 400%"
+    IDS_REFRESHPREPARSERLIST "PreParser一覧の更新"
+    IDS_TOGGLECOPYRUBY      "コピー時、ルビを優先 切り替え"
+    IDS_OPENFILEEXE         "外部プログラム1で開く"
+    IDS_BMAOZORA            "青空文庫"
+    IDS_LINKGOTO            "リンク先に移動"
+    IDS_LINKOPEN            "リンク先を外部プログラムで開く"
+    IDS_CANCEL              "キャンセル"
+    IDS_SELECTIONMODE       "選択モード"
+    IDS_SEARCHFILES         "ファイルから検索"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_OPENFILEEXE1        "外部プログラム2で開く"
+    IDS_OPENFILEEXE2        "外部プログラム3で開く"
+    IDS_SHOWRUBYLIST        "ルビ一覧を表示"
+    IDS_OPENFOLDER          "フォルダを開く"
+    IDS_SELECTFOLDER        "フォルダを選択してください。"
+    IDS_ADDFAVORITE         "お気に入りに追加"
+END
+
+#endif    // 日本語 (日本) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#include "res/TxtMiru.rc2"
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

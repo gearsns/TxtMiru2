@@ -1,0 +1,1195 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>TxtMiru 2.0 - 使い方</title>
+    <link rel="stylesheet" href="./stylesheet.css">
+
+    <!-- you don't need to keep this, but it's cool for stats! -->
+    <meta name="generator" content="Nanoc 4.0.0">
+  </head>
+  <body>
+	<div id="main"><h1 id="はじめに">はじめに</h1>
+
+<p>TxtMiruは、「Web小説」や「青空文庫形式」の作品を書籍のように縦書で表示するソフトです。<br>
+<img src="image/TxtMiru_00.png"> <img src="image/single_page.png"></p>
+
+<h1 id="導入方法">導入方法</h1>
+
+<p><a href="https://drive.google.com/uc?id=1aTKOUupk_3i-sjSn1nz3UpEddXWXsSIT">インストーラ形式</a>と、<a href="https://drive.google.com/uc?id=1VGplrdJArHr9UwayR2nDouy4yPiKg9xL">ZIP形式</a>があります。</p>
+
+<h2 id="インストーラ形式">インストーラ形式</h2>
+
+<p>ファイルを解凍して、インストールを行ってください。<br>
+(インストーラ形式もZIP形式で配布しています)</p>
+
+<p>Windows Vista, Windows 7, Windows 8, Windows 10の場合、Program Filesにフォルダにアプリケーションをおくと<br>
+ 設定ファイルが保存されず場合によってはエラーが発生します。<br>
+Program Filesにインストールする場合には、インストーラ形式を使用してインストールを行ってください。</p>
+
+<ol>
+<li>解凍したファイル内の「TxtMiru2.exe」を実行します。<br>
+<img src="image/setup_icon.png"></li>
+<li>以下の画面が表示されるので 「次へ」を選択します。<br>
+<img src="image/setup_step1.png"></li>
+<li>インストール先を選択して「次へ」を選択します。<br>
+<img src="image/setup_step2.png"></li>
+<li>スタートメニューの名前を設定後「次へ」を選択します。<br>
+<img src="image/setup_step3.png"></li>
+<li>TxtMiruのショートカットをデスクトップに表示する場合には、<br>
+「デスクトップにショートカットを作成」にチェックを入れ 「次へ」を選択します。<br>
+<img src="image/setup_step4.png"></li>
+<li>上記、すべてよければ「インストール」を選択します。<br>
+<img src="image/setup_step5.png"></li>
+<li>インストールが開始されます。<br>
+<img src="image/setup_step6.png"></li>
+<li>以下の画面が表示されれば、インストールは完了です。<br>
+<img src="image/setup_step7.png"></li>
+</ol>
+
+<h2 id="zip形式">ZIP形式</h2>
+
+<p>特に設定はありません。<br>
+任意のフォルダに解凍して実行してください。(USBから起動する際には、こちらを)</p>
+
+<h1 id="最新版を入手">最新版を入手</h1>
+
+<p>最新版は サイト：<a href="https://sites.google.com/site/gearsns/">https://sites.google.com/site/gearsns/</a> にて配布しています。<br>
+<sup>※変更点は当サイトの「お知らせ」を確認ください。</sup></p>
+
+<h1 id="青空文庫の公開作品を読む">青空文庫の公開作品を読む</h1>
+
+<p>「ファイル」-「青空文庫」より 青空文庫の公開作品一覧を表示します。<br>
+<img src="image/Aozora_01.png"><br>
+<br>
+初めて使用する際には、確認画面が表示されます。<br>
+「はい」を選択して 青空文庫のサイトから一覧を取得してください。</p>
+
+<p><img src="image/Aozora_02.png"></p>
+
+<ul>
+<li><p>新しく追加された作品を読む<br><br>
+左側のリストの「新しく追加された作品」を選択すると<br><br>
+最近１ヶ月の間に登録された青空文庫の公開作品一覧が表示されます。<br><br>
+<sup>※()内には、「新しく追加された作品」の件数が表示されます。</sup><br><br>
+<img src="image/Aozora_new.png"><br><br>
+作品を読む際は、読みたい作品を選択して「表示」ボタンを押下します。<br><br>
+<sup>※ダブルクリックでも表示することができます。</sup></p></li>
+<li><p>分野別<br><br>
+<img src="image/Aozora_ndc.png"><br><br>
+日本十進分類法（NDC）による分野別に青空文庫の公開作品を表示します。</p></li>
+<li><p>著者別<br><br>
+<img src="image/Aozora_author.png"><br><br>
+著者別に青空文庫の公開作品を表示します。</p></li>
+<li><p>作品別<br><br>
+<img src="image/Aozora_title.png"><br><br>
+作品別に青空文庫の公開作品を表示します。</p></li>
+<li><p>最新の情報に更新<br><br>
+<img src="image/Aozora_update.png"><br><br>
+(1). 作品一覧は自動では更新されません。<br><br>
+「最新の情報に更新」ボタンを押下して青空文庫のサイトから最新の情報を取得してください。<br><br>
+(2). 更新する情報は、予めダウンロードしておいた(zip,csv)ファイルから取得することもできます。<br><br>
+(3). 一覧の更新日が表示されます。</p></li>
+<li><p>作品の検索<br><br>
+<img src="image/Aozora_search.png"><br><br>
+著者名やタイトルで青空文庫の作品を検索することができます。<br><br>
+右上の検索ボックスに、検索したい文字を入力し「検索」ボタンを押下してください。</p></li>
+<li><p>お気に入りとの連動<br><br>
+お気に入りに登録されている作品には、「☆」マークが表示されます。</p></li>
+</ul>
+
+<h1 id="web小説を読む">Web小説を読む</h1>
+
+<p><a href="http://yomou.syosetu.com/">小説を読もう！</a> 等のWeb小説をURL指定で直接読むことができます。</p>
+
+<ul>
+<li>URLを指定して表示<br>
+<img src="image/open_url_menu.png"><br>
+<sup>「ファイル」-「URLから開く」</sup><br>
+<img src="image/open_url.png"><br>
+<sup>http[s]://から始まるアドレスを入力します。</sup></li>
+<li>ブラウザで表示しているWebページを表示<br>
+ブラウザで表示したいサイトを開いてから<br>
+<img src="image/open_browser.png"><br>
+「ファイル」-「ブラウザで表示中のページを開く」で表示します。<br>
+<img src="image/open_browser_menu.png"></li>
+<li>ドラッグアンドドロップで表示<br>
+<img src="image/open_dad.png"><br>
+ブラウザからURLリンクをドラッグアンドドロップ</li>
+</ul>
+
+<h1 id="青空文庫形式の作品を読む">青空文庫形式の作品を読む</h1>
+
+<ul>
+<li>テキストファイル<br>
+メニュー：「ファイル」-「開く」よりファイルを指定します。<br>
+<img src="image/open_text.png"><br>
+<sup>ドラッグ＆ドロップによる指定も可能です。</sup></li>
+<li>書庫ファイル<br>
+(1). メニュー：「ファイル」-「開く」よりファイル選択画面を表示します。<br>
+(2). 「全てのファイル」を選択し 書庫ファイルが表示されるようにします。<br>
+<img src="image/open_arc.png"><br>
+<sup>書庫ファイルの表示には、<a href="http://www.csdinc.co.jp/archiver/index.html">統合アーカイブプロジェクト</a>ライブラリの導入が必要になります。</sup><br>
+<a href="http://www.kmonos.net/lib/caldix.ja.html">caldix</a>を使用すると自動で最新版をインストールできます。</li>
+</ul>
+
+<table><thead>
+<tr>
+<th style="text-align: left">形式
+<th style="text-align: left">ファイル
+
+</thead><tbody>
+<tr>
+<td style="text-align: left">ZIP形式
+<td style="text-align: left">UNZIP32.DLL
+
+<tr>
+<td style="text-align: left">7z形式
+<td style="text-align: left">7-ZIP32.DLL
+
+<tr>
+<td style="text-align: left">Cab形式
+<td style="text-align: left">CAB32.DLL
+
+</tbody></table>
+
+<ul>
+<li>クリップボード<br>
+メモ帳などで「コピー」したテキストもテキストファイルと同じように表示することができます。<br>
+<img src="image/open_clip.png"></li>
+</ul>
+
+<h1 id="見出し・栞を表示する">見出し・栞を表示する</h1>
+
+<p>見出しと栞の一覧を表示します。</p>
+
+<p><img src="image/subtitle.png"><br>
+1. 指定した見出し・栞のページに移動<br>
+2. 表示しているページに栞をはさみます。<br>
+3. 選択した栞の削除<br>
+4. 常に手前に表示<br>
+5. 栞を表示<br>
+6. 見出しを表示</p>
+
+<ul>
+<li>栞1-10 へ移動<br>
+栞の一覧に表示されている各行のページに移動します。<br>
+<sup>※メニュー、ショートカットキーに登録できるのは、最大10件までです。</sup></li>
+</ul>
+
+<p>見出し</p>
+
+<table><thead>
+<tr>
+<th style="text-align: left">ファイル
+<th style="text-align: left">表記
+
+</thead><tbody>
+<tr>
+<td style="text-align: left">青空文庫形式
+<td style="text-align: left">見出し
+
+<tr>
+<td style="text-align: left">階層付きテキスト(WzMemo)
+<td style="text-align: left">行頭に .
+
+<tr>
+<td style="text-align: left">HTML
+<td style="text-align: left">H1,H2…タグや ANCHORタグ
+
+</tbody></table>
+
+<p><sup>※階層付きテキストの使用は、設定により切り替え可能。</sup></p>
+
+<h1 id="お気に入りで作品を管理する">お気に入りで作品を管理する</h1>
+
+<p><img src="image/favorite.png"><br>
+1. フォルダ<br>
+2. お気に入りの一覧<br>
+3. 詳細</p>
+
+<h2 id="フォルダ">フォルダ</h2>
+
+<p>初めて使用する場合には、まずフォルダを追加します。<br>
+<img src="image/favorite_folder.png"></p>
+
+<ul>
+<li>フォルダは階層で管理できます。</li>
+<li>フォルダの並び順は、ドラッグ&amp;ドロップで行います。</li>
+</ul>
+
+<h2 id="お気に入り">お気に入り</h2>
+
+<p><img src="image/favorite_item.png"></p>
+
+<ul>
+<li>TxtMiruで表示したことのある作品は URLからタイトル/作者名を取得することができます。</li>
+<li>画像を指定しない場合は、No Image画像が設定されます。</li>
+</ul>
+
+<h2 id="詳細">詳細</h2>
+
+<p>見出しの一覧とどのページまで読んだかが表示されます。<br>
+見出しをダブルクリックすることで直接各章から読むことができます。<br>
+<sup><a href="http://yomou.syosetu.com/">小説を読もう！</a>の場合、各章へのリンクが見出しとして表示されます。</sup></p>
+
+<h2 id="栞の一覧">栞の一覧</h2>
+
+<p>URLに「:Siori」と入れると、ファイルを跨いだすべての栞の一覧が表示されます。</p>
+
+<h2 id="最近読んだページ">最近読んだページ</h2>
+
+<p>URLに「:LatestN」(Nは数字)と入れると、最近読んだページ(N件)が表示されます。</p>
+
+<h2 id="よく読むページ">よく読むページ</h2>
+
+<p>URLに「:VisitN」(Nは数字)と入れると、よく読むページ(N件)が表示されます。</p>
+
+<h1 id="画面を広く使う">画面を広く使う</h1>
+
+<h2 id="全画面表示">全画面表示</h2>
+
+<p>全画面で表示することができます。<br>
+（タスクバーの部分まで画面が大きくなります）</p>
+
+<p><sup>※元に戻すには、マウスカーソルを画面上に移動した際に表示されるメニューの「全画面表示」を選択するか、</sup><br>
+ショートカットキー(Ctrl + Enter)にて元のサイズに戻すことができます。</p>
+
+<h2 id="メニュー・スクロールバーを自動的に隠す">メニュー・スクロールバーを自動的に隠す</h2>
+
+<p>メニュー・スクロールバーを隠すことで<br>
+タスクバーを表示したままで、できる限り画面を大きく取ります。<br>
+<img src="image/menubar.png"></p>
+
+<h2 id="シングルページ表示">シングルページ表示</h2>
+
+<p>画面に合わせてシングルページで表示できます。<br>
+<img src="image/single_page.png"></p>
+
+<table><thead>
+<tr>
+<th style="text-align: left">モード
+<th style="text-align: center">２ページ分
+<th style="text-align: center">中間
+<th style="text-align: center">１ページ分
+
+</thead><tbody>
+<tr>
+<td style="text-align: left">常に２ページで表示
+<td style="text-align: center"><img src="image/page2_1.png">
+<td style="text-align: center"><img src="image/page2_3.png">
+<td style="text-align: center"><img src="image/page2_2.png">
+
+<tr>
+<td style="text-align: left">画面比率で切り替え
+<td style="text-align: center"><img src="image/page2_1.png">
+<td style="text-align: center"><img src="image/page2_3.png">
+<td style="text-align: center"><img src="image/pageA_2.png">
+
+<tr>
+<td style="text-align: left">シングルページ（両端揃え）
+<td style="text-align: center"><img src="image/page2_1.png">
+<td style="text-align: center"><img src="image/page1_3s.png">
+<td style="text-align: center"><img src="image/pageA_2.png">
+
+<tr>
+<td style="text-align: left">シングルページ（中央寄せ）
+<td style="text-align: center"><img src="image/page2_1.png">
+<td style="text-align: center"><img src="image/page1_3c.png">
+<td style="text-align: center"><img src="image/pageA_2.png">
+
+</tbody></table>
+
+<p><sup>※初期設定は、常に２ページで表示が選択されています。</sup><br>
+<sup>※画面比率で切り替えは、左右の余白がない場合にのみシングルページ表示になります。</sup></p>
+
+<h1 id="操作">操作</h1>
+
+<h2 id="キー割り当て">キー割り当て</h2>
+
+<p><sup>以下は、初期設定時の主なキー割り当てです。</sup></p>
+
+<table><thead>
+<tr>
+<th style="text-align: left">操作
+<th style="text-align: left">キー
+<th style="text-align: left">画面
+
+</thead><tbody>
+<tr>
+<td style="text-align: left">次のページを表示
+<td style="text-align: left">「←」、「スペース」
+<td style="text-align: left">画面の左側をクリック
+
+<tr>
+<td style="text-align: left">前のページを表示
+<td style="text-align: left">「→」、「Shift」+「スペース」
+<td style="text-align: left">画面の右側をクリック
+
+<tr>
+<td style="text-align: left">先頭ページへ
+<td style="text-align: left">「Home」
+<td style="text-align: left">
+
+<tr>
+<td style="text-align: left">最終ページへ
+<td style="text-align: left">「End」
+<td style="text-align: left">
+
+<tr>
+<td style="text-align: left">(履歴)前のページへ戻る
+<td style="text-align: left">「Back Space」
+<td style="text-align: left">
+
+<tr>
+<td style="text-align: left">(履歴)次のページへ進む
+<td style="text-align: left">「Shift」+「Back Space」
+<td style="text-align: left">
+
+<tr>
+<td style="text-align: left">ページを指定して移動
+<td style="text-align: left">「Ctrl」+「G」
+<td style="text-align: left">
+
+<tr>
+<td style="text-align: left">ファイルを開く
+<td style="text-align: left">「Ctrl」+「O」
+<td style="text-align: left">
+
+<tr>
+<td style="text-align: left">URLから開く
+<td style="text-align: left">「Ctrl」+「L」
+<td style="text-align: left">
+
+<tr>
+<td style="text-align: left">読み直し
+<td style="text-align: left">「F5」
+<td style="text-align: left">
+
+<tr>
+<td style="text-align: left">全画面表示
+<td style="text-align: left">「Ctrl」+「Enter」
+<td style="text-align: left">
+
+<tr>
+<td style="text-align: left">検索
+<td style="text-align: left">「Ctrl」+「F」
+<td style="text-align: left">
+
+<tr>
+<td style="text-align: left">次を検索
+<td style="text-align: left">「F3」
+<td style="text-align: left">
+
+<tr>
+<td style="text-align: left">前を検索
+<td style="text-align: left">「Shift」+「F3」
+<td style="text-align: left">
+
+<tr>
+<td style="text-align: left">ヘルプを表示
+<td style="text-align: left">「F1」
+<td style="text-align: left">
+
+</tbody></table>
+
+<p><sup>キーの割り当ては、メニュー：「ツール」-「設定」-「キーの割り当て」より変更することができます。</sup></p>
+
+<ul>
+<li>選択モード<br>
+閲覧モードと文字選択モードの切り替えを行います。<br>
+選択モード時は、文字の選択・クリップボードへのコピーが使用できます。</li>
+<li>読み直し<br>
+表示中の内容を再度読み直します。<br>
+<sup>※ファイルの内容を編集した際等、表示を更新する場合に使用します。(編集者向け)</sup></li>
+<li>名前を付けて栞を保存<br>
+栞を指定したファイルに保存します。</li>
+<li>栞の自動保存<br>
+終了時、最後に見たファイルとページを自動的保存し 次回起動時にそのページを表示します。</li>
+</ul>
+
+<h1 id="小説の検索-感想の投稿">小説の検索/感想の投稿</h1>
+
+<p>TxtMiruには「小説家になろう」などのサイトの検索・投稿機能はありません。<br>
+代わりに「外部プログラム」から普段お使いのブラウザで現在開いている小説のページを表示することができます。</p>
+
+<p>設定は「<a href="#%E5%A4%96%E9%83%A8%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0%E3%81%A7%E9%96%8B%E3%81%8F">外部プログラムで開く</a>」を参照してください。</p>
+
+<h1 id="辞書で調べる">辞書で調べる</h1>
+
+<p>選択した文字を辞書で引くことができます。</p>
+
+<p><a href="http://ebstudio.info/manual/EBWin4/EBWin4.html">EBWin4</a>を使用した例<br>
+<img src="image/dictionary.png"></p>
+
+<p>「設定」-「オプション」より<br>
+ 自動でクリップボードにコピーするかわりに、以下のプログラムを実行する にチェックを付け<br>
+ 辞書アプリケーションを設定します。</p>
+
+<p><img src="image/dictionary_setting.png"><br>
+1. プログラム名<br>
+2. プログラム引数</p>
+
+<p>例：EBWin4を&quot;C:\Program Files (x86)\EBWin4&quot;にインストールした場合</p>
+
+<table><thead>
+<tr>
+<th style="text-align: left">プログラム名
+<th style="text-align: left">プログラム引数
+
+</thead><tbody>
+<tr>
+<td style="text-align: left">&quot;C:\Program Files (x86)\EBWin4\EBWin4.exe&quot;
+<td style="text-align: left">-S=&quot;%1&quot;
+
+</tbody></table>
+
+<p><sup>※プログラム名に「https://www.google.co.jp/search?q=%1」のように記入するとgoogleで検索することができます。</sup></p>
+
+<h1 id="検索">検索</h1>
+
+<p>文書内を検索し、見つかったページに移動します。<br>
+<img src="image/search.png"></p>
+
+<ul>
+<li>次を検索 (F3)<br>
+今の場所よりも後ろでテキストを検索し、見つかったページに移動します。</li>
+<li>前を検索 (Shift + F3)<br>
+今の場所よりも前でテキストを検索し、見つかったページに移動します。</li>
+<li>正規表現を使用(2.0.10.0)<br>
+正規表現を用いて検索を行います。</li>
+</ul>
+
+<h1 id="文字を拡大して表示する">文字を拡大して表示する</h1>
+
+<p>ルーペ（拡大表示）の表示／非表示を切替えます。<br>
+<img src="image/rupe.png"><br>
+拡大率は、マウスホイールの上下 または、メニューからの拡大率の指定で変更することができます。</p>
+
+<ul>
+<li>カーソル位置を拡大する<br>
+マウスカーソル周辺の文字を拡大します。<br>
+<sup>※チェックをつけない場合、ルーペ窓位置の文字を拡大します。</sup></li>
+<li>拡大率<br>
+拡大率（100%, 150%, 200%, 400%）を選択します。</li>
+</ul>
+
+<h1 id="編集">編集</h1>
+
+<h2 id="外部プログラムで開く">外部プログラムで開く</h2>
+
+<p>現在表示しているファイルを外部プログラムで開きます。<br>
+ <img src="image/run_pgm.png"></p>
+
+<p>例：</p>
+
+<table><thead>
+<tr>
+<th style="text-align: right">No.
+<th>プログラム名
+<th>プログラム引数
+<th>メニュー名
+
+</thead><tbody>
+<tr>
+<td style="text-align: right">1
+<td>microsoft-edge:%1
+<td>
+<td>edgeで開く
+
+<tr>
+<td style="text-align: right">2
+<td>C:\Program\Vivaldi\Application\vivaldi.exe
+<td>&quot;%1&quot;
+<td>vivaldiで開く
+
+<tr>
+<td style="text-align: right">3
+<td>&quot;C:\Program Files\Mozilla Firefox\firefox.exe&quot; -url
+<td>&quot;%1&quot;
+<td>firefoxで開く
+
+</tbody></table>
+
+<p><sup>※「メニュー名」を指定するとポップアップメニューに割り当てた際に「外部プログラム」が入力した名前で表示されます。</sup></p>
+
+<h2 id="コピー">コピー</h2>
+
+<p>選択した文字をクリップボードにコピーできます。</p>
+
+<p><img src="image/copy_text.png"><br>
+ <sup>※「メニュー」-「編集」-「コピー時、ルビを優先」にチェックを付けるとコピー時にルビが振られている箇所はそちらがコピーされます。</sup></p>
+
+<p>辞書で調べる機能とは併用できません。<br>
+ コピーを使用する際には、「メニュー」「設定」「オプション」「自動でクリップボードにコピーするかわりに、以下のプログラムを実行する」のチェックを外しておいてください。<br>
+ <sup>※「辞書で調べる」を参照ください。</sup></p>
+
+<h1 id="スタイルによる表示形式の管理">スタイルによる表示形式の管理</h1>
+
+<p>標準では「新書縦２段」か「文庫本」のどちらかを選択できます。<br>
+<img src="image/style.png"><br>
+<sup>※未設定の場合には、「文庫本」が選択されます。</sup></p>
+
+<p>設定画面で指定したレイアウトの調整を行うことができます。<br>
+<img src="image/layout.png"></p>
+
+<p>-文字サイズを計算<br>
+用紙のサイズと行数、文字数より文字サイズを自動的に計算します。</p>
+
+<p>-別名で保存<br>
+別名で保存するとユーザーフォルダ「％LOCALAPPDATA%\TxtMiru\Layout」に、スタイルファイルが作成されます。<br>
+不要になった場合は、エクスプローラーからファイルを削除してください。</p>
+
+<h1 id="画像にして保存する">画像にして保存する</h1>
+
+<p>表示している内容を画像(png)形式で出力することができます。<br>
+<img src="image/save_image.png"></p>
+
+<h1 id="ページ内の位置を確認">ページ内の位置を確認</h1>
+
+<ol>
+<li>スクロールバーを表示すると、文書のどの辺りを読んでいるか確認できます。<br>
+<img src="image/scrollbar.png"></li>
+<li>タイトルバーに、ページ数を表示することもできます。<br>
+「設定」「<a href="#%E3%82%AA%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3">オプション</a>」「タイトルバーの書式 」を参照ください。</li>
+<li>画面に表示されているページにマウスカーソルを合わせると、ページ/総ページを確認することができます。<br>
+<img src="image/page_full.png"></li>
+</ol>
+
+<h1 id="自動的に再表示">自動的に再表示</h1>
+
+<p>ファイルの変更を監視して 変更された場合、自動的に再表示することができます。<br>
+<img src="image/autosave.png"></p>
+
+<h1 id="設定">設定</h1>
+
+<h2 id="フォントなど、画面の基本設定">フォントなど、画面の基本設定</h2>
+
+<table><thead>
+<tr>
+<th style="text-align: left">項目
+<th style="text-align: left">説明
+
+</thead><tbody>
+<tr>
+<td style="text-align: left">フォント
+<td style="text-align: left">本文、ルビ、注釈は 縦書きで表示されます。<br><sup>フォントは、先頭が@になっているフォントを選択してください。</sup>
+
+<tr>
+<td style="text-align: left">文字間隔
+<td style="text-align: left">メイリオフォントのように フォントそのものに空きがあり間延びしてしまうものに対して<br>文字間隔を設定することで、調整を行うことができます。<br>(メイリオフォントの場合、1.4倍程度に設定すると空きを詰めることができます。) <br>※通常は、0を指定しておきます。
+
+<tr>
+<td style="text-align: left">スタイル
+<td style="text-align: left">標準・太字から選択できます
+
+<tr>
+<td style="text-align: left">アンチエイリアス
+<td style="text-align: left">通常とLCD(液晶)のどちらかを選択できます
+
+<tr>
+<td style="text-align: left">ルビ
+<td style="text-align: left">ルビの位置は、肩付き と 中付きのどちらかを選択できます
+
+<tr>
+<td style="text-align: left">縦中横にする最大文字
+<td style="text-align: left">半角数字を自動的に、縦中横にする場合の最大文字数を指定します
+
+<tr>
+<td style="text-align: left">合成
+<td style="text-align: left">「゜」「˝」を直前の文字と合成する場合にはチェックをいれます
+
+<tr>
+<td style="text-align: left">起動時に、Fontフォルダ以下のフォントをロードする
+<td style="text-align: left">フォントフォルダに配置されたフォントをTxtMiruで使用できるようにします。
+
+<tr>
+<td style="text-align: left">階層付テキスト形式
+<td style="text-align: left">階層付テキストの書式に従い見出しの一覧を自動で作成します。<br>詳細は、<a href="http://ja.wikipedia.org/wiki/">http://ja.wikipedia.org/wiki/ アウトラインプロセッサ</a>を参照ください。
+
+<tr>
+<td style="text-align: left">ページ内で最初に見つかった見出しを柱にする
+<td style="text-align: left">柱にする見出しを選択します。チェックがなければ最後に見つかった見出しが柱になります。
+
+<tr>
+<td style="text-align: left">背景画像
+<td style="text-align: left">ドラック&amp;ドロップでも設定することができます。<br>また、半透明の画像を指定しておくと 色設定の「ページ」の色が透過部分に反映されます。<br>※デフォルトの画像は、本文欄が透明な画像になっています。
+
+<tr>
+<td style="text-align: left">ページめくりアニメーション
+<td style="text-align: left">ページを移動する際にアニメーションを行います。<br>※アニメーションの速度は、任意に設定できます。お使いの端末の設定に合わせて調整してください。
+
+<tr>
+<td style="text-align: left">挿絵をページ一杯に表示
+<td style="text-align: left">ページの余白を無視してページ全体に表示します
+
+<tr>
+<td style="text-align: left">挿絵の白色部分を透過する
+<td style="text-align: left">白色部分を透明色として処理します
+
+<tr>
+<td style="text-align: left">挿絵で改ページを行う
+<td style="text-align: left">挿絵があればその前の時点で改ページを行います
+
+<tr>
+<td style="text-align: left">レイアウト
+<td style="text-align: left">文庫・新書などのあらかじめ設定したスタイルからレイアウトを選択します
+
+<tr>
+<td style="text-align: left">(暫定)Dark mode対応
+<td style="text-align: left">Windows10の設定でDark modeに変更された場合、お気に入り画面などをDark modeにします。
+
+<tr>
+<td style="text-align: left">名前を付けて保存
+<td style="text-align: left">設定項目を名前を付けて保存します。<br>「メニュー」-「ツール」-「スタイル」より選択できるようになります。
+
+</tbody></table>
+
+<h2 id="栞-お気に入り">栞/お気に入り</h2>
+
+<table><thead>
+<tr>
+<th style="text-align: left">項目
+<th style="text-align: left">説明
+
+</thead><tbody>
+<tr>
+<td style="text-align: left">栞の自動保存
+<td style="text-align: left">終了時に、現在表示していたページを保存します。<br>お気に入りと一緒に管理されます<br>※次回起動時に、最後に表示していたページを開きます。<br>また、「栞ファイルは栞フォルダに保存」を指定した場合<br> 栞フォルダに最大「n」個までの栞ファイルを保存します。
+
+<tr>
+<td style="text-align: left">栞ファイルに関連付け
+<td style="text-align: left">栞ファイル .siori にTxtMiruを関連付けます。<br>(.sioriファイルに関連付けられ、前回閲覧していたページから表示できるようになります)<br>※TxtMiruを削除する際には、先に関連付けの削除を行ってください。
+
+<tr>
+<td style="text-align: left">関連付け解除
+<td style="text-align: left">関連付けた 栞ファイル .siori を解除します
+
+<tr>
+<td style="text-align: left">お気に入り画面<br>背面に移動を許可
+<td style="text-align: left">お気に入り画面は、通常 常に手前に表示されます。<br>チェックを入れると、お気に入り画面を表示したまま、TxtMiruの背面に移動させることができます
+
+</tbody></table>
+
+<h2 id="ルビ一覧">ルビ一覧</h2>
+
+<table><thead>
+<tr>
+<th style="text-align: left">項目
+<th style="text-align: left">説明
+
+</thead><tbody>
+<tr>
+<td style="text-align: left">ルビ一覧への除外設定
+<td style="text-align: left">正規表現でルビ一覧への除外の設定を行います。
+
+</tbody></table>
+
+<h2 id="html">HTML</h2>
+
+<table><thead>
+<tr>
+<th style="text-align: left">項目
+<th style="text-align: left">説明
+
+</thead><tbody>
+<tr>
+<td style="text-align: left">画面サイズ
+<td style="text-align: left">ヘッダやリンクに使用されている小さい画像を表示の対象から外します。
+
+<tr>
+<td style="text-align: left">アプリケーション名一覧
+<td style="text-align: left">「ブラウザで表示中のページを開く」際のブラウザ名（DDEの設定）<br>一覧に記載された順にブラウザを検索します
+
+<tr>
+<td style="text-align: left">接続設定
+<td style="text-align: left">
+
+<tr>
+<td style="text-align: left">IEの設定を使用する
+<td style="text-align: left">Internet Explorer で設定している設定を使用します。
+
+<tr>
+<td style="text-align: left">Proxyを使用
+<td style="text-align: left">プロキシを設定します。設定は、アドレス:ポートの形式で設定します。<br>例：localhost:8080
+
+<tr>
+<td style="text-align: left">ダイアログを表示しない
+<td style="text-align: left">エラーなどのダイアログを表示しません
+
+<tr>
+<td style="text-align: left">スクリプトを実行しない
+<td style="text-align: left">JavaScriptの実行を行いません
+
+<tr>
+<td style="text-align: left">URLのブロックを有効化
+<td style="text-align: left">広告など不要なページの画像、JavaScriptのロードを抑制します。
+
+<tr>
+<td style="text-align: left">キャッシュからの読み込みを有効化
+<td style="text-align: left">キャッシュを使用する際には、チェックを入れます。<br>URLのブロックも有効化にもチェックを入れる必要があります。
+
+</tbody></table>
+
+<h2 id="オプション">オプション</h2>
+
+<table><thead>
+<tr>
+<th style="text-align: left">項目
+<th style="text-align: left">説明
+
+</thead><tbody>
+<tr>
+<td style="text-align: left">ウインドウサイズの保存
+<td style="text-align: left">終了時に、ウインドウサイズ、位置を保存しておき、<br>次回 同じサイズ、位置で起動するようにします。
+
+<tr>
+<td style="text-align: left">ファイルの更新時、<br>自動的に再読み込みを行う
+<td style="text-align: left">ローカルファイルの場合、ファイルの更新を監視し変更があれば、再度、読み直します
+
+<tr>
+<td style="text-align: left">非選択モードの時、<br>シフトキー押下で一時的に<br>選択モードに切り替える
+<td style="text-align: left">一時的に選択モードに切り替える設定を行います
+
+<tr>
+<td style="text-align: left">キーリピートを有効にする
+<td style="text-align: left">キーを押し続けた場合に、連続でボタンを押下したことにします。
+
+<tr>
+<td style="text-align: left">文字選択終了後、<br>自動的にクリップボードにコピーする
+<td style="text-align: left">自動的にクリップボードに選択した内容がコピーされます
+
+<tr>
+<td style="text-align: left">自動でクリップボードにコピーする代わりに、プログラムを実行する
+<td style="text-align: left">選択した文字で辞書などのソフトを起動することができます
+
+<tr>
+<td style="text-align: left">Pre-Parserを使用する
+<td style="text-align: left">小説家になろうなどのタグの変換を行うScriptを使用しします
+
+<tr>
+<td style="text-align: left">タッチ操作時、<br>メニューの文字間隔を広くする
+<td style="text-align: left">タッチ操作時、メニューが操作しづらい場合は、こちらにチェックを入れてください。
+
+<tr>
+<td style="text-align: left">書庫ファイル
+<td style="text-align: left">書庫ファイルの展開時、除外するファイルサイズを指定します。
+
+<tr>
+<td style="text-align: left">タイトルバーの書式
+<td style="text-align: left">タイトルバーの書式を設定できます<br>%p:プログラム名,%v:バージョン,%T:タイトル,%A:著者,%P:ページ,%N:ページ数,%F:ファイル名(フルパス),%f:ファイル名
+
+<tr>
+<td style="text-align: left">画像表示用(SUSIE)プラグインフォルダ
+<td style="text-align: left">SUSIEプラグイン。SUSIEプログインを使用した画像表示にも対応しています。<br>Jpeg,PNG,bmp以外の形式の画像を読み込む場合には、SUSIEプラグインを導入してください。<br>詳細は、<a href="http://www.digitalpad.co.jp/%7Etakechin/">http://www.digitalpad.co.jp/~takechin/</a><br>または、<a href="http://www2f.biglobe.ne.jp/%7Ekana/index.html">http://www2f.biglobe.ne.jp/~kana/index.html</a> を参照ください。
+
+<tr>
+<td style="text-align: left">外部プログラム
+<td style="text-align: left">表示しているファイルを外部プログラムで開く際のプログラム名を指定します
+
+<tr>
+<td style="text-align: left">リンククリック時に使用する外部プログラム
+<td style="text-align: left">リンク先を開く際のプログラム名を指定します
+
+<tr>
+<td style="text-align: left">文字コード判別
+<td style="text-align: left">文字コード判別処理を別のプログラムで行うことができます。<br>※別途、DLLでプログラムを用意しておく必要があります
+
+<tr>
+<td style="text-align: left">ファイルの種類
+<td style="text-align: left">各種類を示す拡張子を設定できます。
+
+</tbody></table>
+
+<h1 id="カスタマイズ">カスタマイズ</h1>
+
+<h2 id="キーカスタマイズ">キーカスタマイズ</h2>
+
+<p>ショートカットキーの割り当てを変更します。<br>
+<img src="image/keybind.png"></p>
+
+<ul>
+<li>マウスボタンへの機能割り当ては、「左」「中」「右」で設定することができます。</li>
+<li>右クリックに対して割り当て行った場合、ショートカットキーの割り当てが優先されるため<br>
+ポップアップメニューの表示は使用できません。</li>
+<li>左クリック対して割り当てを行うと、画面の左側をクリックで「次のページ」<br>
+右側をクリックで「前のページ」の動作は使用できなくなります。</li>
+<li>マウスのクリック動作は、初期設定ではページめくりに設定されます。<br>
+無効にする場合には、「機能割り当てなし」にマウスボタンを割り当ててください。</li>
+</ul>
+
+<h2 id="メニューの割り当て">メニューの割り当て</h2>
+
+<p>ポップアップメニュー(右クリックメニュー)の割り当てを変更します。<br>
+(2.0.9.0)</p>
+
+<p><img src="image/menubind.png"></p>
+
+<h2 id="表示用にhtml-テキストを編集-pre-parser">表示用にHTML,テキストを編集(Pre-Parser)</h2>
+
+<p>実際のファイルをそのままに、表示用にHTML,テキストを編集することができます。</p>
+
+<p>「メニュー」-「表示」-「Pre-Parser」よりモードを選択できます。<br>
+<sup>※デフォルトは以下のモードが用意されています。JavaScriptファイルを配置することで、自分用にカスタマイズすることができます。</sup></p>
+
+<table><thead>
+<tr>
+<th style="text-align: left">モード
+<th style="text-align: left">機能
+
+</thead><tbody>
+<tr>
+<td style="text-align: left">青空文庫形式のタイトルを無視
+<td style="text-align: left">テキスト１行目と《,》を通常のテキストとして扱います。
+
+<tr>
+<td style="text-align: left">青空文庫形式のルビを無視
+<td style="text-align: left">《 と》を通常のテキストとして扱います。
+
+<tr>
+<td style="text-align: left">青空文庫形式を無視
+<td style="text-align: left">テキスト１行目と----,［,｜,〔,※,《,》を通常のテキストとして扱います。
+
+<tr>
+<td style="text-align: left">小説家になろう
+<td style="text-align: left">小説家になろう独自の形式を、青空文庫形式に変換します。
+
+</tbody></table>
+
+<p>JavaScriptファイルを配置</p>
+
+<table><thead>
+<tr>
+<th style="text-align: left">TxtMiru
+<th style="text-align: left">フォルダ
+<th style="text-align: left">例
+
+</thead><tbody>
+<tr>
+<td style="text-align: left">インストーラ版
+<td style="text-align: left">%LOCALAPPDATA%\TxtMiru\Script
+<td style="text-align: left">C:\Users\ユーザー名\AppData\Local\TxtMiru\Script
+
+<tr>
+<td style="text-align: left">ZIP版
+<td style="text-align: left">インストールフォルダ\Script
+<td style="text-align: left">C:\Software\TxtMiru\Script
+
+</tbody></table>
+
+<p>フォルダの構成は以下のようになります。<br>
+Scriptフォルダの直下にフォルダ(機能名になります)を作成しその中に各モードごとのJavaScriptファイルを配置します。</p>
+
+<table><thead>
+<tr>
+<th style="text-align: left">フォルダ構成
+<th style="text-align: left">種類
+<th style="text-align: left">機能
+
+</thead><tbody>
+<tr>
+<td style="text-align: left">Script
+<td style="text-align: left">フォルダ
+<td style="text-align: left">
+
+<tr>
+<td style="text-align: left">　機能名
+<td style="text-align: left">フォルダ
+<td style="text-align: left">TxtMiruに表示される名前になります。
+
+<tr>
+<td style="text-align: left">　　text.js
+<td style="text-align: left">JavaScriptファイル
+<td style="text-align: left">テキストファイルを編集します。
+
+<tr>
+<td style="text-align: left">　　html.js
+<td style="text-align: left">JavaScriptファイル
+<td style="text-align: left">HTMLファイルを編集します。
+
+</tbody></table>
+
+<p>JavaScriptファイルについて</p>
+
+<ol>
+<li>UTF16LEで作成します。</li>
+<li>関数名 Parse</li>
+<li>引数1 : filename : ファイル名</li>
+<li>引数2 : str : 本文</li>
+<li>戻り値 : 変換後の本文(変換しない場合は、nullを返す)</li>
+</ol>
+
+<p>例<br>
+<code>
+    function Parse(filename, str){
+     var restr = {
+      &quot;〔&quot;:&quot;［＃始めきっこう（亀甲）括弧、1-1-44］&quot;,
+      &quot;※&quot;:&quot;［＃米印、1-2-8］&quot;,
+      &quot;《&quot;:&quot;［＃始め二重山括弧］&quot;,
+      &quot;》&quot;:&quot;［＃終わり二重山括弧］&quot;,
+      &quot;｜&quot;:&quot;［＃縦線］&quot;
+     };
+     return &quot;［＃TxtMiru2:NOTITLE］&quot;
+     + str.replace(/［/g, function(all,text){ return &quot;［＃始め角括弧］&quot;; })
+          .replace(/｜|〔|※|《|》/g, function(text){ return restr[text]; })
+          .replace(/^(---*)$/g, function(all,text){ return &quot;［＃TxtMiru2:DUMMY］$1&quot;; });
+    }
+</code></p>
+
+<h1 id="ツール">ツール</h1>
+
+<h2 id="dbの最適化">DBの最適化</h2>
+
+<p>お気に入りDBの最適化を行います。<br>
+<sup>※一定期間以上前の履歴を削除します。</sup></p>
+
+<h2 id="インポート">インポート</h2>
+
+<p>IE等のブラウザからお気に入りをインポートします。</p>
+
+<h2 id="キャッシュ管理">キャッシュ管理</h2>
+
+<p><img src="image/Cache.png"></p>
+
+<p><sup>※キャッシュ機能を有効にするには、「設定」-「HTML」の</sup><br>
+「URLのブロックを有効化」と「キャッシュからの読み込みを有効化」にチェックを入れる必要があります。</p>
+
+<ul>
+<li>追加<br>
+指定したサイトをローカルPCにキャッシュします。<br>
+<sup>※「小説家になろう」などのサイトは、目次ページを指定すると一括で処理することができます。</sup></li>
+</ul>
+
+<p><img src="image/Cache_Add.png"></p>
+
+<ul>
+<li><p>最新の情報に更新<br><br>
+選択したサイトを最新にします。</p></li>
+<li><p>削除<br><br>
+キャッシュを削除します。<br><br>
+<sup>※キャッシュされたファイルは「ゴミ箱」に移動します。</sup></p></li>
+<li><p>インポート<br><br>
+ローカルにあるファイルをキャッシュにインポートします。<br><br>
+<sup>※TxtMiruをリムーバブルメディアに入れて使用される際に、ローカルファイルをインポートすることでドライブが変更になってもお気に入りや履歴のパスがそのまま使用できるようになります。</sup></p></li>
+</ul>
+
+<p><img src="image/Cache_Import.png"></p>
+
+<h1 id="ヘルプ">ヘルプ</h1>
+
+<h2 id="txtmiruについて">TxtMiruについて</h2>
+
+<p>TxtMiruの現在のバージョンと、<br>
+最新のバージョンを確認できます。<br>
+<sup>※最新情報の取得のため、インターネットに接続します。</sup></p>
+
+<p><img src="image/version.png"></p>
+
+<h1 id="アンインストール">アンインストール</h1>
+
+<p>インストーラ形式でインストールした場合には、メニューのアンインストール<br>
+ または、アプリケーションの追加と削除 から削除してください。<br>
+ZIP形式の場合、関連付けしていなければ 他にレジストリは使用していません。<br>
+フォルダごと削除してください。<br>
+<sup>※関連付けを行っている場合には、削除前に関連付けを解除しておいてください。</sup></p>
+
+<h1 id="システム">システム</h1>
+
+<p>Windows 7以降</p>
+
+<h1 id="ライセンス">ライセンス</h1>
+
+<p>できるだけ簡潔なライセンスにして、自由に使用してもらいたいので ライセンスはNYSLとします。</p>
+
+<p>NYSL Version 0.9982</p>
+
+<p>A. 本ソフトウェアは Everyone&#39;sWare です。このソフトを手にした一人一人が、<br>
+ ご自分の作ったものを扱うのと同じように、自由に利用することが出来ます。<br>
+A-1. フリーウェアです。作者からは使用料等を要求しません。<br>
+A-2. 有料無料や媒体の如何を問わず、自由に転載・再配布できます。<br>
+A-3. いかなる種類の 改変・他プログラムでの利用 を行っても構いません。<br>
+A-4. 変更したものや部分的に使用したものは、あなたのものになります。<br>
+ 公開する場合は、あなたの名前の下で行って下さい。<br>
+B. このソフトを利用することによって生じた損害等について、作者は<br>
+ 責任を負わないものとします。各自の責任においてご利用下さい。<br>
+C. 著作者人格権は Gears に帰属します。著作権は放棄します。<br>
+D. 以上の３項は、ソース・実行バイナリの双方に適用されます。</p>
+</div><div id="sidebar"><ul>
+<li>
+<a href="#はじめに">はじめに</a>
+</li>
+<li>
+<a href="#導入方法">導入方法</a>
+<ul>
+<li>
+<a href="#インストーラ形式">インストーラ形式</a>
+</li>
+<li>
+<a href="#zip形式">ZIP形式</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#最新版を入手">最新版を入手</a>
+</li>
+<li>
+<a href="#青空文庫の公開作品を読む">青空文庫の公開作品を読む</a>
+</li>
+<li>
+<a href="#web小説を読む">Web小説を読む</a>
+</li>
+<li>
+<a href="#青空文庫形式の作品を読む">青空文庫形式の作品を読む</a>
+</li>
+<li>
+<a href="#見出し・栞を表示する">見出し・栞を表示する</a>
+</li>
+<li>
+<a href="#お気に入りで作品を管理する">お気に入りで作品を管理する</a>
+<ul>
+<li>
+<a href="#フォルダ">フォルダ</a>
+</li>
+<li>
+<a href="#お気に入り">お気に入り</a>
+</li>
+<li>
+<a href="#詳細">詳細</a>
+</li>
+<li>
+<a href="#栞の一覧">栞の一覧</a>
+</li>
+<li>
+<a href="#最近読んだページ">最近読んだページ</a>
+</li>
+<li>
+<a href="#よく読むページ">よく読むページ</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#画面を広く使う">画面を広く使う</a>
+<ul>
+<li>
+<a href="#全画面表示">全画面表示</a>
+</li>
+<li>
+<a href="#メニュー・スクロールバーを自動的に隠す">メニュー・スクロールバーを自動的に隠す</a>
+</li>
+<li>
+<a href="#シングルページ表示">シングルページ表示</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#操作">操作</a>
+<ul>
+<li>
+<a href="#キー割り当て">キー割り当て</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#小説の検索-感想の投稿">小説の検索/感想の投稿</a>
+</li>
+<li>
+<a href="#辞書で調べる">辞書で調べる</a>
+</li>
+<li>
+<a href="#検索">検索</a>
+</li>
+<li>
+<a href="#文字を拡大して表示する">文字を拡大して表示する</a>
+</li>
+<li>
+<a href="#編集">編集</a>
+<ul>
+<li>
+<a href="#外部プログラムで開く">外部プログラムで開く</a>
+</li>
+<li>
+<a href="#コピー">コピー</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#スタイルによる表示形式の管理">スタイルによる表示形式の管理</a>
+</li>
+<li>
+<a href="#画像にして保存する">画像にして保存する</a>
+</li>
+<li>
+<a href="#ページ内の位置を確認">ページ内の位置を確認</a>
+</li>
+<li>
+<a href="#自動的に再表示">自動的に再表示</a>
+</li>
+<li>
+<a href="#設定">設定</a>
+<ul>
+<li>
+<a href="#フォントなど、画面の基本設定">フォントなど、画面の基本設定</a>
+</li>
+<li>
+<a href="#栞-お気に入り">栞/お気に入り</a>
+</li>
+<li>
+<a href="#ルビ一覧">ルビ一覧</a>
+</li>
+<li>
+<a href="#html">HTML</a>
+</li>
+<li>
+<a href="#オプション">オプション</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#カスタマイズ">カスタマイズ</a>
+<ul>
+<li>
+<a href="#キーカスタマイズ">キーカスタマイズ</a>
+</li>
+<li>
+<a href="#メニューの割り当て">メニューの割り当て</a>
+</li>
+<li>
+<a href="#表示用にhtml-テキストを編集-pre-parser">表示用にHTML,テキストを編集(Pre-Parser)</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#ツール">ツール</a>
+<ul>
+<li>
+<a href="#dbの最適化">DBの最適化</a>
+</li>
+<li>
+<a href="#インポート">インポート</a>
+</li>
+<li>
+<a href="#キャッシュ管理">キャッシュ管理</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#ヘルプ">ヘルプ</a>
+<ul>
+<li>
+<a href="#txtmiruについて">TxtMiruについて</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#アンインストール">アンインストール</a>
+</li>
+<li>
+<a href="#システム">システム</a>
+</li>
+<li>
+<a href="#ライセンス">ライセンス</a>
+</li>
+</ul>
+</div>
+  </body>
+</html>

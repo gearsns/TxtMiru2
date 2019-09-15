@@ -1,0 +1,207 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Test|Win32">
+      <Configuration>Test</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{931884F5-6C53-412B-9CFD-12978D821B7F}</ProjectGuid>
+    <RootNamespace>TxtMiru2</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Test|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\passthruapp;..\Common\freetype-2.6.3\include\;..\Common\freetype-2.6.3\include\freetype;..\Common\freetype;func;../include;../include/ctrl;../include/zlib;../include/png;../include/TxtMiru;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>TxtMiruTheme.lib;Iepmapi.lib;strsafe.lib;WinINet.lib;zlib.lib;libpng.lib;comdlg32.lib;comctl32.lib;imm32.lib;version.lib;urlmon.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../lib;Func;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <EnableUAC>true</EnableUAC>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <AdditionalIncludeDirectories>..\passthruapp;..\Common\freetype-2.6.3\include\;..\Common\freetype-2.6.3\include\freetype;..\Common\freetype;../include;../include/ctrl;../include/zlib;../include/png;../include/TxtMiru;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <OpenMPSupport>
+      </OpenMPSupport>
+      <EnablePREfast>false</EnablePREfast>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>TxtMiruTheme.lib;Iepmapi.lib;msimg32.lib;strsafe.lib;WinINet.lib;zlib.lib;libpng.lib;comdlg32.lib;comctl32.lib;imm32.lib;version.lib;urlmon.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <EnableUAC>true</EnableUAC>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateMapFile>true</GenerateMapFile>
+      <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+    <Manifest>
+      <AdditionalManifestFiles>manifest.xml;%(AdditionalManifestFiles)</AdditionalManifestFiles>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
+    </Manifest>
+    <ProjectReference />
+    <ProjectReference />
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\Archive.cpp" />
+    <ClCompile Include="..\src\Bitmap.cpp" />
+    <ClCompile Include="..\src\CharRenderer.cpp" />
+    <ClCompile Include="..\src\CSVText.cpp" />
+    <ClCompile Include="..\src\Ctrl\ComonCtrl.cpp" />
+    <ClCompile Include="..\src\Ctrl\EditKeyBind.cpp" />
+    <ClCompile Include="..\src\Ctrl\Menu.cpp" />
+    <ClCompile Include="..\src\Ctrl\MessageBox.cpp" />
+    <ClCompile Include="..\src\Ctrl\stdwin.cpp" />
+    <ClCompile Include="..\src\Ctrl\Tooltips.cpp" />
+    <ClCompile Include="..\src\Ctrl\WindowCtrl.cpp" />
+    <ClCompile Include="..\src\CurrentDirectory.cpp" />
+    <ClCompile Include="..\src\Font.cpp" />
+    <ClCompile Include="..\src\FunctionKeyMap.cpp" />
+    <ClCompile Include="..\src\Gesture.cpp" />
+    <ClCompile Include="..\src\Image.cpp" />
+    <ClCompile Include="..\src\Lanczos.cpp" />
+    <ClCompile Include="..\src\PageFlip.cpp" />
+    <ClCompile Include="..\src\PictRenderer.cpp" />
+    <ClCompile Include="..\src\shell.cpp" />
+    <ClCompile Include="..\src\stlutil.cpp" />
+    <ClCompile Include="..\src\text.cpp" />
+    <ClCompile Include="..\src\TxtMiru\TxtParam.cpp" />
+    <ClCompile Include="AozoraList.cpp" />
+    <ClCompile Include="TxtMiruTextType.cpp" />
+    <ClCompile Include="TxtFuncWebFilter.cpp" />
+    <ClCompile Include="TxtMiruMenu.cpp" />
+    <ClCompile Include="TxtFuncBookmark.cpp" />
+    <ClCompile Include="ImageFile.cpp" />
+    <ClCompile Include="HTMLPropertyDlg.cpp" />
+    <ClCompile Include="FileUpdateWatcher.cpp" />
+    <ClCompile Include="AozoraData.cpp" />
+    <ClCompile Include="AozoraTxtParser.cpp" />
+    <ClCompile Include="HTMLTxtParser.cpp" />
+    <ClCompile Include="TxtSubtitle.cpp" />
+    <ClCompile Include="JScript.cpp" />
+    <ClCompile Include="LupeWnd.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MessageWnd.cpp" />
+    <ClCompile Include="OpenUrlDlg.cpp" />
+    <ClCompile Include="TxtBookmark.cpp" />
+    <ClCompile Include="TxtBuffer.cpp" />
+    <ClCompile Include="TxtCanvas.cpp" />
+    <ClCompile Include="TxtDocInfoDlg.cpp" />
+    <ClCompile Include="TxtDocument.cpp" />
+    <ClCompile Include="TxtGotoPageDlg.cpp" />
+    <ClCompile Include="TxtLayout.cpp" />
+    <ClCompile Include="TxtMapper.cpp" />
+    <ClCompile Include="TxtMiru.cpp" />
+    <ClCompile Include="TxtParser.cpp" />
+    <ClCompile Include="TxtRenderer.cpp" />
+    <ClCompile Include="TxtSearch.cpp" />
+    <ClCompile Include="VersionDlg.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AozoraTxtParser.h" />
+    <ClInclude Include="LupeWnd.h" />
+    <ClInclude Include="MessageWnd.h" />
+    <ClInclude Include="PageEffect.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="TxtBookmark.h" />
+    <ClInclude Include="TxtBuffer.h" />
+    <ClInclude Include="TxtCanvas.h" />
+    <ClInclude Include="TxtDocInfoDlg.h" />
+    <ClInclude Include="TxtDocument.h" />
+    <ClInclude Include="TxtSubtitle.h" />
+    <ClInclude Include="TxtGotoPageDlg.h" />
+    <ClInclude Include="TxtLayout.h" />
+    <ClInclude Include="TxtMapper.h" />
+    <ClInclude Include="TxtMiru.h" />
+    <ClInclude Include="TxtMiruDef.h" />
+    <ClInclude Include="TxtParser.h" />
+    <ClInclude Include="TxtRenderer.h" />
+    <ClInclude Include="TxtSearch.h" />
+    <ClInclude Include="VersionDlg.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="TxtMiru.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="loading.png" />
+    <Image Include="Siori.ico" />
+    <Image Include="TxtMiru.ico" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

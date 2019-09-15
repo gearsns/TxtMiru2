@@ -1,0 +1,3 @@
+https://kakuyomu.jp/,(\.js|\.svg)
+https*://ncode.syosetu.com/,(sbo\.syosetu\.com|novelheader_bg|novel_bookmarkmenu\.js|cont_access|microad)
+,(counter|www11\.a8|google|moshimo|rakuten|Twitter_logo_blue|novelview_on)
