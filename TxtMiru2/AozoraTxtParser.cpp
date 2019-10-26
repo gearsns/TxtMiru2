@@ -22,18 +22,18 @@ struct PicturePostion {
 	TxtMiru::TextType textType;
 };
 static PicturePostion l_PicturePositionType[] = {
-	{_T("上寄せ"), TxtMiru::TT_PICTURE_LAYOUT   },
-	{_T("中央"  ), TxtMiru::TT_PICTURE_LAYOUT   },
-	{_T("下寄せ"), TxtMiru::TT_PICTURE_LAYOUT   },
-	{_T("段"    ), TxtMiru::TT_PICTURE_LAYOUT   },
-	{_T("頁"    ), TxtMiru::TT_PICTURE_HALF_PAGE},
-	{_T("見開き"), TxtMiru::TT_PICTURE_FULL_PAGE},
+	{_T("上寄せ"), TxtMiru::TextType::PICTURE_LAYOUT   },
+	{_T("中央"  ), TxtMiru::TextType::PICTURE_LAYOUT   },
+	{_T("下寄せ"), TxtMiru::TextType::PICTURE_LAYOUT   },
+	{_T("段"    ), TxtMiru::TextType::PICTURE_LAYOUT   },
+	{_T("頁"    ), TxtMiru::TextType::PICTURE_HALF_PAGE},
+	{_T("見開き"), TxtMiru::TextType::PICTURE_FULL_PAGE},
 };
 
 CGrAozoraTxtParser::CGrAozoraTxtParser()
 {
 	const auto &param = CGrTxtMiru::theApp().Param();
-	m_bUseOverlapChar = param.GetBoolean(CGrTxtParam::UseOverlapChar);
+	m_bUseOverlapChar = param.GetBoolean(CGrTxtParam::PointsType::UseOverlapChar);
 }
 
 CGrAozoraTxtParser::~CGrAozoraTxtParser()
@@ -123,7 +123,7 @@ void CGrAozoraTxtParser::pushNote(TxtMiru::TextInfoList &text_list, LPCTSTR targ
 							bool bMatched1 = false;
 							for(; line_idx>=0; --line_idx){
 								it = &text_list[line_idx];
-								if(it->textType == TxtMiru::TT_TEXT || it->textType == TxtMiru::TT_OTHER){
+								if(it->textType == TxtMiru::TextType::TEXT || it->textType == TxtMiru::TextType::OTHER){
 									if(note_idx == 0){
 										if(it->textType == target_it->textType && CGrText::isMatchLast(it->str.c_str(), target_it->str.c_str())){
 											bMatched1 = true;
@@ -236,8 +236,8 @@ bool CGrAozoraTxtParser::ReadFile(LPCTSTR lpFileName, CGrTxtBuffer &buffer)
 
 void CGrAozoraTxtParser::addLine(CGrTxtBuffer &buffer, LPCTSTR lpSrc, LPCTSTR lpEnd, bool bTrans, int iFileLineNo/* = -1*/)
 {
-	if(m_csComment == CSTAT_SKIP_LINE){
-		m_csComment = CSTAT_NO_MORE;
+	if(m_csComment == CommentStatus::SKIP_LINE){
+		m_csComment = CommentStatus::NO_MORE;
 		// 【テキスト中に現れる記号について】の後は
 		// １行開けて、本文を入れる
 		if(lpSrc == lpEnd-1){
@@ -266,8 +266,8 @@ void CGrAozoraTxtParser::addLine(CGrTxtBuffer &buffer, LPCTSTR lpSrc, LPCTSTR lp
 			buffer.MoveBackLineInfo(
 				TxtMiru::LineInfo {
 					iFileLineNo, 0,0,0,0,0,
-					{TextInfoSpec(TxtMiru::TT_INDENT_START, indent.iIndent1st, indent.iIndent2nd)}
-				}
+					{TextInfoSpec(TxtMiru::TextType::INDENT_START, indent.iIndent1st, indent.iIndent2nd)}
+					}
 				);
 		}
 	}
@@ -279,8 +279,8 @@ void CGrAozoraTxtParser::addLine(CGrTxtBuffer &buffer, LPCTSTR lpSrc, LPCTSTR lp
 			buffer.MoveBackLineInfo(
 				TxtMiru::LineInfo {
 					iFileLineNo, 0,0,0,0,0,
-					{TextInfoSpec(TxtMiru::TT_RINDENT_START, indent.iIndent1st, indent.iIndent2nd)}
-				}
+					{TextInfoSpec(TxtMiru::TextType::RINDENT_START, indent.iIndent1st, indent.iIndent2nd)}
+					}
 				);
 		}
 	}
@@ -372,7 +372,7 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 	auto &line_list = buffer.GetLineList();
 	// 本文が終了している場合、以降すべて無視
 	if(m_bEndofContents){
-		text_list.push_back(TextInfoHalfChar(lpLine, TxtMiru::TT_TEXT));
+		text_list.push_back(TextInfoHalfChar(lpLine, TxtMiru::TextType::TEXT));
 		return true;
 	} else if(line_list.size() > max_info_blank_line && CGrText::isMatchChar(lpLine, _T("底本："))){
 		// 底本判定処理
@@ -389,11 +389,11 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 		if(iLineNum == 0){
 			++pll;
 			if(pll->text_list.empty()){
-				pll->text_list.push_back(TextInfoHalfChar(_T(""), TxtMiru::TT_ENDOFCONTENTS));
+				pll->text_list.push_back(TextInfoHalfChar(_T(""), TxtMiru::TextType::ENDOFCONTENTS));
 			} else {
-				pll->text_list[0].textType = TxtMiru::TT_ENDOFCONTENTS;
+				pll->text_list[0].textType = TxtMiru::TextType::ENDOFCONTENTS;
 			}
-			text_list.push_back(TextInfoHalfChar(lpLine, TxtMiru::TT_TEXT));
+			text_list.push_back(TextInfoHalfChar(lpLine, TxtMiru::TextType::TEXT));
 			m_bEndofContents = true;
 			return true;
 		}
@@ -416,37 +416,37 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 	//
 	//   一行全て '-' の時には、コメントとして判定
 	if(::isCommentLine(lpLine)){
-		if(m_csComment == CSTAT_CONTENTS){
-			m_csComment = CSTAT_BEGIN_COMMENT;
-			text_list.push_back(TextInfoHalfChar(lpLine, TxtMiru::TT_COMMENT_BEGIN));
+		if(m_csComment == CommentStatus::CONTENTS){
+			m_csComment = CommentStatus::BEGIN_COMMENT;
+			text_list.push_back(TextInfoHalfChar(lpLine, TxtMiru::TextType::COMMENT_BEGIN));
 			return true;
-		} else if(m_csComment == CSTAT_COMMENT){
-			m_csComment = CSTAT_SKIP_LINE; // ２回目は無視
-			text_list.push_back(TextInfoHalfChar(lpLine, TxtMiru::TT_COMMENT_END));
+		} else if(m_csComment == CommentStatus::COMMENT){
+			m_csComment = CommentStatus::SKIP_LINE; // ２回目は無視
+			text_list.push_back(TextInfoHalfChar(lpLine, TxtMiru::TextType::COMMENT_END));
 			return true;
 		}
 	}
-	if(m_csComment == CSTAT_BEGIN_COMMENT){
+	if(m_csComment == CommentStatus::BEGIN_COMMENT){
 		if(CGrText::Find(lpLine, _T("【テキスト中に現れる記号について】"))){
-			m_csComment = CSTAT_COMMENT; // コメント開始
+			m_csComment = CommentStatus::COMMENT; // コメント開始
 		} else {
 			// 前回のコメント開始は、コメントとはみなさない。
 			int idx = line_list.size()-1;
-			if(idx >= 0 && line_list[idx].text_list.size() == 1 && line_list[idx].text_list[0].textType == TxtMiru::TT_COMMENT_BEGIN){
+			if(idx >= 0 && line_list[idx].text_list.size() == 1 && line_list[idx].text_list[0].textType == TxtMiru::TextType::COMMENT_BEGIN){
 				auto &&ti = line_list[idx].text_list[0];
-				ti.textType = TxtMiru::TT_TEXT;
+				ti.textType = TxtMiru::TextType::TEXT;
 				ti.chrType  = CGrText::GetStringTypeEx(_T("-"), 1);
 			}
 			if(::isCommentLine(lpLine)){
-				text_list.push_back(TextInfoHalfChar(lpLine, TxtMiru::TT_COMMENT_BEGIN));
+				text_list.push_back(TextInfoHalfChar(lpLine, TxtMiru::TextType::COMMENT_BEGIN));
 				return true;
 			} else {
-				m_csComment = CSTAT_CONTENTS;
+				m_csComment = CommentStatus::CONTENTS;
 			}
 		}
 	}
-	if(m_csComment == CSTAT_COMMENT){
-		text_list.push_back(TextInfoHalfChar(lpLine,  TxtMiru::TT_COMMENT));
+	if(m_csComment == CommentStatus::COMMENT){
+		text_list.push_back(TextInfoHalfChar(lpLine,  TxtMiru::TextType::COMMENT));
 		return true;
 	}
 	//
@@ -504,7 +504,7 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 					} while(1);
 				}
 				if(!lpFindSrc || lpFindSrc > lpFindSrcTmp){
-					if(mps.first.type() == TxtMiru::TT_PICTURE_LAYOUT && !isPicture(CGrText::CharNextN(lpSrc, mps.first.len()))){
+					if(mps.first.type() == TxtMiru::TextType::PICTURE_LAYOUT && !isPicture(CGrText::CharNextN(lpSrc, mps.first.len()))){
 						continue;
 					}
 					lpFindSrc = lpFindSrcTmp;
@@ -533,26 +533,26 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 			std::tstring tt_str(lpTTSrc, lpTTSrcEnd);
 			bool bno_empty_tt_str = (lpTTSrc != lpTTSrcEnd);
 			TxtMiru::TextListPos lastTLP;
-			bool bGetLastTLP = GetRFindTextType(lastTLP, text_list, TxtMiru::TT_TEXT);
+			bool bGetLastTLP = GetRFindTextType(lastTLP, text_list, TxtMiru::TextType::TEXT);
 			// 挿絵のチェック追加(全てのチェックに引っかからない場合に、それらしい指定があるかどうかで)
-			if(textType == TxtMiru::TT_OTHER && isPictureOther(tt_str.c_str())){
-				textType = TxtMiru::TT_PICTURE_LAYOUT;
+			if(textType == TxtMiru::TextType::OTHER && isPictureOther(tt_str.c_str())){
+				textType = TxtMiru::TextType::PICTURE_LAYOUT;
 			}
 			switch(textType){
-			case TxtMiru::TT_TXTMIRU:
+			case TxtMiru::TextType::TXTMIRU:
 				if(bno_empty_tt_str){
 					auto lpttstr = tt_str.c_str();
 					if(CGrText::isMatchChar(lpttstr, _T("Link:"))){
 						lpttstr += 5; //_T("Link:");
-						auto &&tp = m_RangeTextPoint[TxtMiru::TT_LINK];
-						text_list.push_back(TxtMiru::TextInfo(lpttstr, tp.iPos, -1, -1, -1, -1, TxtMiru::TT_LINK));
+						auto &&tp = m_RangeTextPoint[static_cast<int>(TxtMiru::TextType::LINK)];
+						text_list.push_back(TxtMiru::TextInfo(lpttstr, tp.iPos, -1, -1, -1, -1, TxtMiru::TextType::LINK));
 						tp.iIndex = text_list.size()-1;
 						++tp.iPos;
 					} else if(CGrText::isMatchChar(lpttstr, _T("LinkEnd"))){
-						auto &&tp = m_RangeTextPoint[TxtMiru::TT_LINK];
-						if(tp.iPos > 0 && tp.iIndex >= 0 && tp.iIndex < static_cast<signed int>(text_list.size()) && text_list[tp.iIndex].textType == TxtMiru::TT_LINK){
+						auto &&tp = m_RangeTextPoint[static_cast<int>(TxtMiru::TextType::LINK)];
+						if(tp.iPos > 0 && tp.iIndex >= 0 && tp.iIndex < static_cast<signed int>(text_list.size()) && text_list[tp.iIndex].textType == TxtMiru::TextType::LINK){
 							if(text_list[tp.iIndex].str.size() == 0){
-								auto tis = TextInfoSpec(_T(""), TxtMiru::TT_LINK, tp.iIndex, 0, text_list.size(), -1);
+								auto tis = TextInfoSpec(_T(""), TxtMiru::TextType::LINK, tp.iIndex, 0, text_list.size(), -1);
 								{
 									auto e = text_list.end();
 									for(auto ii = text_list.begin() + tp.iIndex+1; ii!=e; ++ii){
@@ -563,25 +563,25 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 								tis.chrType = text_list[tp.iIndex].chrType;
 								text_list.push_back(tis);
 							} else {
-								text_list.push_back(TxtMiru::TextInfo(text_list[tp.iIndex].str.c_str(), tp.iPos, tp.iIndex, 0, text_list.size(), -1, TxtMiru::TT_LINK));
+								text_list.push_back(TxtMiru::TextInfo(text_list[tp.iIndex].str.c_str(), tp.iPos, tp.iIndex, 0, text_list.size(), -1, TxtMiru::TextType::LINK));
 							}
 							tp.iIndex = -1;
 						}
 					} else if(CGrText::isMatchChar(lpttstr, _T("ID:"))){
 						lpttstr += 3; //_T("ID:");
-						text_list.push_back(TxtMiru::TextInfo(lpttstr, 0, -1, -1, -1, -1, TxtMiru::TT_ID));
+						text_list.push_back(TxtMiru::TextInfo(lpttstr, 0, -1, -1, -1, -1, TxtMiru::TextType::ID));
 					} else {
 						m_paramList.push_back(tt_str);
 					}
 				}
 				break;
-			case TxtMiru::TT_ACCENT: break;
-			case TxtMiru::TT_RUBY:
+			case TxtMiru::TextType::ACCENT: break;
+			case TxtMiru::TextType::RUBY:
 				{
 					// RUBY : tt_str
 					// TT_OTHERにも、ルビが振れるように
 					TxtMiru::TextListPos lastOtherTLP;
-					bool bOtherGetLastTLP = GetRFindTextType(lastOtherTLP, text_list, TxtMiru::TT_OTHER);
+					bool bOtherGetLastTLP = GetRFindTextType(lastOtherTLP, text_list, TxtMiru::TextType::OTHER);
 					if(bOtherGetLastTLP){
 						/* TT_OTHER が リストに含まれていた時 */
 						if(bGetLastTLP){
@@ -597,7 +597,7 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 									  │└ TT_TEXT            亜 : ruby_pos_r+1
 									  └ TT_RUBY_SEP          ※ : lastOtherTLP.iIndex
 									 */
-									text_list[ruby_pos_r].textType = TxtMiru::TT_RUBY_SEP;
+									text_list[ruby_pos_r].textType = TxtMiru::TextType::RUBY_SEP;
 									text_list.push_back(TextInfoSpec(static_cast<std::tstring&&>(tt_str), textType, ruby_pos_r+1, 0, lastOtherTLP.iIndex, 0));
 								} else {
 									/* RUBY開始位置が設定されていない時は、TT_OTHER の位置を使用する */
@@ -608,7 +608,7 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 									 */
 									// ルビ開始位置には常に [TT_RUBY_SEP]を入れる // □RUBY長対応
 									TxtMiru::TextInfo ti_sep;
-									ti_sep.textType = TxtMiru::TT_RUBY_SEP;
+									ti_sep.textType = TxtMiru::TextType::RUBY_SEP;
 									auto text_it = text_list.begin() + lastOtherTLP.iIndex;
 									text_list.insert(text_it, ti_sep); // セパレータの挿入
 									// 途中に挿入するので、実際には ruby位置や他のデータの参照位置をずらす必要がある ★★★
@@ -625,7 +625,7 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 								  │└ TT_OTHER
 								  └ TT_RUBY_SEP
 								 */
-								text_list[ruby_pos_r].textType = TxtMiru::TT_RUBY_SEP;
+								text_list[ruby_pos_r].textType = TxtMiru::TextType::RUBY_SEP;
 								text_list.push_back(TextInfoSpec(static_cast<std::tstring&&>(tt_str), textType, ruby_pos_r+1, 0, lastOtherTLP.iIndex, 0));
 							} else {
 								/* RUBY開始位置が設定されていない時は、TT_OTHER の位置を使用する */
@@ -635,7 +635,7 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 								 */
 								// ルビ開始位置には常に [TT_RUBY_SEP]を入れる // □RUBY長対応
 								TxtMiru::TextInfo ti_sep;
-								ti_sep.textType = TxtMiru::TT_RUBY_SEP;
+								ti_sep.textType = TxtMiru::TextType::RUBY_SEP;
 								auto text_it = text_list.begin() + lastOtherTLP.iIndex;
 								text_list.insert(text_it, ti_sep);
 								// 途中に挿入するので、実際には ruby位置や他のデータの参照位置をずらす必要がある ★★★
@@ -655,7 +655,7 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 							  │└ TT_TEXT            ｜ : ruby_pos_r
 							  └ TT_RUBY_SEP          亜 : last_iIndex, last_iPos
 							 */
-							text_list[ruby_pos_r].textType = TxtMiru::TT_RUBY_SEP;
+							text_list[ruby_pos_r].textType = TxtMiru::TextType::RUBY_SEP;
 							text_list.push_back(TextInfoSpec(static_cast<std::tstring&&>(tt_str), textType, ruby_pos_r+1, 0, last_iIndex, last_iPos));
 						} else {
 							/* RUBY開始位置が設定されていない時は、TT_TEXT の位置を使用する */
@@ -665,7 +665,7 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 							 */
 							// ルビ開始位置には常に [TT_RUBY_SEP]を入れる // □RUBY長対応
 							TxtMiru::TextInfo ti_sep;
-							ti_sep.textType = TxtMiru::TT_RUBY_SEP;
+							ti_sep.textType = TxtMiru::TextType::RUBY_SEP;
 							auto text_it = text_list.begin() + last_iIndex;
 							text_list.insert(text_it, ti_sep);
 							// 途中に挿入するので、実際には ruby位置や他のデータの参照位置をずらす必要がある ★★★
@@ -676,80 +676,80 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 				}
 				ruby_pos_r = -1;
 				break;
-			case TxtMiru::TT_RUBY_L:
+			case TxtMiru::TextType::RUBY_L:
 				if(!text_list.empty() && bno_empty_tt_str){
-					auto lpNote = CGrText::Find(lpTTSrc, text_type_name[textType]);
+					auto lpNote = CGrText::Find(lpTTSrc, text_type_name[static_cast<int>(textType)]);
 					if(!lpNote || lpNote > lpTTSrcEnd/*［＃ ～ ］の範囲外 */){
 						break;
 					}
 					std::tstring target(lpTTSrc, CGrText::CharNext(lpNote)-1);
-					std::tstring note(lpNote + text_type_name[textType].size(), lpTTSrcEnd);
+					std::tstring note(lpNote + text_type_name[static_cast<int>(textType)].size(), lpTTSrcEnd);
 					pushNote(text_list, target.c_str(), note.c_str(), textType);
 				}
 				break;
-			case TxtMiru::TT_RUBY_L_START:
+			case TxtMiru::TextType::RUBY_L_START:
 				ruby_pos_l = text_list.size();
 				break;
-			case TxtMiru::TT_RUBY_L_END:
+			case TxtMiru::TextType::RUBY_L_END:
 				if(ruby_pos_l >= 0 && !text_list.empty() && bno_empty_tt_str){
 					std::tstring note(lpTTSrc, lpTTSrcEnd);
-					text_list.push_back(TextInfoSpec(note.c_str(), TxtMiru::TT_RUBY_L, ruby_pos_l, 0, text_list.size(), -1));
+					text_list.push_back(TextInfoSpec(note.c_str(), TxtMiru::TextType::RUBY_L, ruby_pos_l, 0, text_list.size(), -1));
 				}
 				ruby_pos_l = -1;
 				break;
-			case TxtMiru::TT_NOTE:
+			case TxtMiru::TextType::NOTE:
 				if(!text_list.empty() && bno_empty_tt_str){
-					for(const auto check_tt : {TxtMiru::TT_NOTE, TxtMiru::TT_NOTE_L}){
-						auto lpNote = CGrText::Find(lpTTSrc, text_type_name[check_tt]);
+					for(const auto check_tt : {TxtMiru::TextType::NOTE, TxtMiru::TextType::NOTE_L}){
+						auto lpNote = CGrText::Find(lpTTSrc, text_type_name[static_cast<int>(check_tt)]);
 						if(!lpNote || lpNote > lpTTSrcEnd/*［＃ ～ ］の範囲外 */){
 							continue;
 						}
 						std::tstring target(lpTTSrc, CGrText::CharNext(lpNote)-1);
-						std::tstring note(lpNote + text_type_name[check_tt].size(), lpTTSrcEnd);
+						std::tstring note(lpNote + text_type_name[static_cast<int>(check_tt)].size(), lpTTSrcEnd);
 						pushNote(text_list, target.c_str(), note.c_str(), check_tt);
 					}
 				}
 				break;
-			case TxtMiru::TT_NOTE_START:
+			case TxtMiru::TextType::NOTE_START:
 				note_pos_r = text_list.size();
 				break;
-			case TxtMiru::TT_NOTE_START_L:
+			case TxtMiru::TextType::NOTE_START_L:
 				note_pos_l = text_list.size();
 				break;
-			case TxtMiru::TT_NOTE_END:
+			case TxtMiru::TextType::NOTE_END:
 				if(note_pos_r >= 0 && !text_list.empty() && bno_empty_tt_str){
 					std::tstring note(lpTTSrc, lpTTSrcEnd);
 					convertNoteStr(note);
 					int note_pos_r_end = GetPrevIndexTexts(text_list, note_pos_r);
-					text_list.push_back(TextInfoSpec(note.c_str(), TxtMiru::TT_NOTE, note_pos_r, 0, note_pos_r_end, CGrText::CharLen(text_list[note_pos_r_end].str.c_str())-1 ));
+					text_list.push_back(TextInfoSpec(note.c_str(), TxtMiru::TextType::NOTE, note_pos_r, 0, note_pos_r_end, CGrText::CharLen(text_list[note_pos_r_end].str.c_str())-1 ));
 				}
 				note_pos_r = -1;
 				break;
-			case TxtMiru::TT_NOTE_END_L:
+			case TxtMiru::TextType::NOTE_END_L:
 				if(note_pos_l >= 0 && !text_list.empty() && bno_empty_tt_str){
 					std::tstring note(lpTTSrc, lpTTSrcEnd);
 					convertNoteStr(note);
 					int note_pos_l_end = GetPrevIndexTexts(text_list, note_pos_l);
-					text_list.push_back(TextInfoSpec(note.c_str(), TxtMiru::TT_NOTE_L, note_pos_l, 0, note_pos_l_end, CGrText::CharLen(text_list[note_pos_l_end].str.c_str())-1 ));
+					text_list.push_back(TextInfoSpec(note.c_str(), TxtMiru::TextType::NOTE_L, note_pos_l, 0, note_pos_l_end, CGrText::CharLen(text_list[note_pos_l_end].str.c_str())-1 ));
 				}
 				note_pos_l = -1;
 				break;
-			case TxtMiru::TT_TEXT_SIZE  :
-			case TxtMiru::TT_TEXT_SIZE_L:
-			case TxtMiru::TT_TEXT_SIZE_S:
+			case TxtMiru::TextType::TEXT_SIZE  :
+			case TxtMiru::TextType::TEXT_SIZE_L:
+			case TxtMiru::TextType::TEXT_SIZE_S:
 				if(bno_empty_tt_str){
-					auto lpNote = CGrText::Find(lpTTSrc, text_type_name[TxtMiru::TT_TEXT_SIZE]);
+					auto lpNote = CGrText::Find(lpTTSrc, text_type_name[static_cast<int>(TxtMiru::TextType::TEXT_SIZE)]);
 					if(!lpNote || lpNote > lpTTSrcEnd/*［＃ ～ ］の範囲外 */){
 						// 範囲設定
 						int text_size = max(Str2Int(tt_str), 0);
-						if(textType == TxtMiru::TT_TEXT_SIZE_S){
+						if(textType == TxtMiru::TextType::TEXT_SIZE_S){
 							text_size = -text_size;
 							m_fontSizeS.push_back(m_iFontSize);
 						} else {
 							m_fontSizeL.push_back(m_iFontSize);
 						}
 						TxtMiru::TextInfo ti_size;
-						ti_size.textType = TxtMiru::TT_TEXT_SIZE;
+						ti_size.textType = TxtMiru::TextType::TEXT_SIZE;
 						ti_size.chrType  = text_size;
 						text_list.push_back(ti_size);
 						m_iFontSize      = text_size;
@@ -759,16 +759,16 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 						break;
 					}
 					std::tstring target(lpTTSrc, CGrText::CharNext(lpNote)-1);
-					std::tstring note(lpNote+text_type_name[TxtMiru::TT_TEXT_SIZE].size());
+					std::tstring note(lpNote+text_type_name[static_cast<int>(TxtMiru::TextType::TEXT_SIZE)].size());
 					int text_size = max(Str2Int(note), 0);
-					if(textType == TxtMiru::TT_TEXT_SIZE_S){
+					if(textType == TxtMiru::TextType::TEXT_SIZE_S){
 						text_size = -text_size;
 					}
 					auto len = text_list.size();
-					pushNote(text_list, target.c_str(), _T(""), TxtMiru::TT_MaxNum/*Dummy*/);
+					pushNote(text_list, target.c_str(), _T(""), TxtMiru::TextType::MaxNum/*Dummy*/);
 					if(len < text_list.size()){
 						auto ti_size = text_list[len];
-						ti_size.textType = TxtMiru::TT_TEXT_SIZE;
+						ti_size.textType = TxtMiru::TextType::TEXT_SIZE;
 						auto ti_str = text_list[ti_size.tpBegin.iIndex].str;
 						TxtMiru::TextInfoList::iterator size_insert_it;
 						auto lpti_str = ti_str.c_str();
@@ -836,45 +836,45 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 					}
 				}
 				break;
-			case TxtMiru::TT_UNKOWN_ERROR        :
-			case TxtMiru::TT_WHITE_DOT           :
-			case TxtMiru::TT_ROUND_DOT           :
-			case TxtMiru::TT_WHITE_ROUND_DOT     :
-			case TxtMiru::TT_BLACK_TRIANGLE_DOT  :
-			case TxtMiru::TT_WHITE_TRIANGLE_DOT  :
-			case TxtMiru::TT_DOUBLE_ROUND_DOT    :
-			case TxtMiru::TT_BULLS_EYE_DOT       :
-			case TxtMiru::TT_SALTIRE_DOT         :
-			case TxtMiru::TT_DOT                 :
-			case TxtMiru::TT_LINE                :
-			case TxtMiru::TT_WAVE_LINE           :
-			case TxtMiru::TT_DEL_LINE            :
-			case TxtMiru::TT_UNDER_LINE          :
-			case TxtMiru::TT_SHORT_DASHED_LINE   :
-			case TxtMiru::TT_DOT_LINE            :
-			case TxtMiru::TT_DOUBLE_LINE         :
-			case TxtMiru::TT_WHITE_DOT_L         :
-			case TxtMiru::TT_ROUND_DOT_L         :
-			case TxtMiru::TT_WHITE_ROUND_DOT_L   :
-			case TxtMiru::TT_BLACK_TRIANGLE_DOT_L:
-			case TxtMiru::TT_WHITE_TRIANGLE_DOT_L:
-			case TxtMiru::TT_DOUBLE_ROUND_DOT_L  :
-			case TxtMiru::TT_BULLS_EYE_DOT_L     :
-			case TxtMiru::TT_SALTIRE_DOT_L       :
-			case TxtMiru::TT_DOT_L               :
-			case TxtMiru::TT_LINE_L              :
-			case TxtMiru::TT_WAVE_LINE_L         :
-			case TxtMiru::TT_SHORT_DASHED_LINE_L :
-			case TxtMiru::TT_DOT_LINE_L          :
-			case TxtMiru::TT_DOUBLE_LINE_L       :
-			case TxtMiru::TT_BOLD                :
-			case TxtMiru::TT_SUBTITLE1           :
-			case TxtMiru::TT_SUBTITLE2           :
-			case TxtMiru::TT_SUBTITLE3           :
-			case TxtMiru::TT_MOVING_BORDER       :
-			case TxtMiru::TT_HORZ_START          :
+			case TxtMiru::TextType::UNKOWN_ERROR        :
+			case TxtMiru::TextType::WHITE_DOT           :
+			case TxtMiru::TextType::ROUND_DOT           :
+			case TxtMiru::TextType::WHITE_ROUND_DOT     :
+			case TxtMiru::TextType::BLACK_TRIANGLE_DOT  :
+			case TxtMiru::TextType::WHITE_TRIANGLE_DOT  :
+			case TxtMiru::TextType::DOUBLE_ROUND_DOT    :
+			case TxtMiru::TextType::BULLS_EYE_DOT       :
+			case TxtMiru::TextType::SALTIRE_DOT         :
+			case TxtMiru::TextType::DOT                 :
+			case TxtMiru::TextType::LINE                :
+			case TxtMiru::TextType::WAVE_LINE           :
+			case TxtMiru::TextType::DEL_LINE            :
+			case TxtMiru::TextType::UNDER_LINE          :
+			case TxtMiru::TextType::SHORT_DASHED_LINE   :
+			case TxtMiru::TextType::DOT_LINE            :
+			case TxtMiru::TextType::DOUBLE_LINE         :
+			case TxtMiru::TextType::WHITE_DOT_L         :
+			case TxtMiru::TextType::ROUND_DOT_L         :
+			case TxtMiru::TextType::WHITE_ROUND_DOT_L   :
+			case TxtMiru::TextType::BLACK_TRIANGLE_DOT_L:
+			case TxtMiru::TextType::WHITE_TRIANGLE_DOT_L:
+			case TxtMiru::TextType::DOUBLE_ROUND_DOT_L  :
+			case TxtMiru::TextType::BULLS_EYE_DOT_L     :
+			case TxtMiru::TextType::SALTIRE_DOT_L       :
+			case TxtMiru::TextType::DOT_L               :
+			case TxtMiru::TextType::LINE_L              :
+			case TxtMiru::TextType::WAVE_LINE_L         :
+			case TxtMiru::TextType::SHORT_DASHED_LINE_L :
+			case TxtMiru::TextType::DOT_LINE_L          :
+			case TxtMiru::TextType::DOUBLE_LINE_L       :
+			case TxtMiru::TextType::BOLD                :
+			case TxtMiru::TextType::SUBTITLE1           :
+			case TxtMiru::TextType::SUBTITLE2           :
+			case TxtMiru::TextType::SUBTITLE3           :
+			case TxtMiru::TextType::MOVING_BORDER       :
+			case TxtMiru::TextType::HORZ_START          :
 				if(tt_str.empty()){
-					auto &&rtp = m_RangeTextPoint[textType];
+					auto &&rtp = m_RangeTextPoint[static_cast<int>(textType)];
 					rtp.iLine = line_list.size();
 					if(rtp.iCount == 0){
 						if(bGetLastTLP){
@@ -887,10 +887,10 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 					}
 					++rtp.iCount;
 				} else {
-					pushNote(text_list, tt_str.c_str(), text_type_name[textType], textType);
+					pushNote(text_list, tt_str.c_str(), text_type_name[static_cast<int>(textType)], textType);
 				}
 				break;
-			case TxtMiru::TT_CAPTION             :
+			case TxtMiru::TextType::CAPTION             :
 				if(tt_str.empty()){
 					text_list.push_back(TextInfoSpec(textType, 0));
 				} else {
@@ -901,11 +901,11 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 					if(tpBegin.iPos > 0){
 						text_list[tpBegin.iIndex].str = text_list[tpBegin.iIndex].str.substr(0, tpBegin.iPos);
 					} else {
-						text_list[tpBegin.iIndex].textType = TxtMiru::TT_COMMENT;
+						text_list[tpBegin.iIndex].textType = TxtMiru::TextType::COMMENT;
 					}
 					int tt_len = text_list.size();
 					for(int caption_index = tpBegin.iIndex+1; caption_index<tt_len; ++caption_index){
-						text_list[caption_index].textType = TxtMiru::TT_COMMENT;
+						text_list[caption_index].textType = TxtMiru::TextType::COMMENT;
 					}
 					auto *pti = GetPrevTextInfoPicture(line_list, text_list);
 					if(pti){
@@ -913,7 +913,7 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 					}
 				}
 				break;
-			case TxtMiru::TT_LINE_BOX_START      :
+			case TxtMiru::TextType::LINE_BOX_START      :
 				{
 					LineBox linebox;
 					linebox.top    = 0;
@@ -926,18 +926,17 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 						const auto &indent = m_RIndent.back();
 						linebox.bottom = indent.iIndent1st;
 					}
-					if(m_LineBox.size() < static_cast<unsigned int>(m_RangeTextPoint[textType].iCount)){
-						m_LineBox.resize(m_RangeTextPoint[textType].iCount);
+					if(m_LineBox.size() < static_cast<unsigned int>(m_RangeTextPoint[static_cast<int>(textType)].iCount)){
+						m_LineBox.resize(m_RangeTextPoint[static_cast<int>(textType)].iCount);
 					}
 					m_LineBox.push_back(linebox);
-					++m_RangeTextPoint[textType].iCount;
-					// 2.0.29.0
+					++m_RangeTextPoint[static_cast<int>(textType)].iCount;
 					text_list.push_back(
-						TxtMiru::TextInfo(static_cast<const TCHAR*>(text_type_name[TxtMiru::TT_MOVING_BORDER]), m_RangeTextPoint[textType].iCount, linebox.top, linebox.bottom, 0, 0, textType)
+						TxtMiru::TextInfo(static_cast<const TCHAR*>(text_type_name[static_cast<int>(TxtMiru::TextType::MOVING_BORDER)]), m_RangeTextPoint[static_cast<int>(textType)].iCount, linebox.top, linebox.bottom, 0, 0, textType)
 						);
 				}
 				break;
-			case TxtMiru::TT_RANGE_END           :
+			case TxtMiru::TextType::RANGE_END           :
 				{
 					const auto *it_pl=it_plb;
 					int skip = 2; // '［＃'の２文字分スキップ
@@ -951,35 +950,35 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 						const auto &mps = (*it_pl);
 						if(mps.first.str_len == len && _tcscmp(CGrText::CharNextN(mps.first, skip), tt_str.c_str()) == 0){
 							auto tt = mps.first.type();
-							auto &&tp = m_RangeTextPoint[tt];
-							auto tis = TextInfoSpec(static_cast<const TCHAR*>(text_type_name[tt]), tt, tp.iIndex, tp.iPos, text_list.size(), -1);
-							if(tt == TxtMiru::TT_LINE_BOX_START && !m_LineBox.empty()){
+							auto &&tp = m_RangeTextPoint[static_cast<int>(tt)];
+							auto tis = TextInfoSpec(static_cast<const TCHAR*>(text_type_name[static_cast<int>(tt)]), tt, tp.iIndex, tp.iPos, text_list.size()/*lastTLP.iIndex + 1*/, -1);
+							if(tt == TxtMiru::TextType::LINE_BOX_START && !m_LineBox.empty()){
 								// 罫囲み の場合
 								const auto &linebox = m_LineBox.back();
 								tis.tpBegin.iIndex = linebox.top   ; // 無理やり：tpBegin.iIndex  に TOP
 								tis.tpBegin.iPos   = linebox.bottom; //           tpBegin.iPos    に BOTTOM
 								tis.chrType        = tp.iCount     ; //           chrType         に 罫囲み連番
 								tis.tpEnd.iPos     = 2             ; //           tpEnd.iPos      に 線のタイプ を入れる /* 開始=0、途中=1, 終了=2*/
-								tis.textType = TxtMiru::TT_LINE_BOX_END;
+								tis.textType = TxtMiru::TextType::LINE_BOX_END;
 								m_LineBox.pop_back();
-							} else if(tt == TxtMiru::TT_TEXT_SIZE_L || tt == TxtMiru::TT_TEXT_SIZE_S){
-								if(TxtMiru::TT_TEXT_SIZE_S == tt && !m_fontSizeS.empty()){
+							} else if(tt == TxtMiru::TextType::TEXT_SIZE_L || tt == TxtMiru::TextType::TEXT_SIZE_S){
+								if(TxtMiru::TextType::TEXT_SIZE_S == tt && !m_fontSizeS.empty()){
 									m_iFontSize = m_fontSizeS.back();
 									m_fontSizeS.pop_back();
-								} else if(TxtMiru::TT_TEXT_SIZE_L == tt && !m_fontSizeL.empty()){
+								} else if(TxtMiru::TextType::TEXT_SIZE_L == tt && !m_fontSizeL.empty()){
 									m_iFontSize = m_fontSizeL.back();
 									m_fontSizeL.pop_back();
 								} else {
 									break;
 								}
-								tis.textType = TxtMiru::TT_TEXT_SIZE;
+								tis.textType = TxtMiru::TextType::TEXT_SIZE;
 								tis.chrType  = m_iFontSize;
-							} else if(tt == TxtMiru::TT_CAPTION){
+							} else if(tt == TxtMiru::TextType::CAPTION){
 								bool bBeginCaption = false;
 								std::vector<std::tstring> string_list;
 								for(auto &&ti : reverse_iterate(text_list)){
-									if(ti.textType == TxtMiru::TT_CAPTION){
-										ti.textType = TxtMiru::TT_COMMENT_BEGIN;
+									if(ti.textType == TxtMiru::TextType::CAPTION){
+										ti.textType = TxtMiru::TextType::COMMENT_BEGIN;
 										bBeginCaption = true;
 										break;
 									} else if(TxtMiruType::isTextOrSkipOrRotateNum(ti.textType)){
@@ -989,8 +988,8 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 								if(!bBeginCaption){
 									for(auto &&ll_item : reverse_iterate(line_list)){
 										for(auto &&ti : reverse_iterate(ll_item.text_list)){
-											if(ti.textType == TxtMiru::TT_CAPTION){
-												ti.textType = TxtMiru::TT_COMMENT_BEGIN;
+											if(ti.textType == TxtMiru::TextType::CAPTION){
+												ti.textType = TxtMiru::TextType::COMMENT_BEGIN;
 												bBeginCaption = true;
 												if(!string_list.empty() && string_list.back() == _T("\n")){
 													string_list.pop_back();
@@ -1015,11 +1014,11 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 										}
 										SetCaption(pti->str, caption.c_str());
 									}
-									text_list.push_back(TextInfoSpec(TxtMiru::TT_COMMENT_END, 0));
+									text_list.push_back(TextInfoSpec(TxtMiru::TextType::COMMENT_END, 0));
 								}
 								break;
-							} else if(tt == TxtMiru::TT_HORZ_START){
-								tis.textType = TxtMiru::TT_HORZ_END;
+							} else if(tt == TxtMiru::TextType::HORZ_START){
+								tis.textType = TxtMiru::TextType::HORZ_END;
 							}
 							text_list.push_back(tis);
 							--tp.iCount;
@@ -1031,27 +1030,27 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 					}
 				}
 				break;
-			case TxtMiru::TT_OTHER_NOTE        :
+			case TxtMiru::TextType::OTHER_NOTE        :
 				if(!text_list.empty() && bno_empty_tt_str){
-					auto lpNote = CGrText::Find(lpTTSrc, text_type_name[TxtMiru::TT_ERROR]);
+					auto lpNote = CGrText::Find(lpTTSrc, text_type_name[static_cast<int>(TxtMiru::TextType::ERROR_STR)]);
 					if(!lpNote || lpNote > lpTTSrcEnd/*［＃ ～ ］の範囲外 */){
 						break;
 					}
 					std::tstring target(lpTTSrc, CGrText::CharNext(lpNote)-1);
-					std::tstring note(lpNote + text_type_name[TxtMiru::TT_ERROR].size(), lpTTSrcEnd);
+					std::tstring note(lpNote + text_type_name[static_cast<int>(TxtMiru::TextType::ERROR_STR)].size(), lpTTSrcEnd);
 					note.insert(0, _T("底本では、"));
 					pushNote(text_list, target.c_str(), note.c_str(), textType);
 					break;
 				}
-				pushNote(text_list, tt_str.c_str(), text_type_name[textType], textType);
+				pushNote(text_list, tt_str.c_str(), text_type_name[static_cast<int>(textType)], textType);
 				break;
-			case TxtMiru::TT_NO_READ:
-				text_list.push_back(TxtMiru::TextInfo(static_cast<const TCHAR*>(text_type_name[textType]), 0xffff));
+			case TxtMiru::TextType::NO_READ:
+				text_list.push_back(TxtMiru::TextInfo(static_cast<const TCHAR*>(text_type_name[static_cast<int>(textType)]), 0xffff));
 				text_list.push_back(TextInfoSpec(static_cast<std::tstring&&>(tt_str), textType, text_list.size()-1));
 				break;
-			case TxtMiru::TT_HORZ:
+			case TxtMiru::TextType::HORZ:
 				if(bno_empty_tt_str){
-					auto lpNote = CGrText::Find(lpTTSrc, text_type_name[TxtMiru::TT_TEXT_SIZE]);
+					auto lpNote = CGrText::Find(lpTTSrc, text_type_name[static_cast<int>(TxtMiru::TextType::TEXT_SIZE)]);
 					if(!lpNote || lpNote > lpTTSrcEnd/*［＃ ～ ］の範囲外 */){
 						break;
 					}
@@ -1059,12 +1058,12 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 						break;
 					}
 					std::tstring target(lpTTSrc, CGrText::CharNext(lpNote)-1);
-					std::tstring note(lpNote+text_type_name[TxtMiru::TT_TEXT_SIZE].size());
+					std::tstring note(lpNote+text_type_name[static_cast<int>(TxtMiru::TextType::TEXT_SIZE)].size());
 					auto len = text_list.size();
-					pushNote(text_list, target.c_str(), _T(""), TxtMiru::TT_MaxNum/*Dummy*/);
+					pushNote(text_list, target.c_str(), _T(""), TxtMiru::TextType::MaxNum/*Dummy*/);
 					if(len < text_list.size()){
 						auto ti_size = text_list[len];
-						ti_size.textType = TxtMiru::TT_HORZ_START;
+						ti_size.textType = TxtMiru::TextType::HORZ_START;
 						ti_size.chrType = 1;
 						auto ti_str = text_list[ti_size.tpBegin.iIndex].str;
 						TxtMiru::TextInfoList::iterator size_insert_it;
@@ -1085,7 +1084,7 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 							}
 							size_insert_it = text_list.insert(size_insert_it, ti_size);
 							size_insert_it += 2;
-							ti_size.textType = TxtMiru::TT_HORZ_END;
+							ti_size.textType = TxtMiru::TextType::HORZ_END;
 							size_insert_it = text_list.insert(size_insert_it, ti_size);
 							if(/**/ti_size.tpBegin.iPos == ti_size.tpEnd.iPos
 							   ||  ti_size.tpEnd.iPos == CGrText::CharLen(lpti_str)-1){
@@ -1111,7 +1110,7 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 							}
 							size_insert_it = text_list.insert(size_insert_it, ti_size);
 							size_insert_it += ti_size.tpEnd.iIndex - ti_size.tpBegin.iIndex + 2;
-							ti_size.textType = TxtMiru::TT_HORZ_END;
+							ti_size.textType = TxtMiru::TextType::HORZ_END;
 							size_insert_it = text_list.insert(size_insert_it, ti_size);
 
 							auto ti_end_str = (size_insert_it-1)->str;
@@ -1129,9 +1128,9 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 					}
 				}
 				break;
-			case TxtMiru::TT_ROTATE_NUM:
-			case TxtMiru::TT_SUP_NOTE:
-			case TxtMiru::TT_SUB_NOTE:
+			case TxtMiru::TextType::ROTATE_NUM:
+			case TxtMiru::TextType::SUP_NOTE:
+			case TxtMiru::TextType::SUB_NOTE:
 				if(bno_empty_tt_str && bGetLastTLP){
 					auto lpPreStr = text_list[lastTLP.iIndex].str.c_str();
 					int nPreStrLen = CGrText::CharLen(lpPreStr);
@@ -1245,8 +1244,8 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 					}
 				}
 				break;
-			case TxtMiru::TT_SMALL_NOTE_R:
-			case TxtMiru::TT_SMALL_NOTE_L:
+			case TxtMiru::TextType::SMALL_NOTE_R:
+			case TxtMiru::TextType::SMALL_NOTE_L:
 				if(bno_empty_tt_str && bGetLastTLP){
 					TxtMiru::TextListPos tpBegin;
 					if(GetRFindText(tpBegin, text_list, tt_str.c_str())){
@@ -1273,7 +1272,7 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 					}
 				}
 				break;
-			case TxtMiru::TT_SMALL_NOTE:
+			case TxtMiru::TextType::SMALL_NOTE:
 				if(bno_empty_tt_str){
 					TxtMiru::TextInfo ti;
 					if(bGetLastTLP){
@@ -1286,54 +1285,54 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 					text_list.push_back(ti);
 				}
 				break;
-			case TxtMiru::TT_INDENT      :
-			case TxtMiru::TT_INDENT_START:
+			case TxtMiru::TextType::INDENT      :
+			case TxtMiru::TextType::INDENT_START:
 				{
-					auto lpTurn = CGrText::Find(lpTTSrc, text_type_name[TxtMiru::TT_INDENT_START]);
+					auto lpTurn = CGrText::Find(lpTTSrc, text_type_name[static_cast<int>(TxtMiru::TextType::INDENT_START)]);
 					if(lpTurn && lpTurn <= lpTTSrcEnd/*［＃ ～ ］の範囲 */){ // 折り返して
 						std::tstring first_indent(lpTTSrc, CGrText::CharNext(lpTurn)-1);
-						std::tstring second_indent(lpTurn + text_type_name[TxtMiru::TT_INDENT_START].size(), lpTTSrcEnd);
+						std::tstring second_indent(lpTurn + text_type_name[static_cast<int>(TxtMiru::TextType::INDENT_START)].size(), lpTTSrcEnd);
 						indentStart(buffer, text_list, textType, Str2Int(first_indent), Str2Int(second_indent));
 					} else {
 						indentStart(buffer, text_list, textType, Str2Int(tt_str));
 					}
 				}
 				break;
-			case TxtMiru::TT_INDENT2      : indentStart (buffer, text_list, TxtMiru::TT_INDENT      , 0, Str2Int(tt_str)); break;
-			case TxtMiru::TT_INDENT_START2: indentStart (buffer, text_list, TxtMiru::TT_INDENT_START, 0, Str2Int(tt_str)); break;
-			case TxtMiru::TT_INDENT3      : indentStart (buffer, text_list, TxtMiru::TT_INDENT      , Str2Int(tt_str)); break;
-			case TxtMiru::TT_RINDENT      :
-			case TxtMiru::TT_RINDENT_START: rindentStart(buffer, text_list, textType                , Str2Int(tt_str)); break;
-			case TxtMiru::TT_INDENT_END:
+			case TxtMiru::TextType::INDENT2      : indentStart (buffer, text_list, TxtMiru::TextType::INDENT      , 0, Str2Int(tt_str)); break;
+			case TxtMiru::TextType::INDENT_START2: indentStart (buffer, text_list, TxtMiru::TextType::INDENT_START, 0, Str2Int(tt_str)); break;
+			case TxtMiru::TextType::INDENT3      : indentStart (buffer, text_list, TxtMiru::TextType::INDENT      , Str2Int(tt_str)); break;
+			case TxtMiru::TextType::RINDENT      :
+			case TxtMiru::TextType::RINDENT_START: rindentStart(buffer, text_list, textType                , Str2Int(tt_str)); break;
+			case TxtMiru::TextType::INDENT_END:
 				indentEnd(buffer, text_list, textType); break;
-			case TxtMiru::TT_RINDENT_END:
+			case TxtMiru::TextType::RINDENT_END:
 				rindentEnd(buffer, text_list, textType); break;
-			case TxtMiru::TT_LIMIT_CHAR_START:
+			case TxtMiru::TextType::LIMIT_CHAR_START:
 				m_LimitChar.push_back(Str2Int(tt_str));
-				text_list.push_back(TextInfoSpec(TxtMiru::TT_LIMIT_CHAR_START, m_LimitChar.back(), 0));
+				text_list.push_back(TextInfoSpec(TxtMiru::TextType::LIMIT_CHAR_START, m_LimitChar.back(), 0));
 				break;
-			case TxtMiru::TT_LIMIT_CHAR_END:
+			case TxtMiru::TextType::LIMIT_CHAR_END:
 				if(!m_LimitChar.empty()){
 					m_LimitChar.pop_back();
 				}
 				if(m_LimitChar.empty()){
-					text_list.push_back(TextInfoSpec(TxtMiru::TT_LIMIT_CHAR_START, 0, 0));
+					text_list.push_back(TextInfoSpec(TxtMiru::TextType::LIMIT_CHAR_START, 0, 0));
 				} else {
-					text_list.push_back(TextInfoSpec(TxtMiru::TT_LIMIT_CHAR_START, m_LimitChar.back(), 0));
+					text_list.push_back(TextInfoSpec(TxtMiru::TextType::LIMIT_CHAR_START, m_LimitChar.back(), 0));
 				}
 				break;
-			case TxtMiru::TT_BOLD_START:
-			case TxtMiru::TT_BOLD_END:
+			case TxtMiru::TextType::BOLD_START:
+			case TxtMiru::TextType::BOLD_END:
 				text_list.push_back(TextInfoSpec(textType, 0));
 				break;
-			case TxtMiru::TT_NEXT_LINE:
+			case TxtMiru::TextType::NEXT_LINE:
 				// 行の最中に 改行が見つかった場合、リストを分割
 				bSplitLine = true;
 				break;
-			case TxtMiru::TT_NEXT_LAYOUT:
-			case TxtMiru::TT_NEXT_PAGE:
-			case TxtMiru::TT_NEXT_PAPER:
-			case TxtMiru::TT_NEXT_PAPER_FIRST:
+			case TxtMiru::TextType::NEXT_LAYOUT:
+			case TxtMiru::TextType::NEXT_PAGE:
+			case TxtMiru::TextType::NEXT_PAPER:
+			case TxtMiru::TextType::NEXT_PAPER_FIRST:
 				if(!text_list.empty()){
 					// 行の最中に 改段・改頁・改丁が見つかった場合、リストを分割
 					buffer.MoveBackLineInfo(TxtMiru::LineInfo{ -1,0,0,0,0,0,text_list });
@@ -1345,9 +1344,9 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 				text_list.push_back(TextInfoSpec(textType, 0));
 				bSplitLine = true;
 				break;
-			case TxtMiru::TT_OTHER:
-				if(CGrText::isMatchChar(lpSrc, text_type_name[TxtMiru::TT_NO_READ])){
-					auto lpNote = CGrText::Find(lpTTSrc, text_type_name[TxtMiru::TT_OTHER]);
+			case TxtMiru::TextType::OTHER:
+				if(CGrText::isMatchChar(lpSrc, text_type_name[static_cast<int>(TxtMiru::TextType::NO_READ)])){
+					auto lpNote = CGrText::Find(lpTTSrc, text_type_name[static_cast<int>(TxtMiru::TextType::OTHER)]);
 					LPCTSTR lpConvertStr;
 					if(lpNote && lpNote <= lpTTSrcEnd){
 						// ※［＃始め二重山括弧、1-1-52］
@@ -1369,12 +1368,12 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 				}
 				if(CGrText::CharLen(tt_str.c_str()) == 1){ // 返り点 ? 訓点
 					if(bGetLastTLP){
-						text_list.push_back(TextInfoSpec(static_cast<std::tstring&&>(tt_str), TxtMiru::TT_GUID_MARK, lastTLP));
+						text_list.push_back(TextInfoSpec(static_cast<std::tstring&&>(tt_str), TxtMiru::TextType::GUID_MARK, lastTLP));
 					} else {
-						text_list.push_back(TextInfoSpec(static_cast<std::tstring&&>(tt_str), TxtMiru::TT_GUID_MARK, 0));
+						text_list.push_back(TextInfoSpec(static_cast<std::tstring&&>(tt_str), TxtMiru::TextType::GUID_MARK, 0));
 					}
 				} else {
-					auto lpNote = CGrText::Find(lpTTSrc, text_type_name[TxtMiru::TT_OTHER]);
+					auto lpNote = CGrText::Find(lpTTSrc, text_type_name[static_cast<int>(TxtMiru::TextType::OTHER)]);
 					if(!lpNote || lpNote > lpTTSrcEnd/*［＃ ～ ］の範囲外 */){
 						auto lpConvertStr = ConvertNoteChar(tt_str.c_str());
 						if(lpConvertStr){
@@ -1399,10 +1398,10 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 							text_list[lastTLP.iIndex].tpBegin = lastTLP;
 							auto lpConvertStr = ConvertNoteChar(ttsrc.c_str());
 							if(lpConvertStr){
-								text_list[lastTLP.iIndex].textType = TxtMiru::TT_TEXT;
+								text_list[lastTLP.iIndex].textType = TxtMiru::TextType::TEXT;
 								text_list[lastTLP.iIndex].str = lpConvertStr;
 							} else {
-								text_list[lastTLP.iIndex].textType = TxtMiru::TT_OTHER;
+								text_list[lastTLP.iIndex].textType = TxtMiru::TextType::OTHER;
 								text_list[lastTLP.iIndex].str = target;
 							}
 						} else {
@@ -1420,15 +1419,15 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 										ct,
 										TxtMiru::TextListPos{lastTLP.iIndex + 1},
 										TxtMiru::TextListPos(),
-										TxtMiru::TT_OTHER
-											)
+										TxtMiru::TextType::OTHER
+										)
 									);
 							}
 						}
 					}
 				}
 				break;
-			case TxtMiru::TT_PICTURE_LAYOUT:
+			case TxtMiru::TextType::PICTURE_LAYOUT:
 				if(bno_empty_tt_str){
 					// ［＃石鏃二つの図（fig42154_01.png、横321×縦123）入る］
 					// ［＃「第一七圖　國頭郡今歸仁村今泊阿應理惠按司勾玉」のキャプション付きの図（fig4990_07.png、横321×縦123）入る］
@@ -1487,11 +1486,11 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 					text_list.push_back(TextInfoSpec(static_cast<std::tstring&&>(tt_str), textType, lastTLP));
 				}
 				break;
-			case TxtMiru::TT_ENDOFCONTENTS:
+			case TxtMiru::TextType::ENDOFCONTENTS:
 				text_list.push_back(TextInfoSpec(textType, 0));
 				m_bEndofContents = true;
 				break;
-			case TxtMiru::TT_CENTER:
+			case TxtMiru::TextType::CENTER:
 				text_list.push_back(TextInfoSpec(textType, 0));
 				break;
 			default:
@@ -1513,7 +1512,7 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 			for(int it_ps_idx=it_sl_len; it_ps_idx>0; --it_ps_idx, ++it_ps){
 				const auto &ms = (*it_ps);
 				auto textType = ms.type();
-				if(textType == TxtMiru::TT_OVERLAP_CHAR && !m_bUseOverlapChar){
+				if(textType == TxtMiru::TextType::OVERLAP_CHAR && !m_bUseOverlapChar){
 					continue;
 				}
 				if(CGrText::isMatchChar(lpSrc, ms)){
@@ -1522,12 +1521,12 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 						lpTextStart = nullptr;
 					}
 					auto tmpCharType = CGrText::GetStringTypeEx(lpSrc, lpNextSrc-lpSrc);
-					if(textType == TxtMiru::TT_RUBY_SEP){
+					if(textType == TxtMiru::TextType::RUBY_SEP){
 						text_list.push_back(TxtMiru::TextInfo(static_cast<const TCHAR*>(ms), tmpCharType));
 						ruby_pos_r = text_list.size()-1;
 					} else {
 						TxtMiru::TextListPos lastTLP;
-						GetRFindTextType(lastTLP, text_list, TxtMiru::TT_TEXT);
+						GetRFindTextType(lastTLP, text_list, TxtMiru::TextType::TEXT);
 						text_list.push_back(TxtMiru::TextInfo(static_cast<const TCHAR*>(ms), tmpCharType, textType, lastTLP));
 					}
 					lpFindSrc = lpNextSrc;
@@ -1564,9 +1563,9 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 	}
 	for(int i=0; i<sizeof(m_RangeTextPoint)/sizeof(m_RangeTextPoint[0]); ++i){
 		auto tt = static_cast<TxtMiru::TextType>(i);
-		if(tt != TxtMiru::TT_LINE_BOX_START && m_RangeTextPoint[tt].iCount != 0){
-			const auto &tp = m_RangeTextPoint[tt];
-			text_list.push_back(TextInfoSpec(static_cast<const TCHAR*>(text_type_name[tt]), tt, tp.iIndex, tp.iPos, text_list.size(), -1));
+		if(tt != TxtMiru::TextType::LINE_BOX_START && m_RangeTextPoint[static_cast<int>(tt)].iCount != 0){
+			const auto &tp = m_RangeTextPoint[static_cast<int>(tt)];
+			text_list.push_back(TextInfoSpec(static_cast<const TCHAR*>(text_type_name[static_cast<int>(tt)]), tt, tp.iIndex, tp.iPos, text_list.size(), -1));
 			m_RangeTextPoint[i].iIndex = 0;
 			m_RangeTextPoint[i].iPos   = 0;
 		}
@@ -1574,7 +1573,7 @@ bool CGrAozoraTxtParser::parse(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text
 	if(!m_LineBox.empty()){
 		const auto *it = &m_LineBox[0];
 		auto len = m_LineBox.size();
-		auto tis = TextInfoSpec(static_cast<const TCHAR*>(text_type_name[TxtMiru::TT_MOVING_BORDER]), TxtMiru::TT_LINE_BOX_START, 0, 0, text_list.size(), -1);
+		auto tis = TextInfoSpec(static_cast<const TCHAR*>(text_type_name[static_cast<int>(TxtMiru::TextType::MOVING_BORDER)]), TxtMiru::TextType::LINE_BOX_START, 0, 0, text_list.size(), -1);
 		tis.chrType = 1;
 		tis.tpEnd.iPos = 1;/* 開始=0、途中=1, 終了=2 */
 		for(; len>0; --len, ++it, ++tis.chrType){
@@ -1599,10 +1598,10 @@ void CGrAozoraTxtParser::rindentEnd(CGrTxtBuffer &buffer, TxtMiru::TextInfoList 
 	text_list.push_back(TextInfoSpec(textType, 0));
 	if(!m_RIndent.empty()){
 		const auto &indent = m_RIndent.back();
-		text_list.push_back(TextInfoSpec(TxtMiru::TT_RINDENT_START, indent.iIndent1st));
+		text_list.push_back(TextInfoSpec(TxtMiru::TextType::RINDENT_START, indent.iIndent1st));
 	}
 	// ［＃ここで字上げ終わり］省略時の対応 バグ修正
-	if(textType == TxtMiru::TT_RINDENT_END && !m_RIndent.empty()){
+	if(textType == TxtMiru::TextType::RINDENT_END && !m_RIndent.empty()){
 		rindentEnd(buffer, text_list, textType);
 	}
 }
@@ -1618,10 +1617,10 @@ void CGrAozoraTxtParser::indentEnd(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &
 	text_list.push_back(TextInfoSpec(textType, 0));
 	if(!m_Indent.empty()){
 		const auto &indent = m_Indent.back();
-		text_list.push_back(TextInfoSpec(TxtMiru::TT_INDENT_START , indent.iIndent1st, indent.iIndent2nd));
+		text_list.push_back(TextInfoSpec(TxtMiru::TextType::INDENT_START , indent.iIndent1st, indent.iIndent2nd));
 	}
 	// ［＃ここで字下げ終わり］省略時の対応 バグ修正
-	if(textType == TxtMiru::TT_INDENT_END && !m_Indent.empty()){
+	if(textType == TxtMiru::TextType::INDENT_END && !m_Indent.empty()){
 		indentEnd(buffer, text_list, textType);
 	}
 }
@@ -1635,11 +1634,11 @@ void CGrAozoraTxtParser::rindentStart(CGrTxtBuffer &buffer, TxtMiru::TextInfoLis
 	m_bRIndentReset = false;
 	if(!m_RIndent.empty()){
 		buffer.MoveBackLineInfo(
-			TxtMiru::LineInfo { -1,0,0,0,0,0, TxtMiru::TextInfoList{TextInfoSpec(TxtMiru::TT_RINDENT_END, 0)} }
+			TxtMiru::LineInfo { -1,0,0,0,0,0, TxtMiru::TextInfoList{TextInfoSpec(TxtMiru::TextType::RINDENT_END, 0)} }
 			);
 	}
 	Indent indent = {iIndent, iIndent};
-	if(textType == TxtMiru::TT_RINDENT){
+	if(textType == TxtMiru::TextType::RINDENT){
 		m_bRIndentReset = true;
 	}
 	text_list.push_back(TextInfoSpec(textType, indent.iIndent1st));
@@ -1659,11 +1658,11 @@ void CGrAozoraTxtParser::indentStart(CGrTxtBuffer &buffer, TxtMiru::TextInfoList
 	m_bIndentReset = false;
 	if(!m_Indent.empty()){
 		buffer.MoveBackLineInfo(
-			TxtMiru::LineInfo { -1,0,0,0,0,0, TxtMiru::TextInfoList{TextInfoSpec(TxtMiru::TT_INDENT_END, 0)} }
+			TxtMiru::LineInfo { -1,0,0,0,0,0, TxtMiru::TextInfoList{TextInfoSpec(TxtMiru::TextType::INDENT_END, 0)} }
 			);
 	}
 	Indent indent = {iIndent1st, iIndent2nd};
-	if(textType == TxtMiru::TT_INDENT){
+	if(textType == TxtMiru::TextType::INDENT){
 		m_bIndentReset = true;
 	}
 	text_list.push_back(TextInfoSpec(textType, indent.iIndent1st, indent.iIndent2nd));
@@ -1700,7 +1699,7 @@ bool CGrAozoraTxtParser::ReadDataBuffer(LPBYTE lpData, DWORD fsize, CGrTxtBuffer
 			if(detectEnc.nCodePage == 0){
 				const auto &param = CGrTxtMiru::theApp().Param();
 				std::tstring dll_filename;
-				param.GetText(CGrTxtParam::GuessEncodingDLL, dll_filename);
+				param.GetText(CGrTxtParam::TextType::GuessEncodingDLL, dll_filename);
 				if(!dll_filename.empty()){
 					CGrLoadDllFunc func(dll_filename.c_str());
 					UINT(cdecl *DetectInputCodepage)(const char *buf, int buflen);
@@ -1769,7 +1768,7 @@ bool CGrAozoraTxtParser::ReadDataBuffer(LPBYTE lpData, DWORD fsize, CGrTxtBuffer
 			{
 				const auto &param = CGrTxtMiru::theApp().Param();
 				int usePreParser[3] = {}; /* 0:Pre-Parserを使用する, 1:Pre-Parserのエラーを表示しない, 2:(n)MB以上のファイルはPre-Parserを使用しない */
-				param.GetPoints(CGrTxtParam::UsePreParser, usePreParser, sizeof(usePreParser)/sizeof(int));
+				param.GetPoints(CGrTxtParam::PointsType::UsePreParser, usePreParser, sizeof(usePreParser)/sizeof(int));
 				if(usePreParser[2] > 0 && fsize > static_cast<UINT>(usePreParser[2]) * 1024/*KB*/ * 1024/*MB*/){
 					bUsePreParser = false;
 				}
@@ -1783,7 +1782,7 @@ bool CGrAozoraTxtParser::ReadDataBuffer(LPBYTE lpData, DWORD fsize, CGrTxtBuffer
 	}
 	return bret;
 }
-bool CGrAozoraTxtParser::ReadBuffer(LPCTSTR lpBuffer, CGrTxtBuffer &buffer, LPCTSTR lpFileName, bool bUsePreParser/* = true 2.0.30.0*/)
+bool CGrAozoraTxtParser::ReadBuffer(LPCTSTR lpBuffer, CGrTxtBuffer &buffer, LPCTSTR lpFileName, bool bUsePreParser/* = true*/)
 {
 	m_lastWriteTime.clear();
 	if(!lpBuffer){ return false; }
@@ -1798,7 +1797,7 @@ bool CGrAozoraTxtParser::ReadBuffer(LPCTSTR lpBuffer, CGrTxtBuffer &buffer, LPCT
 	buffer.MoveBackLineInfo(TxtMiru::LineInfo{ 1 });
 	//
 	m_Indent.clear();
-	m_csComment      = CSTAT_CONTENTS;
+	m_csComment      = CommentStatus::CONTENTS;
 	m_bEndofContents = false;
 	m_bIndentReset   = false;
 	m_bRIndentReset  = false;

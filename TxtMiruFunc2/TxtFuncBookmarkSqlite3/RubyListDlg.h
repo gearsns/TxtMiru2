@@ -16,7 +16,7 @@
 class CGrRubyListDlg : public CGrModelessWnd
 {
 public:
-	enum RubyListColumn {
+	enum class RubyListColumn {
 		RLC_STR ,
 		RLC_RUBY,
 		RLC_PAGE,
@@ -32,7 +32,7 @@ private:
 	std::wregex m_ignore_pattern;
 	std::vector<RubyInfo> m_rubyInfoList;
 	void *m_pDoc = nullptr;
-	bool m_bAsc[RLC_MAX] = {true, false, false};
+	bool m_bAsc[static_cast<int>(RubyListColumn::RLC_MAX)] = {true, false, false};
 	CGrListView m_listView;
 	CGrFilterEditBox m_filterEditBox;
 public:
@@ -57,7 +57,7 @@ private:
 
 	void endDialog(UINT id);
 	void setWindowSize(int cx, int cy);
-
+	
 	static void __stdcall DocEachAllProcCallbak(CGrTxtFuncIEachAllTool *pTool, LPARAM lParam);
 };
 

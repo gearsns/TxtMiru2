@@ -24,10 +24,11 @@ namespace CGrTxtFunc
 	bool GetSinglePage(HWND hWnd);
 	void GetBookmarkFolder(CGrTxtFuncIParam *pParam, std::tstring &str);
 	int AddBookmark(HWND hWnd);
-	int DeleteBookmark(HWND hWnd, int idx); 
-	bool BackupImgFile(int id); 
+	int DeleteBookmark(HWND hWnd, int idx);
+	bool BackupImgFile(int id);
 	bool RemoveBackupImgFolder(HWND hWnd);
 	bool GetBookByUrl(TxtFuncBookmark::Book& book, LPCTSTR lpURL);
+
 };
 
 #endif // __TXTFUNC_H__

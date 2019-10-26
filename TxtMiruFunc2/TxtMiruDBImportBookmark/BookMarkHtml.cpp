@@ -16,20 +16,9 @@
 #include <algorithm>
 std::wstring toUtf16(const std::string &str)
 {
-	std::vector<wchar_t> wtext;
-	do {
-		int nLenWide = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, NULL, 0);
-		if(nLenWide <= 0){
-			break;
-		}
-		wtext.resize(nLenWide + 1);
-		if(MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, wtext.data(), nLenWide) != nLenWide){
-			// Error
-			wtext.clear();
-		}
-		return std::wstring(wtext.begin(), wtext.end());
-	} while(0);
-	return std::wstring();
+	std::tstring wtext;
+	CGrText::MultiByteToTString(CP_UTF8, str.c_str(), -1, wtext);
+	return wtext;
 }
 
 void toLower(std::string &str){ std::transform(str.begin(), str.end(), str.begin(), ::tolower); }
@@ -103,10 +92,10 @@ static void Parse(const char *in_html, BookmarkDB::BookList &out_book_list)
 			for(; text<end_text; ++text){
 				if(*text == '&'){
 					bool bFind = false;
-					for(const auto &ecm_item : escape_char_map){
-						if(0 == strncmp(text, ecm_item.first.c_str(), ecm_item.first.size()-1)){
-							text += ecm_item.first.size()-1;
-							for(const char tch : ecm_item.second){
+					for(const auto &[ecm_key, ecm_value] : escape_char_map){
+						if(0 == strncmp(text, ecm_key.c_str(), ecm_key.size()-1)){
+							text += ecm_key.size()-1;
+							for(const char tch : ecm_value){
 								bFind = true;
 								*p = tch;
 								++p;

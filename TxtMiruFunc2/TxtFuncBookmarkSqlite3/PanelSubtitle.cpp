@@ -42,9 +42,9 @@ bool CGrPanelSubtitleWnd::Create(HWND hParent, HIMAGELIST hImg)
 	//
 	auto &&toolBar = m_coolBar.GetToolBar();
 	TBBUTTON tbb[] = {
-		//iBitmap                           idCommand          fsState          fsStyle                         bReserved[2]  dwData iString
-		{TxtFuncBookmark::ii_subtitle_open, IDM_SUBTITLE_OPEN, TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_TIPS_SUBTITLE_OPEN},
-		{I_IMAGENONE                      , IDS_BMH_TITLE    , TBSTATE_ENABLED, BTNS_AUTOSIZE  | BTNS_SHOWTEXT, 0, 0        , 0    , IDS_ERROR_BOOK        },
+		//iBitmap                                                        idCommand          fsState          fsStyle                         bReserved[2]  dwData iString
+		{static_cast<int>(TxtFuncBookmark::ImageIcon::ii_subtitle_open), IDM_SUBTITLE_OPEN, TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_TIPS_SUBTITLE_OPEN},
+		{I_IMAGENONE                                                   , IDS_BMH_TITLE    , TBSTATE_ENABLED, BTNS_AUTOSIZE  | BTNS_SHOWTEXT, 0, 0        , 0    , IDS_ERROR_BOOK        },
 	};
 	for(auto &&item : tbb){
 		if(item.iString != 0){
@@ -295,8 +295,6 @@ bool CGrPanelSubtitleWnd::setRead(int iItem)
 void CGrPanelSubtitleWnd::OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 {
 	switch(id){
-	case IDM_MAKECACHE:
-		break;
 	case IDM_SUBTITLE_OPEN:
 		{
 			auto iItem = GetFocusedItem();
@@ -319,8 +317,8 @@ void CGrPanelSubtitleWnd::OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNo
 					if(FALSE == m_listView.GetItem(&item)){
 						continue;
 					}
-					if(/**/item.iImage == TxtFuncBookmark::ii_stat_bookmark_normal_update || item.iImage == TxtFuncBookmark::ii_stat_bookmark_current_update
-					   ||  item.iImage == TxtFuncBookmark::ii_stat_link_normal_update     || item.iImage == TxtFuncBookmark::ii_stat_link_current_update     ){
+					if(/**/item.iImage == static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_bookmark_normal_update) || item.iImage == static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_bookmark_current_update)
+					   ||  item.iImage == static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_link_normal_update    ) || item.iImage == static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_link_current_update    ) ){
 						continue;
 					}
 					if(!setRead(iItem)){
@@ -347,8 +345,8 @@ void CGrPanelSubtitleWnd::OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNo
 					if(FALSE == m_listView.GetItem(&item)){
 						continue;
 					}
-					if(/**/item.iImage == TxtFuncBookmark::ii_stat_bookmark_normal || item.iImage == TxtFuncBookmark::ii_stat_bookmark_current
-					   ||  item.iImage == TxtFuncBookmark::ii_stat_link_normal     || item.iImage == TxtFuncBookmark::ii_stat_link_current     ){
+					if(/**/item.iImage == static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_bookmark_normal) || item.iImage == static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_bookmark_current)
+					   ||  item.iImage == static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_link_normal    ) || item.iImage == static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_link_current    ) ){
 						continue;
 					}
 					if(!setUnRead(iItem)){
@@ -371,11 +369,11 @@ LRESULT CGrPanelSubtitleWnd::OnNotify(HWND hWnd, int idFrom, NMHDR FAR *lpnmhdr)
 	if(idFrom == listwnd_id){
 		switch (lpnmhdr->code) {
 		case NM_DBLCLK:
-			{
-				auto lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(lpnmhdr);
-				openFile(lpnmitem->iItem);
-				break;
-			}
+		{
+			auto lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(lpnmhdr);
+			openFile(lpnmitem->iItem);
+			break;
+		}
 		case NM_RCLICK:
 			if (!CGrTxtFunc::IsWaitting()) {
 				POINT cursor;
@@ -389,52 +387,52 @@ LRESULT CGrPanelSubtitleWnd::OnNotify(HWND hWnd, int idFrom, NMHDR FAR *lpnmhdr)
 			}
 			break;
 		case LVN_BEGINDRAG:
-			{
-				if (!m_booklistDlg.IsUpdating()) {
-					auto pnmv = reinterpret_cast<LPNMLISTVIEW>(lpnmhdr);
-					int cnt = m_listView.GetSelectedCount();
-					UINT flags = (cnt <= 0) ? (LVNI_ALL | LVNI_FOCUSED) : (LVNI_ALL | LVNI_SELECTED);
-					int iItem = -1;
-					std::tstring url;
-					while ((iItem = m_listView.GetNextItem(iItem, flags)) != -1) {
-						LVITEM item = { LVIF_PARAM };
-						item.iItem = iItem;
-						if (FALSE == m_listView.GetItem(&item)) {
-							break;
-						}
-						int index = static_cast<int>(item.lParam);
-						if (index < 0 || index >= static_cast<signed int>(m_subtitle_list.size())) {
-							break;
-						}
-						if (url.empty()) {
-							url = m_subtitle_list[index].url;
-						}
+		{
+			if (!m_booklistDlg.IsUpdating()) {
+				auto pnmv = reinterpret_cast<LPNMLISTVIEW>(lpnmhdr);
+				int cnt = m_listView.GetSelectedCount();
+				UINT flags = (cnt <= 0) ? (LVNI_ALL | LVNI_FOCUSED) : (LVNI_ALL | LVNI_SELECTED);
+				int iItem = -1;
+				std::tstring url;
+				while ((iItem = m_listView.GetNextItem(iItem, flags)) != -1) {
+					LVITEM item = { LVIF_PARAM };
+					item.iItem = iItem;
+					if (FALSE == m_listView.GetItem(&item)) {
+						break;
 					}
-					auto* pDropSource = new CDropSource;
-					///////////////
-					auto* pDataObject = new CDataObject(pDropSource);
-					pDataObject->SetUrl(url.c_str());
-					///////////////
-					CDragSourceHelper dragSrcHelper;
-					dragSrcHelper.InitializeFromWindow(m_listView, pnmv->ptAction, pDataObject);
-
-					DWORD dwEffect;
-					auto hr = ::DoDragDrop(pDataObject, pDropSource, DROPEFFECT_MOVE, &dwEffect);
-					if (SUCCEEDED(hr)) {
-						if (dwEffect == DROPEFFECT_MOVE) {
-							DispList(true);
-						}
+					int index = static_cast<int>(item.lParam);
+					if (index < 0 || index >= static_cast<signed int>(m_subtitle_list.size())) {
+						break;
 					}
-					pDropSource->Release();
-					pDataObject->Release();
+					if (url.empty()) {
+						url = m_subtitle_list[index].url;
+					}
 				}
-				break;
+				auto* pDropSource = new CDropSource;
+				///////////////
+				auto* pDataObject = new CDataObject(pDropSource);
+				pDataObject->SetUrl(url.c_str());
+				///////////////
+				CDragSourceHelper dragSrcHelper;
+				dragSrcHelper.InitializeFromWindow(m_listView, pnmv->ptAction, pDataObject);
+
+				DWORD dwEffect;
+				auto hr = ::DoDragDrop(pDataObject, pDropSource, DROPEFFECT_MOVE, &dwEffect);
+				if (SUCCEEDED(hr)) {
+					if (dwEffect == DROPEFFECT_MOVE) {
+						DispList(true);
+					}
+				}
+				pDropSource->Release();
+				pDataObject->Release();
 			}
+			break;
+		}
 		case NM_CUSTOMDRAW:
-			{
-				auto lpCustomDraw = reinterpret_cast<LPNMTBCUSTOMDRAW>(lpnmhdr);
-				break;
-			}
+		{
+			auto lpCustomDraw = reinterpret_cast<LPNMTBCUSTOMDRAW>(lpnmhdr);
+			break;
+		}
 		}
 	}
 	return CGrPanelWnd::OnNotify(hWnd, idFrom, lpnmhdr);
@@ -612,7 +610,7 @@ bool CGrPanelSubtitleWnd::DispList(bool bKeepIndex)
 					item.iItem    = m_listView.GetItemCount();
 					item.iSubItem = 0;
 					item.lParam   = m_subtitle_list.size();
-					item.iImage   = TxtFuncBookmark::ii_stat_book_normal;
+					item.iImage   = static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_book_normal);
 					item.pszText  = const_cast<LPTSTR>(title.c_str());
 
 					bool bRead = false;
@@ -657,8 +655,8 @@ bool CGrPanelSubtitleWnd::DispList(bool bKeepIndex)
 			sqlite3_stmt *pstmt_txtmiru_st_latest = nullptr;
 			do {
 				int ret = sqlite3_prepare16(pSqlite3, _T("SELECT P.PLACE_ID,P.URL,P.TITLE,P.AUTHOR,P.READ_PAGE,P.PAGE,P.LAST_VISIT_DATE")
-											_T(" FROM TXTMIRU_HISTORY P")
-											_T(" ORDER BY P.LAST_VISIT_DATE DESC"), -1, &pstmt_txtmiru_st_latest, nullptr);
+										_T(" FROM TXTMIRU_HISTORY P")
+										_T(" ORDER BY P.LAST_VISIT_DATE DESC"), -1, &pstmt_txtmiru_st_latest, nullptr);
 				if(ret != SQLITE_OK || !pstmt_txtmiru_st_latest) {
 					// コメント等、有効なSQLステートメントでないと、戻り値はOKだがstmはNULLになる。
 					bRet = false;
@@ -708,7 +706,7 @@ bool CGrPanelSubtitleWnd::DispList(bool bKeepIndex)
 					item.iItem    = m_listView.GetItemCount();
 					item.iSubItem = 0;
 					item.lParam   = m_subtitle_list.size();
-					item.iImage   = TxtFuncBookmark::ii_stat_book_normal;
+					item.iImage   = static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_book_normal);
 					item.pszText  = const_cast<LPTSTR>(title.c_str());
 
 					bool bRead = false;
@@ -749,9 +747,9 @@ bool CGrPanelSubtitleWnd::DispList(bool bKeepIndex)
 			sqlite3_stmt *pstmt_txtmiru_st_siori = nullptr;
 			do {
 				int ret = sqlite3_prepare16(pSqlite3, _T("SELECT P.URL,P.TITLE,P.AUTHOR,B.TITLE,B.PAGE")
-											_T(" FROM TXTMIRU_BOOKMARKS B")
-											_T(" INNER JOIN TXTMIRU_PLACES P ON P.ID=B.PLACE_ID")
-											_T(" ORDER BY P.URL,B.PAGE,B.B_LINE,B.B_INDEX,B.B_POS"), -1, &pstmt_txtmiru_st_siori, nullptr);
+										_T(" FROM TXTMIRU_BOOKMARKS B")
+										_T(" INNER JOIN TXTMIRU_PLACES P ON P.ID=B.PLACE_ID")
+										_T(" ORDER BY P.URL,B.PAGE,B.B_LINE,B.B_INDEX,B.B_POS"), -1, &pstmt_txtmiru_st_siori, nullptr);
 				if(ret != SQLITE_OK || !pstmt_txtmiru_st_siori) {
 					// コメント等、有効なSQLステートメントでないと、戻り値はOKだがstmはNULLになる。
 					bRet = false;
@@ -790,7 +788,7 @@ bool CGrPanelSubtitleWnd::DispList(bool bKeepIndex)
 					item.iItem    = m_listView.GetItemCount();
 					item.iSubItem = 0;
 					item.lParam   = m_subtitle_list.size();
-					item.iImage   = TxtFuncBookmark::ii_bookmark;
+					item.iImage   = static_cast<int>(TxtFuncBookmark::ImageIcon::ii_bookmark);
 					item.pszText  = const_cast<LPTSTR>(title.c_str());
 
 					bool bRead = false;
@@ -820,10 +818,10 @@ bool CGrPanelSubtitleWnd::DispList(bool bKeepIndex)
 			sqlite3_stmt *pstmt_txtmiru_st_siori = nullptr;
 			do {
 				int ret = sqlite3_prepare16(pSqlite3, _T("SELECT P.URL,P.TITLE,P.AUTHOR,B.TITLE,B.PAGE")
-											_T(" FROM TXTMIRU_BOOKMARKS B")
-											_T(" INNER JOIN TXTMIRU_PLACES P ON P.ID=B.PLACE_ID")
-											_T(" WHERE B.PLACE_ID=@PLACE_ID")
-											_T(" ORDER BY P.URL,B.PAGE,B.B_LINE,B.B_INDEX,B.B_POS"), -1, &pstmt_txtmiru_st_siori, nullptr);
+										_T(" FROM TXTMIRU_BOOKMARKS B")
+										_T(" INNER JOIN TXTMIRU_PLACES P ON P.ID=B.PLACE_ID")
+										_T(" WHERE B.PLACE_ID=@PLACE_ID")
+										_T(" ORDER BY P.URL,B.PAGE,B.B_LINE,B.B_INDEX,B.B_POS"), -1, &pstmt_txtmiru_st_siori, nullptr);
 				if(ret != SQLITE_OK || !pstmt_txtmiru_st_siori) {
 					// コメント等、有効なSQLステートメントでないと、戻り値はOKだがstmはNULLになる。
 					bRet = false;
@@ -861,7 +859,7 @@ bool CGrPanelSubtitleWnd::DispList(bool bKeepIndex)
 					item.iSubItem = 0;
 					item.lParam   = m_subtitle_list.size();
 					item.pszText  = const_cast<LPTSTR>(title.c_str());
-					item.iImage   = TxtFuncBookmark::ii_bookmark;
+					item.iImage   = static_cast<int>(TxtFuncBookmark::ImageIcon::ii_bookmark);
 
 					bool bRead = false;
 					item.iItem    = m_listView.InsertItem(&item);
@@ -890,9 +888,9 @@ bool CGrPanelSubtitleWnd::DispList(bool bKeepIndex)
 			sqlite3_stmt *pstmt_txtmiru_st_bm   = nullptr;
 			do {
 				int ret = sqlite3_prepare16(pSqlite3, _T("SELECT S.ID,S.B_ORDER,S.TITLE,S.URL,")
-											_T("P.PAGE,P.READ_PAGE,P.LAST_VISIT_DATE,S.PAGE,S.LEVEL")
-											_T(" FROM TXTMIRU_SUBTITLES S LEFT JOIN TXTMIRU_PLACES P ON P.URL=S.URL ")
-											_T(" WHERE S.PLACE_ID=@PLACE_ID AND S.URL!='' ORDER BY S.B_ORDER"), -1, &pstmt_txtmiru_st_link, nullptr);
+										_T("P.PAGE,P.READ_PAGE,P.LAST_VISIT_DATE,S.PAGE,S.LEVEL")
+										_T(" FROM TXTMIRU_SUBTITLES S LEFT JOIN TXTMIRU_PLACES P ON P.URL=S.URL ")
+										_T(" WHERE S.PLACE_ID=@PLACE_ID AND S.URL!='' ORDER BY S.B_ORDER"), -1, &pstmt_txtmiru_st_link, nullptr);
 				if(ret != SQLITE_OK || !pstmt_txtmiru_st_link) {
 					// コメント等、有効なSQLステートメントでないと、戻り値はOKだがstmはNULLになる。
 					bRet = false;
@@ -955,7 +953,7 @@ bool CGrPanelSubtitleWnd::DispList(bool bKeepIndex)
 					bool bRead = false;
 
 					if(subtitle.url.empty()){
-						item.iImage   = TxtFuncBookmark::ii_stat_bookmark_normal;
+						item.iImage   = static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_bookmark_normal);
 						CGrDBFunc::GetValue(pstmt, 7, subtitle.page);
 						int subtitle_page = subtitle.page;
 						subtitle_page &= (-2);
@@ -973,14 +971,14 @@ bool CGrPanelSubtitleWnd::DispList(bool bKeepIndex)
 						}
 						if(iCurrentPage >= subtitle.page){
 							iCurrentTitle = item.lParam;
-							iCurrentImage = TxtFuncBookmark::ii_stat_bookmark_current;
+							iCurrentImage = static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_bookmark_current);
 							if(bRead){
 								iCurrentImage += 1;
 							}
 						}
 						subtitle.url = m_book.url;
 					} else {
-						item.iImage   = TxtFuncBookmark::ii_stat_link_normal;
+						item.iImage   = static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_link_normal);
 						if((subtitle.page < 4 && subtitle.page > 0)|| subtitle.read_page > (subtitle.page / 4) && !subtitle.last_visit_date.empty()){
 							bRead = true;
 						}
@@ -993,7 +991,7 @@ bool CGrPanelSubtitleWnd::DispList(bool bKeepIndex)
 						}
 						if(subtitle.url == current_filename){
 							iCurrentTitle = item.lParam;
-							iCurrentImage = TxtFuncBookmark::ii_stat_link_current;
+							iCurrentImage = static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_link_current);
 							if(bRead){
 								iCurrentImage += 1;
 							}
@@ -1065,7 +1063,6 @@ bool CGrPanelSubtitleWnd::DispList(bool bKeepIndex)
 			::SetScrollInfo(m_listView, SB_HORZ, &si, TRUE);
 		}
 	} while(0);
-
 	m_listView.SetRedraw(TRUE);
 
 	return bRet;

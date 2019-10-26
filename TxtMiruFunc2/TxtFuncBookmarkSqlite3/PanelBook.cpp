@@ -170,7 +170,7 @@ public:
 						m_bookWnd.addDelayBookDlg(fileName, m_listview.GetDrawInsertPos());
 					}
 				}
-			} else if(pFmtEtc->cfFormat ==CF_UNICODETEXT/*CF_TEXT*/){
+			} else if(pFmtEtc->cfFormat ==CF_UNICODETEXT){
 				// NOP
 			}
 		}
@@ -210,16 +210,16 @@ bool CGrPanelBookWnd::Create(HWND hParent, HIMAGELIST hImg)
 	//
 	auto &&toolBar = m_coolBar.GetToolBar();
 	TBBUTTON tbb[] = {
-		//iBitmap                             idCommand           fsState          fsStyle                         bReserved[2]  dwData iString
-		{TxtFuncBookmark::ii_book_open      , IDM_BOOK_OPEN     , TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_TIPS_BOOK_OPEN      },
-		{TxtFuncBookmark::ii_book_add       , IDM_BOOK_ADD      , TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_TIPS_BOOK_ADD       },
-		{TxtFuncBookmark::ii_book_modify    , IDM_BOOK_MODIFY   , TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_TIPS_BOOK_MODIFY    },
-		{TxtFuncBookmark::ii_book_delete    , IDM_BOOK_DELETE   , TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_TIPS_BOOK_DELETE    },
-		{TxtFuncBookmark::ii_book_update    , IDM_UPDATECHECK   , TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_TIPS_BOOK_UPDATE    },
-		{TxtFuncBookmark::ii_book_update_all, IDM_UPDATECHECKALL, TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_TIPS_BOOK_UPDATE_ALL},
-		{TxtFuncBookmark::ii_book_up        , IDM_BOOK_UP       , TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_TIPS_BOOK_UP        },
-		{TxtFuncBookmark::ii_book_down      , IDM_BOOK_DOWN     , TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_TIPS_BOOK_DOWN      },
-		{I_IMAGENONE                        , IDS_BMH_TITLE     , TBSTATE_ENABLED, BTNS_AUTOSIZE  | BTNS_SHOWTEXT, 0, 0        , 0    , IDS_ERROR_FOLDER        },
+		//iBitmap                                                          idCommand           fsState          fsStyle                         bReserved[2]  dwData iString
+		{static_cast<int>(TxtFuncBookmark::ImageIcon::ii_book_open      ), IDM_BOOK_OPEN     , TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_TIPS_BOOK_OPEN      },
+		{static_cast<int>(TxtFuncBookmark::ImageIcon::ii_book_add       ), IDM_BOOK_ADD      , TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_TIPS_BOOK_ADD       },
+		{static_cast<int>(TxtFuncBookmark::ImageIcon::ii_book_modify    ), IDM_BOOK_MODIFY   , TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_TIPS_BOOK_MODIFY    },
+		{static_cast<int>(TxtFuncBookmark::ImageIcon::ii_book_delete    ), IDM_BOOK_DELETE   , TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_TIPS_BOOK_DELETE    },
+		{static_cast<int>(TxtFuncBookmark::ImageIcon::ii_book_update    ), IDM_UPDATECHECK   , TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_TIPS_BOOK_UPDATE    },
+		{static_cast<int>(TxtFuncBookmark::ImageIcon::ii_book_update_all), IDM_UPDATECHECKALL, TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_TIPS_BOOK_UPDATE_ALL},
+		{static_cast<int>(TxtFuncBookmark::ImageIcon::ii_book_up        ), IDM_BOOK_UP       , TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_TIPS_BOOK_UP        },
+		{static_cast<int>(TxtFuncBookmark::ImageIcon::ii_book_down      ), IDM_BOOK_DOWN     , TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_TIPS_BOOK_DOWN      },
+		{I_IMAGENONE                                                     , IDS_BMH_TITLE     , TBSTATE_ENABLED, BTNS_AUTOSIZE  | BTNS_SHOWTEXT, 0, 0        , 0    , IDS_ERROR_FOLDER        },
 	};
 	for(auto &item : tbb){
 		if(item.iString != 0){
@@ -535,10 +535,10 @@ void CGrPanelBookWnd::SetWorking(bool bWork)
 	TBBUTTONINFO ti = {sizeof(TBBUTTONINFO)};
 	ti.dwMask = TBIF_IMAGE | TBIF_TEXT;
 	if(bWork){
-		ti.iImage = TxtFuncBookmark::ii_book_abort;
+		ti.iImage = static_cast<int>(TxtFuncBookmark::ImageIcon::ii_book_abort);
 		CGrText::LoadString(IDS_TIPS_BOOK_UPDATE, tips);
 	} else {
-		ti.iImage = TxtFuncBookmark::ii_book_update;
+		ti.iImage = static_cast<int>(TxtFuncBookmark::ImageIcon::ii_book_update);
 		CGrText::LoadString(IDS_TIPS_BOOK_UPDATE, tips);
 	}
 	ti.pszText = const_cast<LPTSTR>(tips.c_str());
@@ -679,6 +679,7 @@ void CGrPanelBookWnd::OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify
 			if(!url.empty()){
 				auto lpFileName = url.c_str();
 				if(CGrShell::IsURI(lpFileName) || CGrText::Find(lpFileName, _T("|"))/* アーカイブファイル */){
+					;
 				} else {
 					SHELLEXECUTEINFO si = { sizeof(SHELLEXECUTEINFO) };
 					si.fMask   = SEE_MASK_INVOKEIDLIST | SEE_MASK_FLAG_NO_UI;
@@ -804,7 +805,7 @@ bool CGrPanelBookWnd::SetUpdating(int iItem)
 		}
 		LVITEM item = { LVIF_IMAGE };
 		item.iItem = iItem;
-		item.iImage = TxtFuncBookmark::ii_stat_book_check;
+		item.iImage = static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_book_check);
 		if(FALSE == m_listView.SetItem(&item)){
 			break;
 		}
@@ -859,7 +860,7 @@ bool CGrPanelBookWnd::refreshItem(int iItem)
 			break;
 		}
 		iImage = item.iImage;
-		item.iImage = TxtFuncBookmark::ii_stat_book_check;
+		item.iImage = static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_book_check);
 		item.mask   = LVIF_IMAGE;
 		if(FALSE == m_listView.SetItem(&item)){
 			break;
@@ -1059,15 +1060,15 @@ bool CGrPanelBookWnd::dispListSub(LPCTSTR lpSql, bool bKeepIndex, int in_iItem, 
 			if(book.total_cnt == 0){
 				book.read_page &= (-2);
 				if(book.read_page + 1 < book.page){
-					item.iImage = bCurrent ? TxtFuncBookmark::ii_stat_book_current_update : TxtFuncBookmark::ii_stat_book_normal_update;
+					item.iImage = bCurrent ? static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_book_current_update) : static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_book_normal_update);
 				} else {
-					item.iImage = bCurrent ? TxtFuncBookmark::ii_stat_book_current        : TxtFuncBookmark::ii_stat_book_normal       ;
+					item.iImage = bCurrent ? static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_book_current       ) : static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_book_normal       );
 				}
 			} else {
 				if(book.read_cnt < book.total_cnt){
-					item.iImage = bCurrent ? TxtFuncBookmark::ii_stat_book_current_update : TxtFuncBookmark::ii_stat_book_normal_update;
+					item.iImage = bCurrent ? static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_book_current_update) : static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_book_normal_update);
 				} else {
-					item.iImage = bCurrent ? TxtFuncBookmark::ii_stat_book_current        : TxtFuncBookmark::ii_stat_book_normal       ;
+					item.iImage = bCurrent ? static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_book_current       ) : static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_book_normal       );
 				}
 			}
 			if(in_iItem < 0){

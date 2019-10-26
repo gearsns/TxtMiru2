@@ -154,12 +154,12 @@ LRESULT CGrBookListDlg::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	return CGrModelessWnd::WndProc(hWnd, uMsg, wParam, lParam);
 }
 
-static LPCTSTR l_treeicon_name_list[TxtFuncBookmark::iti_max] = {
+static LPCTSTR l_treeicon_name_list[static_cast<int>(TxtFuncBookmark::ImageTreeIcon::iti_max)] = {
 	_T("stat_tree_collapsed"         ),
 	_T("stat_tree_expanded"          ),
 	_T("stat_tree_none"              ),
 };
-static LPCTSTR l_icon_name_list[TxtFuncBookmark::ii_max] = {
+static LPCTSTR l_icon_name_list[static_cast<int>(TxtFuncBookmark::ImageIcon::ii_max)] = {
 	_T("stat_tag_favorite"           ),
 	_T("stat_book_normal"            ),
 	_T("stat_book_normal_update"     ),
@@ -214,8 +214,8 @@ BOOL CGrBookListDlg::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 		//
 		CGrBitmap bmp_list;
 		CGrBitmap bmp_tree;
-		bmp_list.Create(height*TxtFuncBookmark::ii_max, height);
-		bmp_tree.Create(height*TxtFuncBookmark::iti_max / 2, height);
+		bmp_list.Create(height*static_cast<int>(TxtFuncBookmark::ImageIcon::ii_max), height);
+		bmp_tree.Create(height*static_cast<int>(TxtFuncBookmark::ImageTreeIcon::iti_max) / 2, height);
 		{
 			{
 				auto color = GetSysColor(COLOR_WINDOW);
@@ -223,7 +223,7 @@ BOOL CGrBookListDlg::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 				int g = GetGValue(color);
 				int b = GetBValue(color);
 				{
-					int l = height*TxtFuncBookmark::ii_max * height;
+					int l = height*static_cast<int>(TxtFuncBookmark::ImageIcon::ii_max) * height;
 					auto lpRGB = bmp_list.GetBits();
 					for(; l>0; --l, ++lpRGB){
 						lpRGB->rgbRed = r;
@@ -233,7 +233,7 @@ BOOL CGrBookListDlg::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 					}
 				}
 				{
-					int l = height*TxtFuncBookmark::iti_max / 2 * height;
+					int l = height*static_cast<int>(TxtFuncBookmark::ImageTreeIcon::iti_max) / 2 * height;
 					auto lpRGB = bmp_tree.GetBits();
 					for(; l>0; --l, ++lpRGB){
 						lpRGB->rgbRed = r;
@@ -248,7 +248,7 @@ BOOL CGrBookListDlg::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 			auto lpDir = CGrTxtFunc::GetDataPath();
 			TCHAR curPath[MAX_PATH];
 			CGrShell::GetExePath(curPath);
-			for(int i=0; i<TxtFuncBookmark::ii_max; ++i){
+			for(int i=0; i< static_cast<int>(TxtFuncBookmark::ImageIcon::ii_max); ++i){
 				TCHAR path[_MAX_PATH] = {};
 				_stprintf_s(path, _T("%s\\toolbar_icon\\list_icon_%s"), lpDir, l_icon_name_list[i]);
 				std::tstring image_filename;
@@ -262,7 +262,7 @@ BOOL CGrBookListDlg::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 				}
 			}
 			int width = height / 2;
-			for(int i=0; i<TxtFuncBookmark::iti_max; ++i){
+			for(int i=0; i< static_cast<int>(TxtFuncBookmark::ImageTreeIcon::iti_max); ++i){
 				TCHAR path[_MAX_PATH] = {};
 				_stprintf_s(path, _T("%s\\toolbar_icon\\list_icon_%s"), lpDir, l_treeicon_name_list[i]);
 				std::tstring image_filename;
@@ -327,8 +327,8 @@ BOOL CGrBookListDlg::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 				int h0 = desktop_rc.bottom - desktop_rc.top;
 				int w = w0 * 80 / 100;
 				int h = h0 * 80 / 100;
-				int x = w0 / 2 - w / 2;
-				int y = h0 / 2 - h / 2;
+				int x = w0 / 2 - w / 2;// + desktop_rc.left;
+				int y = h0 / 2 - h / 2;// + desktop_rc.top ;
 				wndp.rcNormalPosition.left   = x    ;
 				wndp.rcNormalPosition.right  = x + w;
 				wndp.rcNormalPosition.top    = y    ;

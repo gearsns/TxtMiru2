@@ -57,7 +57,7 @@ void CGrLupeWnd::Show(HWND hWnd, int page)
 			this);
 		const auto &param = CGrTxtMiru::theApp().Param();
 		int window_pos[5] = {};
-		param.GetPoints(CGrTxtParam::LupePos, window_pos, sizeof(window_pos)/sizeof(int));
+		param.GetPoints(CGrTxtParam::PointsType::LupePos, window_pos, sizeof(window_pos)/sizeof(int));
 		// モニタ内でウインドウを移動
 		MoveWindowInMonitor(window_pos[1], window_pos[2], window_pos[3], window_pos[4]);
 	}
@@ -217,18 +217,18 @@ LRESULT CGrLupeWnd::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 		{
 			auto &&param = CGrTxtMiru::theApp().Param();
-			if(!param.GetBoolean(CGrTxtParam::SaveWindowSize)){
+			if(!param.GetBoolean(CGrTxtParam::PointsType::SaveWindowSize)){
 				break;
 			}
 			RECT rect;
 			int window_pos[5] = {};
 			::GetWindowRect(m_hWnd, &rect);
-			param.GetPoints(CGrTxtParam::LupePos, window_pos, sizeof(window_pos)/sizeof(int));
+			param.GetPoints(CGrTxtParam::PointsType::LupePos, window_pos, sizeof(window_pos)/sizeof(int));
 			window_pos[1] = rect.left   ;
 			window_pos[2] = rect.top    ;
 			window_pos[3] = rect.right  - rect.left;
 			window_pos[4] = rect.bottom - rect.top;
-			param.SetPoints(CGrTxtParam::LupePos, window_pos, sizeof(window_pos)/sizeof(int));
+			param.SetPoints(CGrTxtParam::PointsType::LupePos, window_pos, sizeof(window_pos)/sizeof(int));
 			if(m_pTxtCanvas){
 				delete m_pTxtCanvas;
 				m_pTxtCanvas = nullptr;
@@ -253,7 +253,7 @@ void CGrLupeWnd::OnPaint(HWND hwnd)
 
 	const auto &param = CGrTxtMiru::theApp().Param();
 	COLORREF page_color[3] = {}; /* paper, shadow, back */
-	param.GetPoints(CGrTxtParam::PageColor, (int*)page_color, sizeof(page_color)/sizeof(COLORREF));
+	param.GetPoints(CGrTxtParam::PointsType::PageColor, (int*)page_color, sizeof(page_color)/sizeof(COLORREF));
 	auto oldclr = ::SetBkColor(hdc, page_color[2]);
 	auto temp_rect = rect;
 	temp_rect.right = -m_offset.x;
@@ -296,20 +296,20 @@ void CGrLupeWnd::setWindowSize(int cx, int cy)
 
 void CGrLupeWnd::UpdatePos(POINT pos)
 {
-	if(m_selectType == ST_MousePos){
+	if(m_selectType == SelectType::MousePos){
 		SetOffset(pos);
 	}
 }
 
 void CGrLupeWnd::UpdateWindowPos()
 {
-	if(m_selectType == ST_WindowPos){
+	if(m_selectType == SelectType::WindowPos){
 		RECT winRect;
 		GetWindowRect(m_hWnd, &winRect);
 		POINT pos = {
 			winRect.left + (winRect.right - winRect.left) / 2,
 			winRect.top  + (winRect.bottom - winRect.top) / 2
-			};
+		};
 		ScreenToClient(GetParent(m_hWnd), &pos);
 		SetOffset(pos);
 	}
@@ -348,7 +348,7 @@ void CGrLupeWnd::SetOffset(POINT pos)
 
 void CGrLupeWnd::OnNCMouseMove(HWND hwnd, int x, int y, UINT codeHitTest)
 {
-	if(m_selectType == ST_MousePos){
+	if(m_selectType == SelectType::MousePos){
 		POINT pos = {x, y};
 		ScreenToClient(GetParent(m_hWnd), &pos);
 		SetOffset(pos);

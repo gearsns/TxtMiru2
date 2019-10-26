@@ -107,13 +107,13 @@ void CGrTxtRendererMgr::createCharRenderer(FontType ft, CGrTxtParam &param, CGrT
 {
 	try {
 		if(size <= 0){
-			if(m_currentCharRendererMap[ft]){
-				delete m_currentCharRendererMap[ft];
-				m_currentCharRendererMap[ft] = nullptr;
+			if(m_currentCharRendererMap[static_cast<int>(ft)]){
+				delete m_currentCharRendererMap[static_cast<int>(ft)];
+				m_currentCharRendererMap[static_cast<int>(ft)] = nullptr;
 			}
 			return;
 		}
-		auto &&cr = selectCharRenderer(size, &m_currentCharRendererMap[ft]);
+		auto &&cr = selectCharRenderer(size, &m_currentCharRendererMap[static_cast<int>(ft)]);
 		LOGFONT logFont = {
 			-12, 0,
 			FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
@@ -149,14 +149,14 @@ void CGrTxtRendererMgr::createFlexCharRenderer(FontType ft, CGrTxtParam &param, 
 
 void CGrTxtRendererMgr::SetTextColor(FontType ft, COLORREF color)
 {
-	auto pcr = m_currentCharRendererMap[ft];
+	auto pcr = m_currentCharRendererMap[static_cast<int>(ft)];
 	if(pcr){
 		pcr->SetTextColor(color);
 	}
 }
 COLORREF CGrTxtRendererMgr::GetTextColor(FontType ft)
 {
-	auto pcr = m_currentCharRendererMap[ft];
+	auto pcr = m_currentCharRendererMap[static_cast<int>(ft)];
 	if(pcr){
 		return pcr->GetTextColor();
 	}
@@ -165,23 +165,23 @@ COLORREF CGrTxtRendererMgr::GetTextColor(FontType ft)
 
 void CGrTxtRendererMgr::SetTextColor(COLORREF color)
 {
-	if(GetTextColor(Text              ) != color){ SetTextColor(Text              , color); }
-	if(GetTextColor(HalfText          ) != color){ SetTextColor(HalfText          , color); }
-	if(GetTextColor(RotateText        ) != color){ SetTextColor(RotateText        , color); }
-	if(GetTextColor(HalfRotateText    ) != color){ SetTextColor(HalfRotateText    , color); }
-	if(GetTextColor(TurnText          ) != color){ SetTextColor(TurnText          , color); }
-	if(GetTextColor(HalfTurnText      ) != color){ SetTextColor(HalfTurnText      , color); }
-	if(GetTextColor(BoldText          ) != color){ SetTextColor(BoldText          , color); }
-	if(GetTextColor(BoldHalfText      ) != color){ SetTextColor(BoldHalfText      , color); }
-	if(GetTextColor(BoldRotateText    ) != color){ SetTextColor(BoldRotateText    , color); }
-	if(GetTextColor(BoldHalfRotateText) != color){ SetTextColor(BoldHalfRotateText, color); }
-	if(GetTextColor(BoldTurnText      ) != color){ SetTextColor(BoldTurnText      , color); }
-	if(GetTextColor(BoldHalfTurnText  ) != color){ SetTextColor(BoldHalfTurnText  , color); }
+	if(GetTextColor(FontType::Text              ) != color){ SetTextColor(FontType::Text              , color); }
+	if(GetTextColor(FontType::HalfText          ) != color){ SetTextColor(FontType::HalfText          , color); }
+	if(GetTextColor(FontType::RotateText        ) != color){ SetTextColor(FontType::RotateText        , color); }
+	if(GetTextColor(FontType::HalfRotateText    ) != color){ SetTextColor(FontType::HalfRotateText    , color); }
+	if(GetTextColor(FontType::TurnText          ) != color){ SetTextColor(FontType::TurnText          , color); }
+	if(GetTextColor(FontType::HalfTurnText      ) != color){ SetTextColor(FontType::HalfTurnText      , color); }
+	if(GetTextColor(FontType::BoldText          ) != color){ SetTextColor(FontType::BoldText          , color); }
+	if(GetTextColor(FontType::BoldHalfText      ) != color){ SetTextColor(FontType::BoldHalfText      , color); }
+	if(GetTextColor(FontType::BoldRotateText    ) != color){ SetTextColor(FontType::BoldRotateText    , color); }
+	if(GetTextColor(FontType::BoldHalfRotateText) != color){ SetTextColor(FontType::BoldHalfRotateText, color); }
+	if(GetTextColor(FontType::BoldTurnText      ) != color){ SetTextColor(FontType::BoldTurnText      , color); }
+	if(GetTextColor(FontType::BoldHalfTurnText  ) != color){ SetTextColor(FontType::BoldHalfTurnText  , color); }
 }
 void CGrTxtRendererMgr::ResetTextColor()
 {
 	auto &&param = CGrTxtMiru::theApp().Param();
-	SetTextColor(param.GetColor(CGrTxtParam::Text));
+	SetTextColor(param.GetColor(CGrTxtParam::CharType::Text));
 }
 
 void CGrTxtRendererMgr::SetFontSize(int size, int text_size, int ruby_size, int note_size, int nombre_size, int running_heads_size)
@@ -190,7 +190,7 @@ void CGrTxtRendererMgr::SetFontSize(int size, int text_size, int ruby_size, int 
 		if(m_charRendererMap != m_currentCharRendererMap){
 			m_currentCharRendererMap = m_charRendererMap;
 			auto &&param = CGrTxtMiru::theApp().Param();
-			SetTextColor(param.GetColor(CGrTxtParam::Text));
+			SetTextColor(param.GetColor(CGrTxtParam::CharType::Text));
 		}
 	} else {
 		if (m_flexCharRendererMap != m_currentCharRendererMap) {
@@ -201,7 +201,7 @@ void CGrTxtRendererMgr::SetFontSize(int size, int text_size, int ruby_size, int 
 			ClearFlexChar();
 			m_iFontSize = size;
 			createCharRenderer(text_size, ruby_size, note_size, nombre_size, running_heads_size);
-			SetTextColor(param.GetColor(CGrTxtParam::Text));
+			SetTextColor(param.GetColor(CGrTxtParam::CharType::Text));
 		}
 	}
 }
@@ -210,23 +210,23 @@ void CGrTxtRendererMgr::createCharRenderer(int text_size, int ruby_size, int not
 {
 	auto &&param = CGrTxtMiru::theApp().Param();
 	int half_text_size = text_size / 2;
-	createCharRenderer(Text              , param, CGrTxtParam::Text        , text_size         , 2700/*, false*/);
-	createCharRenderer(HalfText          , param, CGrTxtParam::Text        , half_text_size    , 2700/*, false*/);
-	createCharRenderer(RotateText        , param, CGrTxtParam::Text        , text_size         ,    0/*, false*/);
-	createCharRenderer(HalfRotateText    , param, CGrTxtParam::Text        , half_text_size    ,    0/*, false*/);
-	createCharRenderer(TurnText          , param, CGrTxtParam::Text        , text_size         , 1800/*, false*/);
-	createCharRenderer(HalfTurnText      , param, CGrTxtParam::Text        , half_text_size    , 1800/*, false*/);
-	createCharRenderer(BoldText          , param, CGrTxtParam::Bold        , text_size         , 2700/*, true */);
-	createCharRenderer(BoldHalfText      , param, CGrTxtParam::Bold        , half_text_size    , 2700/*, true */);
-	createCharRenderer(BoldRotateText    , param, CGrTxtParam::Bold        , text_size         ,    0/*, true */);
-	createCharRenderer(BoldHalfRotateText, param, CGrTxtParam::Bold        , half_text_size    ,    0/*, true */);
-	createCharRenderer(BoldTurnText      , param, CGrTxtParam::Bold        , text_size         , 1800/*, true */);
-	createCharRenderer(BoldHalfTurnText  , param, CGrTxtParam::Bold        , half_text_size    , 1800/*, true */);
-	createCharRenderer(RubyText          , param, CGrTxtParam::Ruby        , ruby_size         , 2700/*, false*/);
-	createCharRenderer(TurnRubyText      , param, CGrTxtParam::Ruby        , ruby_size         , 1800/*, false*/);
-	createCharRenderer(Note              , param, CGrTxtParam::Note        , note_size         , 2700/*, false*/);
-	createCharRenderer(Nombre            , param, CGrTxtParam::Nombre      , nombre_size       ,    0/*, false*/);
-	createCharRenderer(RunningHeads      , param, CGrTxtParam::RunningHeads, running_heads_size,    0/*, false*/);
+	createCharRenderer(FontType::Text              , param, CGrTxtParam::CharType::Text        , text_size         , 2700/*, false*/);
+	createCharRenderer(FontType::HalfText          , param, CGrTxtParam::CharType::Text        , half_text_size    , 2700/*, false*/);
+	createCharRenderer(FontType::RotateText        , param, CGrTxtParam::CharType::Text        , text_size         ,    0/*, false*/);
+	createCharRenderer(FontType::HalfRotateText    , param, CGrTxtParam::CharType::Text        , half_text_size    ,    0/*, false*/);
+	createCharRenderer(FontType::TurnText          , param, CGrTxtParam::CharType::Text        , text_size         , 1800/*, false*/);
+	createCharRenderer(FontType::HalfTurnText      , param, CGrTxtParam::CharType::Text        , half_text_size    , 1800/*, false*/);
+	createCharRenderer(FontType::BoldText          , param, CGrTxtParam::CharType::Bold        , text_size         , 2700/*, true */);
+	createCharRenderer(FontType::BoldHalfText      , param, CGrTxtParam::CharType::Bold        , half_text_size    , 2700/*, true */);
+	createCharRenderer(FontType::BoldRotateText    , param, CGrTxtParam::CharType::Bold        , text_size         ,    0/*, true */);
+	createCharRenderer(FontType::BoldHalfRotateText, param, CGrTxtParam::CharType::Bold        , half_text_size    ,    0/*, true */);
+	createCharRenderer(FontType::BoldTurnText      , param, CGrTxtParam::CharType::Bold        , text_size         , 1800/*, true */);
+	createCharRenderer(FontType::BoldHalfTurnText  , param, CGrTxtParam::CharType::Bold        , half_text_size    , 1800/*, true */);
+	createCharRenderer(FontType::RubyText          , param, CGrTxtParam::CharType::Ruby        , ruby_size         , 2700/*, false*/);
+	createCharRenderer(FontType::TurnRubyText      , param, CGrTxtParam::CharType::Ruby        , ruby_size         , 1800/*, false*/);
+	createCharRenderer(FontType::Note              , param, CGrTxtParam::CharType::Note        , note_size         , 2700/*, false*/);
+	createCharRenderer(FontType::Nombre            , param, CGrTxtParam::CharType::Nombre      , nombre_size       ,    0/*, false*/);
+	createCharRenderer(FontType::RunningHeads      , param, CGrTxtParam::CharType::RunningHeads, running_heads_size,    0/*, false*/);
 }
 
 //
@@ -237,7 +237,7 @@ void CGrTxtRendererMgr::Create(CGrTxtDocument &doc, int text_size, int ruby_size
 	//
 	createCharRenderer(text_size, ruby_size, note_size, nombre_size, running_heads_size);
 	// キャッシュ候補設定
-	auto pcr_text = m_currentCharRendererMap[Text];
+	auto pcr_text = m_currentCharRendererMap[static_cast<int>(FontType::Text)];
 	if(pcr_text){
 		// ★サイズが大きいと時間がかかる
 		std::tstring str;
@@ -258,24 +258,32 @@ bool CGrTxtRendererMgr::DrawText(FontType ft, int x, int y, LPCTSTR lpSrc, LPCTS
 
 bool CGrTxtRendererMgr::DrawText(FontType ft, int x, int y, LPCTSTR lpSrc, int len)
 {
-	auto pcr = m_currentCharRendererMap[ft];
+	auto pcr = m_currentCharRendererMap[static_cast<int>(ft)];
 	if(pcr){
 		return pcr->Draw(*m_pBmpCanvas, x, y, lpSrc, len);
 	}
 	return false;
 }
 
-void CGrTxtRendererMgr::PatternFill(FontType ft, int x, int y, int w, int h, LPCTSTR lpSrc, int len)
+void CGrTxtRendererMgr::PatternFillVert(FontType ft, int x, int y, int w, int h, LPCTSTR lpSrc, int len)
 {
-	auto pcr = m_currentCharRendererMap[ft];
+	auto pcr = m_currentCharRendererMap[static_cast<int>(ft)];
 	if(pcr){
-		pcr->PatternFill(*m_pBmpCanvas, x, y, w, h, lpSrc, len);
+		pcr->PatternFillVert(*m_pBmpCanvas, x, y, w, h, lpSrc, len);
+	}
+}
+
+void CGrTxtRendererMgr::PatternFillHorz(FontType ft, int x, int y, int w, int h, LPCTSTR lpSrc, int len)
+{
+	auto pcr = m_currentCharRendererMap[static_cast<int>(ft)];
+	if (pcr) {
+		pcr->PatternFillHorz(*m_pBmpCanvas, x, y, w, h, lpSrc, len);
 	}
 }
 
 int CGrTxtRendererMgr::GetFontHeight(FontType ft)
 {
-	auto pcr = m_currentCharRendererMap[ft];
+	auto pcr = m_currentCharRendererMap[static_cast<int>(ft)];
 	if(pcr){
 		return pcr->GetFont().Height();
 	}
@@ -290,13 +298,13 @@ void CGrTxtRendererMgr::Initialize(CGrTxtDocument &doc)
 		m_curDir = CGrTxtMiru::GetDataPath();
 	}
 	const auto &param = CGrTxtMiru::theApp().Param();
-	m_pictRendererMap[PRT_Spi] = new CGrPictSPIRenderer();
-	m_pictRendererMap[PRT_Ole] = new CGrPictOleRenderer();
-	m_pictRendererMap[PRT_Emf] = new CGrPictEmfRenderer();
+	m_pictRendererMap[static_cast<int>(PictRenderType::Spi)] = new CGrPictSPIRenderer();
+	m_pictRendererMap[static_cast<int>(PictRenderType::Ole)] = new CGrPictOleRenderer();
+	m_pictRendererMap[static_cast<int>(PictRenderType::Emf)] = new CGrPictEmfRenderer();
 	//
 	std::tstring dir;
-	param.GetText(CGrTxtParam::SpiPluginFolder, dir);
-	m_pictRendererMap[PRT_Spi]->SetParam(_T("PluginDir"), dir.c_str());
+	param.GetText(CGrTxtParam::TextType::SpiPluginFolder, dir);
+	m_pictRendererMap[static_cast<int>(PictRenderType::Spi)]->SetParam(_T("PluginDir"), dir.c_str());
 	//
 	for(auto &&item : m_pictRendererMap){
 		if(item){
@@ -457,13 +465,13 @@ int CGrTxtRendererMgr::GetAntialias()
 	return m_iAntialias;
 }
 
-bool CGrTxtRendererMgr::DrawBorder(int x, int y, int w, int h, BorderType borderType)
+bool CGrTxtRendererMgr::DrawBorder(int x, int y, int w, int h, CGrTxtRendererMgr::BorderType borderType)
 {
 	if(!m_pBmpCanvas || w <= 0 || h <= 0){
 		return false;
 	}
 	COLORREF color = 0;
-	auto pcr = m_currentCharRendererMap[Text];
+	auto pcr = m_currentCharRendererMap[static_cast<int>(FontType::Text)];
 	if(pcr){
 		color = pcr->GetTextColor();
 	} else {

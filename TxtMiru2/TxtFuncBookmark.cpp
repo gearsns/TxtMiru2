@@ -116,7 +116,6 @@ bool CGrTxtFuncBookmark::IsLinkMember(HWND hWnd)
 	return m_fIsMemLn(hWnd);
 }
 
-// 2.0.17.0
 bool CGrTxtFuncBookmark::ShowRubyList(HWND hWnd, CGrTxtDocument *pDoc, CGrTxtFuncIBookmark *pBookkmark)
 {
 	if(!m_fRuby){
@@ -128,7 +127,6 @@ bool CGrTxtFuncBookmark::ShowRubyList(HWND hWnd, CGrTxtDocument *pDoc, CGrTxtFun
 	auto &&param = CGrTxtMiru::theApp().Param();
 	return m_fRuby(hWnd, pDoc, &m_bookmark, CGrTxtMiru::GetDataPath(), &param);
 }
-// 2.0.17.0
 bool CGrTxtFuncBookmark::HideRubyList()
 {
 	if(!m_fRuby){
@@ -140,7 +138,6 @@ bool CGrTxtFuncBookmark::HideRubyList()
 	return m_fRuby(NULL, nullptr, nullptr, nullptr, nullptr);
 }
 
-// 2.0.17.0
 bool CGrTxtFuncBookmark::IsShowRubyList()
 {
 	if(!m_fIsShowRb){
@@ -151,7 +148,6 @@ bool CGrTxtFuncBookmark::IsShowRubyList()
 	}
 	return m_fIsShowRb();
 }
-// 2.0.17.0
 bool CGrTxtFuncBookmark::RefreshRubyList()
 {
 	if(!m_fRefreshRb){
@@ -162,7 +158,6 @@ bool CGrTxtFuncBookmark::RefreshRubyList()
 	}
 	return m_fRefreshRb();
 }
-// 2.0.18.0
 bool CGrTxtFuncBookmark::SaveText(HWND hWnd, CGrTxtDocument *pDoc, CGrTxtFuncIBookmark *pBookkmark)
 {
 	if(!m_fSaveText){
@@ -179,7 +174,6 @@ bool CGrTxtFuncBookmark::SaveText(HWND hWnd, CGrTxtDocument *pDoc, CGrTxtFuncIBo
 	return m_fSaveText(hWnd, pDoc, fileName.c_str(), realFileName.c_str(), &m_bookmark, CGrTxtMiru::GetDataPath(), &param);
 }
 
-// 2.0.19.0
 bool CGrTxtFuncBookmark::Search(HWND hWnd, TxtMiru::TextPoint &point, CGrTxtDocument *pDoc, CGrTxtFuncIBookmark *pBookkmark/* = nullptr*/)
 {
 	if(!m_fSearch){
@@ -247,7 +241,6 @@ bool CGrTxtFuncBookmark::ShowBook(HWND hWnd, LPCTSTR lpFileName, CGrTxtFuncIBook
 	return m_fShow(hWnd, lpFileName, pBookkmark, CGrTxtMiru::GetDataPath(), &param);
 }
 
-// 2.0.13.0
 bool CGrTxtFuncBookmark::SearchFiles(HWND hWnd)
 {
 	if(!m_fSearchFil){

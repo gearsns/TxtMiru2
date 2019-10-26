@@ -76,7 +76,7 @@ static HRESULT LoadURLFromFile(MSHTML::IHTMLDocument2Ptr spIHTMLDocument2, _bstr
 	return E_FAIL;
 }
 
-enum HTMLTAGTYPE {
+enum class HTMLTAGTYPE {
 	HTMLTAG_ERROR,
 	HTMLTAG_UNKNOWN,
 	HTMLTAG_A,
@@ -110,53 +110,53 @@ static struct NameTypeMap {
 	int type;
 } l_htmltag_map[] = {
 	// 予め name で ソートしておくこと
-	{_T("#text"),HTMLTAG_TEXTNODE},
-	{_T("A"),HTMLTAG_A       },
-	{_T("BR"),HTMLTAG_BR      },
-	{_T("DEL"),HTMLTAG_DEL     },
-	{_T("DIV"),HTMLTAG_DIV     },
-	{_T("EM"),HTMLTAG_EM      },
-	{_T("FORM"),HTMLTAG_FORM    },
-	{_T("H1"),HTMLTAG_H1      },
-	{_T("H2"),HTMLTAG_H2      },
-	{_T("H3"),HTMLTAG_H3      },
-	{_T("H4"),HTMLTAG_H4      },
-	{_T("H5"),HTMLTAG_H5      },
-	{_T("H6"),HTMLTAG_H6      },
-	{_T("IMG"),HTMLTAG_IMG     },
-	{_T("P"),HTMLTAG_P       },
-	{_T("PBR"),HTMLTAG_PBR     },
-	{_T("RB"),HTMLTAG_RB      },
-	{_T("RP"),HTMLTAG_RP      },
-	{_T("RT"),HTMLTAG_RT      },
-	{_T("RUBY"),HTMLTAG_RUBY    },
-	{_T("S"),HTMLTAG_DEL     },
-	{_T("SCRIPT"),HTMLTAG_SCRIPT  },
-	{_T("SPAN"),HTMLTAG_SPAN    },
-	{_T("STRIKE"),HTMLTAG_DEL     },
-	{_T("STYLE"),HTMLTAG_STYLE   },
-	{_T("SUB"),HTMLTAG_SUB     },
-	{_T("SUP"),HTMLTAG_SUP     },
+	{_T("#text" ),static_cast<int>(HTMLTAGTYPE::HTMLTAG_TEXTNODE)},
+	{_T("A"     ),static_cast<int>(HTMLTAGTYPE::HTMLTAG_A       )},
+	{_T("BR"    ),static_cast<int>(HTMLTAGTYPE::HTMLTAG_BR      )},
+	{_T("DEL"   ),static_cast<int>(HTMLTAGTYPE::HTMLTAG_DEL     )},
+	{_T("DIV"   ),static_cast<int>(HTMLTAGTYPE::HTMLTAG_DIV     )},
+	{_T("EM"    ),static_cast<int>(HTMLTAGTYPE::HTMLTAG_EM      )},
+	{_T("FORM"  ),static_cast<int>(HTMLTAGTYPE::HTMLTAG_FORM    )},
+	{_T("H1"    ),static_cast<int>(HTMLTAGTYPE::HTMLTAG_H1      )},
+	{_T("H2"    ),static_cast<int>(HTMLTAGTYPE::HTMLTAG_H2      )},
+	{_T("H3"    ),static_cast<int>(HTMLTAGTYPE::HTMLTAG_H3      )},
+	{_T("H4"    ),static_cast<int>(HTMLTAGTYPE::HTMLTAG_H4      )},
+	{_T("H5"    ),static_cast<int>(HTMLTAGTYPE::HTMLTAG_H5      )},
+	{_T("H6"    ),static_cast<int>(HTMLTAGTYPE::HTMLTAG_H6      )},
+	{_T("IMG"   ),static_cast<int>(HTMLTAGTYPE::HTMLTAG_IMG     )},
+	{_T("P"     ),static_cast<int>(HTMLTAGTYPE::HTMLTAG_P       )},
+	{_T("PBR"   ),static_cast<int>(HTMLTAGTYPE::HTMLTAG_PBR     )},
+	{_T("RB"    ),static_cast<int>(HTMLTAGTYPE::HTMLTAG_RB      )},
+	{_T("RP"    ),static_cast<int>(HTMLTAGTYPE::HTMLTAG_RP      )},
+	{_T("RT"    ),static_cast<int>(HTMLTAGTYPE::HTMLTAG_RT      )},
+	{_T("RUBY"  ),static_cast<int>(HTMLTAGTYPE::HTMLTAG_RUBY    )},
+	{_T("S"     ),static_cast<int>(HTMLTAGTYPE::HTMLTAG_DEL     )},
+	{_T("SCRIPT"),static_cast<int>(HTMLTAGTYPE::HTMLTAG_SCRIPT  )},
+	{_T("SPAN"  ),static_cast<int>(HTMLTAGTYPE::HTMLTAG_SPAN    )},
+	{_T("STRIKE"),static_cast<int>(HTMLTAGTYPE::HTMLTAG_DEL     )},
+	{_T("STYLE" ),static_cast<int>(HTMLTAGTYPE::HTMLTAG_STYLE   )},
+	{_T("SUB"   ),static_cast<int>(HTMLTAGTYPE::HTMLTAG_SUB     )},
+	{_T("SUP"   ),static_cast<int>(HTMLTAGTYPE::HTMLTAG_SUP     )},
 }, l_texttype_map[] = {
 	// 予め name で ソートしておくこと
-	{_T("black_circle"),TxtMiru::TT_ROUND_DOT         },
-	{_T("black_up-pointing_triangle"),TxtMiru::TT_BLACK_TRIANGLE_DOT},
-	{_T("bullseye"),TxtMiru::TT_DOUBLE_ROUND_DOT  },
-	{_T("caption"),TxtMiru::TT_CAPTION           },
-	{_T("fisheye"),TxtMiru::TT_BULLS_EYE_DOT     },
-	{_T("keigakomi"),TxtMiru::TT_LINE_BOX_START    },
-	{_T("overline_solid"),TxtMiru::TT_UNDER_LINE        },
-	{_T("saltire"),TxtMiru::TT_SALTIRE_DOT       },
-	{_T("sesame_dot"),TxtMiru::TT_DOT               },
-	{_T("underline_dashed"),TxtMiru::TT_SHORT_DASHED_LINE },
-	{_T("underline_dotted"),TxtMiru::TT_DOT_LINE          },
-	{_T("underline_double"),TxtMiru::TT_DOUBLE_LINE       },
-	{_T("underline_solid"),TxtMiru::TT_LINE              },
-	{_T("underline_wave"),TxtMiru::TT_WAVE_LINE         },
-	{_T("white_circle"),TxtMiru::TT_WHITE_ROUND_DOT   },
-	{_T("white_sesame_dot"),TxtMiru::TT_WHITE_DOT         },
-	{_T("white_up-pointing_triangle"),TxtMiru::TT_WHITE_TRIANGLE_DOT},
-	{_T("yokogumi"),TxtMiru::TT_HORZ_START},
+	{_T("black_circle"),static_cast<int>(TxtMiru::TextType::ROUND_DOT)        },
+	{_T("black_up-pointing_triangle"),static_cast<int>(TxtMiru::TextType::BLACK_TRIANGLE_DOT)},
+	{_T("bullseye"),static_cast<int>(TxtMiru::TextType::DOUBLE_ROUND_DOT)  },
+	{_T("caption"),static_cast<int>(TxtMiru::TextType::CAPTION)           },
+	{_T("fisheye"),static_cast<int>(TxtMiru::TextType::BULLS_EYE_DOT)     },
+	{_T("keigakomi"),static_cast<int>(TxtMiru::TextType::LINE_BOX_START)    },
+	{_T("overline_solid"),static_cast<int>(TxtMiru::TextType::UNDER_LINE)        },
+	{_T("saltire"),static_cast<int>(TxtMiru::TextType::SALTIRE_DOT)       },
+	{_T("sesame_dot"),static_cast<int>(TxtMiru::TextType::DOT)               },
+	{_T("underline_dashed"),static_cast<int>(TxtMiru::TextType::SHORT_DASHED_LINE) },
+	{_T("underline_dotted"),static_cast<int>(TxtMiru::TextType::DOT_LINE)          },
+	{_T("underline_double"),static_cast<int>(TxtMiru::TextType::DOUBLE_LINE)       },
+	{_T("underline_solid"),static_cast<int>(TxtMiru::TextType::LINE)              },
+	{_T("underline_wave"),static_cast<int>(TxtMiru::TextType::WAVE_LINE)         },
+	{_T("white_circle"),static_cast<int>(TxtMiru::TextType::WHITE_ROUND_DOT)   },
+	{_T("white_sesame_dot"),static_cast<int>(TxtMiru::TextType::WHITE_DOT)         },
+	{_T("white_up-pointing_triangle"),static_cast<int>(TxtMiru::TextType::WHITE_TRIANGLE_DOT)},
+	{_T("yokogumi"),static_cast<int>(TxtMiru::TextType::HORZ_START)},
 }, l_fontsize_map[] = {
 	{_T("dai1"),  1},
 	{_T("dai2"),  2},
@@ -199,9 +199,9 @@ static HTMLTAGTYPE GetHtmlTagType(MSHTML::IHTMLDOMNodePtr pchild_node)
 {
 	BSTR bstr = nullptr;
 	if(!pchild_node || FAILED(pchild_node->get_nodeName(&bstr))){
-		return HTMLTAG_ERROR;
+		return HTMLTAGTYPE::HTMLTAG_ERROR;
 	}
-	auto ht = HTMLTAG_UNKNOWN;
+	auto ht = HTMLTAGTYPE::HTMLTAG_UNKNOWN;
 	auto *pntm = static_cast<NameTypeMap*>(bsearch(bstr2char(bstr), l_htmltag_map, sizeof(l_htmltag_map)/sizeof(NameTypeMap), sizeof(NameTypeMap), NameTypeMapCompare));
 	if(pntm){
 		ht = static_cast<HTMLTAGTYPE>(pntm->type);
@@ -225,7 +225,7 @@ static TxtMiru::TextType GetTextType(LPCTSTR str)
 	if(pntm){
 		return static_cast<TxtMiru::TextType>(pntm->type);
 	}
-	return TxtMiru::TT_MaxNum;
+	return TxtMiru::TextType::MaxNum;
 }
 
 static int GetFontSize(LPCTSTR str)
@@ -286,7 +286,7 @@ static bool GetUrlCacheFileName(LPCWSTR lpwUrl, LPWSTR lpszwFileName, DWORD dwFi
 		// gzip圧縮のファイル場合、内容が 1F 8B 08 になるhtmファイルが取得されるので URLDownloadToCacheFileでファイルを取得しなおす
 		const auto &param = CGrTxtMiru::theApp().Param();
 		auto *lpExt = CGrShell::GetFileExt(lpszwFileName);
-		if(lpExt && param.GetFileType(lpExt) == CGrTxtParam::FT_Html){
+		if(lpExt && param.GetFileType(lpExt) == CGrTxtParam::FileType::Html){
 			if(S_OK == URLDownloadToCacheFile(nullptr, lpwUrl, lpszwFileName, dwFileNameInBytes, 0, nullptr)){
 				return true;
 			}
@@ -415,17 +415,18 @@ private:
 	int m_current_subtitle_no = 0;
 	int m_iLine = 0;
 	int m_iRubyPos = -1;
-	enum BoldState {
+	enum class BoldState {
 		BS_INIT,
 		BS_NONE,
 		BS_BOLD
-	} m_curBoldState = BS_INIT;
+	} m_curBoldState = BoldState::BS_INIT;
 	struct IndentState {
 		int i1st = 0;
 		int i2nd = 0;
+		bool bIndent = false;
 		IndentState() {}
-		bool isIndent() { return i1st != 0 || i2nd != 0; }
-		bool operator !=(const IndentState& i) const { return i1st != i.i1st || i2nd != i.i2nd; }
+		bool isIndent() { return bIndent; }
+		bool operator !=(const IndentState& i) const { return i1st != i.i1st || i2nd != i.i2nd || bIndent != i.bIndent; }
 	};
 	IndentState m_curIndentState;
 	IndentState m_curRIndentState;
@@ -445,12 +446,12 @@ private:
 	CGrWebFilter webFilter;
 public:
 	CGrHTMLTxtNodeParser(CGrTxtBuffer &buffer, std::tstring &title, std::tstring &author, std::tstring &info, std::tstring &lastWriteTime)
-	: m_buffer(buffer), m_title(title), m_author(author), m_info(info), m_lastWriteTime(lastWriteTime)
+		: m_buffer(buffer), m_title(title), m_author(author), m_info(info), m_lastWriteTime(lastWriteTime)
 	{
 		const auto &param = CGrTxtMiru::theApp().Param();
-		m_bUseOverlapChar = param.GetBoolean(CGrTxtParam::UseOverlapChar);
+		m_bUseOverlapChar = param.GetBoolean(CGrTxtParam::PointsType::UseOverlapChar);
 		int ieOptions[2] = {};
-		param.GetPoints(CGrTxtParam::IEOption, ieOptions, sizeof(ieOptions)/sizeof(int));
+		param.GetPoints(CGrTxtParam::PointsType::IEOption, ieOptions, sizeof(ieOptions)/sizeof(int));
 		UINT idlctl_silent     = (ieOptions[0] == 1) ? DLCTL_SILENT     : 0;
 		UINT idlctl_no_scripts = (ieOptions[1] == 1) ? DLCTL_NO_SCRIPTS : 0;
 		m_iIEOption = DLCTL_NO_FRAMEDOWNLOAD | DLCTL_NO_CLIENTPULL | DLCTL_DLIMAGES | idlctl_silent | idlctl_no_scripts | DLCTL_NO_JAVA | DLCTL_NO_DLACTIVEXCTLS | DLCTL_NO_RUNACTIVEXCTLS;
@@ -512,40 +513,40 @@ public:
 					for (auto&& ll : m_buffer.GetLineList()) {
 						for (auto&& tl : ll.text_list) {
 							switch(tl.textType){
-							case TxtMiru::TT_LINK:
+							case TxtMiru::TextType::LINK:
 								break;
-							case TxtMiru::TT_FILE:
+							case TxtMiru::TextType::FILE:
 								break;
-							case TxtMiru::TT_PICTURE_FULL_PAGE:
-							case TxtMiru::TT_PICTURE_HALF_PAGE:
-							case TxtMiru::TT_PICTURE_LAYOUT:
-								{
-									if (tl.str.find(L':') == std::tstring::npos) {
-										std::tstring url(&baseUrl[0]);
-										url += tl.str;
-										TCHAR cacheFileName[MAX_PATH] = {};
-										if (GetUrlCacheFileName(url.c_str(), cacheFileName, _countof(cacheFileName))) {
-											std::vector<std::tstring> param_list;
-											std::tstring buf;
-											for (auto c : tl.str) {
-												if (c == L'\0') {
-													param_list.push_back(buf);
-												} else {
-													buf += c;
-												}
+							case TxtMiru::TextType::PICTURE_FULL_PAGE:
+							case TxtMiru::TextType::PICTURE_HALF_PAGE:
+							case TxtMiru::TextType::PICTURE_LAYOUT:
+							{
+								if (tl.str.find(L':') == std::tstring::npos) {
+									std::tstring url(&baseUrl[0]);
+									url += tl.str;
+									TCHAR cacheFileName[MAX_PATH] = {};
+									if (GetUrlCacheFileName(url.c_str(), cacheFileName, _countof(cacheFileName))) {
+										std::vector<std::tstring> param_list;
+										std::tstring buf;
+										for (auto c : tl.str) {
+											if (c == L'\0') {
+												param_list.push_back(buf);
+											} else {
+												buf += c;
 											}
-											param_list.push_back(buf);
-											param_list[0] = cacheFileName;
-											tl.str.clear();
-											for (auto& item : param_list) {
-												tl.str += item;
-												tl.str.append(1, L'\0');
-											}
+										}
+										param_list.push_back(buf);
+										param_list[0] = cacheFileName;
+										tl.str.clear();
+										for (auto& item : param_list) {
+											tl.str += item;
+											tl.str.append(1, L'\0');
 										}
 									}
 								}
+							}
 								break;
-							case TxtMiru::TT_TXTMIRU:
+							case TxtMiru::TextType::TXTMIRU:
 								break;
 							}
 						}
@@ -652,8 +653,8 @@ private:
 			if(!m_line_info.text_list.empty()){
 				addLineInfo();
 			}
-			if(m_curBoldState == BS_BOLD){
-				m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TT_BOLD_END, 0));
+			if(m_curBoldState == BoldState::BS_BOLD){
+				m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TextType::BOLD_END, 0));
 				addLineInfo();
 			}
 			if(m_title.empty()){
@@ -711,13 +712,13 @@ private:
 				if(!m_line_info.text_list.empty()){
 					addLineInfo();
 				}
-				m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TT_INDENT_END, 0));
+				m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TextType::INDENT_END, 0));
 			}
 			if(indentState.isIndent()){
 				if(!m_line_info.text_list.empty()){
 					addLineInfo();
 				}
-				m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TT_INDENT_START, indentState.i1st, indentState.i2nd));
+				m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TextType::INDENT_START, indentState.i1st, indentState.i2nd));
 			}
 			m_curIndentState = indentState;
 			return true;
@@ -731,13 +732,13 @@ private:
 				if (!m_line_info.text_list.empty()) {
 					addLineInfo();
 				}
-				m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TT_RINDENT_END, 0));
+				m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TextType::RINDENT_END, 0));
 			}
 			if(rIndentState.isIndent()){
 				if (!m_line_info.text_list.empty()) {
 					addLineInfo();
 				}
-				m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TT_RINDENT_START, rIndentState.i1st, rIndentState.i2nd));
+				m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TextType::RINDENT_START, rIndentState.i1st, rIndentState.i2nd));
 			}
 			m_curRIndentState = rIndentState;
 			return true;
@@ -762,7 +763,7 @@ private:
 			if(!child_node){
 				continue;
 			}
-			if(HTMLTAG_A == GetHtmlTagType(child_node)){
+			if(HTMLTAGTYPE::HTMLTAG_A == GetHtmlTagType(child_node)){
 				return true;
 			}
 			if(FAILED(child_node->get_childNodes(&pnode))){
@@ -781,13 +782,13 @@ private:
 			int tl_idx_init = tl_idx;
 			for(; tl_idx<tl_max; ++tl_idx){
 				const auto &ti = li.text_list[tl_idx];
-				if(ti.textType == TxtMiru::TT_TEXT){
+				if(ti.textType == TxtMiru::TextType::TEXT){
 					break;
 				}
 			}
-			li.text_list.push_back(TxtMiru::TextInfo(href.c_str(), m_iLinkNum, tl_idx, 0, tl_max, -1, TxtMiru::TT_LINK));
+			li.text_list.push_back(TxtMiru::TextInfo(href.c_str(), m_iLinkNum, tl_idx, 0, tl_max, -1, TxtMiru::TextType::LINK));
 			if(order != 0){
-				li.text_list.push_back(TxtMiru::TextInfo(comment.c_str(), order, tl_idx, 0, tl_max, -1, TxtMiru::TT_FILE));
+				li.text_list.push_back(TxtMiru::TextInfo(comment.c_str(), order, tl_idx, 0, tl_max, -1, TxtMiru::TextType::FILE));
 			}
 			for(tl_idx=tl_idx_init; tl_idx<tl_max; ++tl_idx){
 				auto &&ti = li.text_list[tl_idx];
@@ -833,7 +834,7 @@ private:
 			addText(_T("※"), 0);
 			auto &&text_list = m_line_info.text_list;
 			int iIndex = text_list.size() - 1;
-			text_list[iIndex].textType = TxtMiru::TT_OTHER;
+			text_list[iIndex].textType = TxtMiru::TextType::OTHER;
 			text_list[iIndex].str      = target;
 			text_list[iIndex].tpBegin  = TxtMiru::TextListPos{iIndex, 0};
 			note.resize(0);
@@ -843,7 +844,7 @@ private:
 	{
 		if(!m_line_info.text_list.empty()){
 			for(int i=m_line_info.text_list.size()-1; i>=iIndex; --i){
-				if(m_line_info.text_list[i].textType == TxtMiru::TT_TEXT){
+				if(m_line_info.text_list[i].textType == TxtMiru::TextType::TEXT){
 					m_line_info.text_list[i].textType = t;
 				}
 			}
@@ -873,7 +874,7 @@ private:
 			m_curRIndentState.i1st  , //           tpBegin.iPos    に BOTTOM
 			0                       ,
 			0                       , /* 開始=0、途中=1, 終了=2 */
-			TxtMiru::TT_LINE_BOX_START
+			TxtMiru::TextType::LINE_BOX_START
 			);
 		m_line_info.text_list.push_back(ti);
 		m_border_list.push_back(ti);
@@ -899,7 +900,7 @@ private:
 			}
 			ti.tpEnd.iIndex = m_line_info.text_list.size();
 			ti.tpEnd.iPos = 2; // 終了
-			ti.textType = TxtMiru::TT_LINE_BOX_END;
+			ti.textType = TxtMiru::TextType::LINE_BOX_END;
 			m_line_info.text_list.push_back(ti);
 		}
 		if(m_border_current < borderNo){
@@ -946,7 +947,7 @@ private:
 				}
 			}
 			auto tag_type = GetHtmlTagType(current_node);
-			if(tag_type == HTMLTAG_RP || tag_type == HTMLTAG_FORM || tag_type == HTMLTAG_ERROR){
+			if(tag_type == HTMLTAGTYPE::HTMLTAG_RP || tag_type == HTMLTAGTYPE::HTMLTAG_FORM || tag_type == HTMLTAGTYPE::HTMLTAG_ERROR){
 				continue;
 			}
 			//
@@ -959,12 +960,12 @@ private:
 			BSTR bstr = nullptr;
 			if(m_iRubyPos < 0){
 				switch(tag_type){
-				case HTMLTAG_RUBY    : ; break;
-				case HTMLTAG_RB      : ; break; // ルビを振る文字
-				case HTMLTAG_RT      : ; break; // ルビ
-				case HTMLTAG_BR      : ; break;
-				case HTMLTAG_PBR     : ; break;
-				case HTMLTAG_TEXTNODE: ; break;
+				case HTMLTAGTYPE::HTMLTAG_RUBY    : ; break;
+				case HTMLTAGTYPE::HTMLTAG_RB      : ; break; // ルビを振る文字
+				case HTMLTAGTYPE::HTMLTAG_RT      : ; break; // ルビ
+				case HTMLTAGTYPE::HTMLTAG_BR      : ; break;
+				case HTMLTAGTYPE::HTMLTAG_PBR     : ; break;
+				case HTMLTAGTYPE::HTMLTAG_TEXTNODE: ; break;
 				default:
 					{
 						MSHTML::IHTMLElementPtr element(current_node);
@@ -986,14 +987,14 @@ private:
 						}
 						if(!className.empty()){
 							switch(GetTextType(className.c_str())){
-							case TxtMiru::TT_CAPTION:
+							case TxtMiru::TextType::CAPTION:
 								{
 									std::tstring innerText;
 									if(getInnerText(element, innerText)){
 										auto *pti = CGrTxtParser::GetPrevTextInfoPicture(m_buffer.GetLineList(), m_line_info.text_list);
 										if(pti){
 											if(m_bAutoDetectPictureType){
-												pti->textType = TxtMiru::TT_PICTURE_HALF_PAGE;
+												pti->textType = TxtMiru::TextType::PICTURE_HALF_PAGE;
 											}
 											CGrTxtParser::SetCaption(pti->str, innerText.c_str());
 										}
@@ -1001,8 +1002,8 @@ private:
 									}
 								}
 								break;
-							case TxtMiru::TT_LINE_BOX_START:
-								if(tag_type == HTMLTAG_DIV){
+							case TxtMiru::TextType::LINE_BOX_START:
+								if(tag_type == HTMLTAGTYPE::HTMLTAG_DIV){
 									::SysFreeStringSetNull(bstr);
 									if(SUCCEEDED(style->get_borderWidth(&bstr))){
 										borderNo = 0;
@@ -1010,13 +1011,13 @@ private:
 									::SysFreeStringSetNull(bstr);
 								}
 								break;
-							case TxtMiru::TT_HORZ_START:
+							case TxtMiru::TextType::HORZ_START:
 								bHorz = true;
 								break;
 							}
 						}
 						//
-						if(tag_type == HTMLTAG_SPAN){
+						if(tag_type == HTMLTAGTYPE::HTMLTAG_SPAN){
 							::SysFreeStringSetNull(bstr);
 							if(SUCCEEDED(element2->get_dir(&bstr))){
 								// 明示的に ltrになっている場合には、縦中横として処理
@@ -1024,7 +1025,7 @@ private:
 									bTateChuYoko = true;
 								}
 							}
-						} else if(tag_type == HTMLTAG_DIV && m_author.empty()){
+						} else if(tag_type == HTMLTAGTYPE::HTMLTAG_DIV && m_author.empty()){
 							getAttribute(element, m_author, _T("Author"));
 						}
 						//
@@ -1035,12 +1036,12 @@ private:
 							}
 						}
 						::SysFreeStringSetNull(bstr);
-						if(tag_type != HTMLTAG_IMG){
+						if(tag_type != HTMLTAGTYPE::HTMLTAG_IMG){
 							VARIANT verticalAlign;
 							VariantInit(&verticalAlign);
 							if(SUCCEEDED(style->get_verticalAlign(&verticalAlign))){
 								if(_tcsicmp(bstr2char(verticalAlign.bstrVal), _T("middle")) == 0){
-									m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TT_CENTER, 0));
+									m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TextType::CENTER, 0));
 									nextLine();
 									bCenter = true;
 								}
@@ -1059,20 +1060,20 @@ private:
 							}
 						}
 						//
-						BoldState boldState = BS_INIT;
+						BoldState boldState = BoldState::BS_INIT;
 						VARIANT fontWeight;
 						VariantInit(&fontWeight);
 						if(SUCCEEDED(style->get_fontWeight(&fontWeight))){
 							if(static_cast<long>(_variant_t(fontWeight, false)) > 400){
-								boldState = BS_BOLD;
+								boldState = BoldState::BS_BOLD;
 							}
 						}
 						VariantClear(&fontWeight);
 						if(m_curBoldState != boldState){
-							if(boldState == BS_BOLD){
-								m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TT_BOLD_START, 0));
-							} else if(m_curBoldState != BS_INIT){
-								m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TT_BOLD_END, 0));
+							if(boldState == BoldState::BS_BOLD){
+								m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TextType::BOLD_START, 0));
+							} else if(m_curBoldState != BoldState::BS_INIT){
+								m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TextType::BOLD_END, 0));
 							}
 						}
 						m_curBoldState = boldState;
@@ -1098,7 +1099,7 @@ private:
 						int right = styleEmSize(margin, -1000) + styleEmSize(padding);
 						VariantClear(&margin);
 						VariantClear(&padding);
-						if(tag_type == HTMLTAG_P){
+						if(tag_type == HTMLTAGTYPE::HTMLTAG_P){
 							// Top
 							VariantInit(&margin);
 							style->get_marginTop(&margin);
@@ -1122,10 +1123,21 @@ private:
 							indentState.i1st = left + indent;
 							indentState.i2nd = left;
 						}
-						if(right > 0){
+						indentState.bIndent = indentState.i1st != 0 || indentState.i2nd != 0;
+						if (right > 0) {
 							rIndentState.i1st = right;
 							rIndentState.i2nd = right;
 						}
+						rIndentState.bIndent = rIndentState.i1st != 0 || rIndentState.i2nd != 0;
+						if (!rIndentState.bIndent) {
+							if (SUCCEEDED(style->get_textAlign(&bstr))) {
+								if (_tcsicmp(bstr2char(bstr), _T("right")) == 0) {
+									rIndentState.bIndent = true;
+								}
+							}
+							::SysFreeStringSetNull(bstr);
+						}
+
 						auto bIndent = setIndent(indentState);
 						auto bRIndent = setRIndent(rIndentState);
 						if(bIndent || bRIndent){
@@ -1137,7 +1149,7 @@ private:
 							if(fontSize != 0){
 								m_iFontSize = fontSize;
 								TxtMiru::TextInfo ti_size;
-								ti_size.textType = TxtMiru::TT_TEXT_SIZE;
+								ti_size.textType = TxtMiru::TextType::TEXT_SIZE;
 								ti_size.chrType  = m_iFontSize;
 								m_line_info.text_list.push_back(ti_size);
 							}
@@ -1155,7 +1167,7 @@ private:
 			}
 			// 開始
 			switch(tag_type){
-			case HTMLTAG_A       :
+			case HTMLTAGTYPE::HTMLTAG_A       :
 				if(m_iLine != iLine){
 					const auto &ll = m_buffer.GetLineList();
 					if(static_cast<int>(ll.size()) > m_iLine){
@@ -1202,55 +1214,55 @@ private:
 						if(SUCCEEDED(element->get_href(&bstr))){
 							std::tstring link_str = bstr2char(bstr);
 							url_decode(bstr2char(bstr), link_str);
-							m_line_info.text_list.push_back(TxtMiru::TextInfo(link_str.c_str(), m_iLinkNum, -1, -1, -1, -1, TxtMiru::TT_LINK));
+							m_line_info.text_list.push_back(TxtMiru::TextInfo(link_str.c_str(), m_iLinkNum, -1, -1, -1, -1, TxtMiru::TextType::LINK));
 							if(!str_id.empty()){
-								m_line_info.text_list.push_back(TxtMiru::TextInfo(str_id.c_str(), 0, -1, -1, -1, -1, TxtMiru::TT_ID));
+								m_line_info.text_list.push_back(TxtMiru::TextInfo(str_id.c_str(), 0, -1, -1, -1, -1, TxtMiru::TextType::ID));
 							}
 						}
 						::SysFreeStringSetNull(bstr);
 					}
 				}
 				break;
-			case HTMLTAG_P       :
+			case HTMLTAGTYPE::HTMLTAG_P       :
 				if(margin_top > 0 || !m_line_info.text_list.empty()){
 					nextLine();
 				}
 				break;
 				// ruby rb  rp rt     rp
 				//      漢字 ( かんじ )
-			case HTMLTAG_RUBY    : m_iRubyPos = iIndex; break;
-			case HTMLTAG_RB      : // ルビを振る文字
+			case HTMLTAGTYPE::HTMLTAG_RUBY    : m_iRubyPos = iIndex; break;
+			case HTMLTAGTYPE::HTMLTAG_RB      : // ルビを振る文字
 				bBlock = false;
 				// ルビ開始位置には常に [TT_RUBY_SEP]を入れる // □RUBY長対応
-				m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TT_RUBY_SEP, 0));
+				m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TextType::RUBY_SEP, 0));
 				++iIndex;
 				m_iRubyPos = iIndex;
 				break;
-			case HTMLTAG_BR      : nextLine(); break;
-			case HTMLTAG_PBR     :
+			case HTMLTAGTYPE::HTMLTAG_BR      : nextLine(); break;
+			case HTMLTAGTYPE::HTMLTAG_PBR     :
 				bCenter = false;
 				if(!m_line_info.text_list.empty()){
 					nextLine();
 				}
-				m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TT_NEXT_PAGE, 0));
+				m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TextType::NEXT_PAGE, 0));
 				nextLine();
 				break;
-			case HTMLTAG_H1      :
-			case HTMLTAG_H2      :
-			case HTMLTAG_H3      :
-			case HTMLTAG_H4      :
-			case HTMLTAG_H5      :
-			case HTMLTAG_H6      :
+			case HTMLTAGTYPE::HTMLTAG_H1      :
+			case HTMLTAGTYPE::HTMLTAG_H2      :
+			case HTMLTAGTYPE::HTMLTAG_H3      :
+			case HTMLTAGTYPE::HTMLTAG_H4      :
+			case HTMLTAGTYPE::HTMLTAG_H5      :
+			case HTMLTAGTYPE::HTMLTAG_H6      :
 				{
-					m_iFontSize = 5 - (tag_type-HTMLTAG_H1);
+					m_iFontSize = 5 - (static_cast<int>(tag_type)-static_cast<int>(HTMLTAGTYPE::HTMLTAG_H1));
 					TxtMiru::TextInfo ti_size;
-					ti_size.textType = TxtMiru::TT_TEXT_SIZE;
+					ti_size.textType = TxtMiru::TextType::TEXT_SIZE;
 					ti_size.chrType  = m_iFontSize;
 					m_line_info.text_list.push_back(ti_size);
-					m_current_subtitle_no = (tag_type-HTMLTAG_H1);
+					m_current_subtitle_no = (static_cast<int>(tag_type)-static_cast<int>(HTMLTAGTYPE::HTMLTAG_H1));
 					break;
 				}
-			case HTMLTAG_TEXTNODE:
+			case HTMLTAGTYPE::HTMLTAG_TEXTNODE:
 				{
 					MSHTML::IHTMLDOMTextNodePtr textNode(current_node);
 					::SysFreeStringSetNull(bstr);
@@ -1290,25 +1302,25 @@ private:
 					}
 				}
 				break;
-			case HTMLTAG_SCRIPT:
-			case HTMLTAG_STYLE:
+			case HTMLTAGTYPE::HTMLTAG_SCRIPT:
+			case HTMLTAGTYPE::HTMLTAG_STYLE:
 				child_nodes = nullptr;
 				break;
 			default:
 				break;
 			}
 			if (bHorz) {
-				m_line_info.text_list.push_back(TxtMiru::TextInfo(_T(""), 1, 0, 0, 0, 0, TxtMiru::TT_HORZ_START));
+				m_line_info.text_list.push_back(TxtMiru::TextInfo(_T(""), 1, 0, 0, 0, 0, TxtMiru::TextType::HORZ_START));
 			}
 			if(child_nodes){
 				parseNode(current_node, child_nodes, level+1);
 			}
 			if(bTateChuYoko){
 				// 縦中横
-				setTextTypeRange(TxtMiru::TT_ROTATE_NUM, iIndex);
+				setTextTypeRange(TxtMiru::TextType::ROTATE_NUM, iIndex);
 			}
 			if (bHorz) {
-				m_line_info.text_list.push_back(TxtMiru::TextInfo(_T(""),1,0,0,0,0,TxtMiru::TT_HORZ_END));
+				m_line_info.text_list.push_back(TxtMiru::TextInfo(_T(""),1,0,0,0,0,TxtMiru::TextType::HORZ_END));
 			}
 			const auto &ad = CGrAozoraData::Data();
 			const auto *test_type_name = ad.GetTT();
@@ -1317,7 +1329,7 @@ private:
 				AddEndBorder(borderNo);
 			}
 			switch(tag_type){
-			case HTMLTAG_A       :
+			case HTMLTAGTYPE::HTMLTAG_A       :
 				{
 					MSHTML::IHTMLAnchorElementPtr element(current_node);
 					if(!element
@@ -1365,16 +1377,16 @@ private:
 							if(SUCCEEDED(element->get_name(&bstr))){
 								std::tstring name_str = bstr2char(bstr);
 								if(!name_str.empty()){
-									m_line_info.text_list.push_back(TxtMiru::TextInfo(name_str.c_str(), 0, -1, -1, -1, -1, TxtMiru::TT_ID));
+									m_line_info.text_list.push_back(TxtMiru::TextInfo(name_str.c_str(), 0, -1, -1, -1, -1, TxtMiru::TextType::ID));
 								}
 								const auto &text_list = m_line_info.text_list;
 								if(m_current_subtitle_no == 0){
 									for(int i=text_list.size()-1; i>=iIndex; --i){
 										if(CGrTxtParser::isText(text_list[i].textType)){
 											if(name_str.empty()){
-												m_line_info.text_list.push_back(TextInfoSpec(_T(""), TxtMiru::TT_ID, iIndex, 0, m_line_info.text_list.size(), -1));
+												m_line_info.text_list.push_back(TextInfoSpec(_T(""), TxtMiru::TextType::ID, iIndex, 0, m_line_info.text_list.size(), -1));
 											} else {
-												m_line_info.text_list.push_back(TextInfoSpec(_T(""), TxtMiru::TT_SUBTITLE3, iIndex, 0, m_line_info.text_list.size(), -1));
+												m_line_info.text_list.push_back(TextInfoSpec(_T(""), TxtMiru::TextType::SUBTITLE3, iIndex, 0, m_line_info.text_list.size(), -1));
 											}
 											break;
 										}
@@ -1397,10 +1409,10 @@ private:
 				}
 				++m_iLinkNum;
 				break;
-			case HTMLTAG_DEL     :
-				m_line_info.text_list.push_back(TextInfoSpec(static_cast<const TCHAR*>(test_type_name[TxtMiru::TT_DEL_LINE]), TxtMiru::TT_DEL_LINE, iIndex, 0, m_line_info.text_list.size(), -1));
+			case HTMLTAGTYPE::HTMLTAG_DEL     :
+				m_line_info.text_list.push_back(TextInfoSpec(static_cast<const TCHAR*>(test_type_name[static_cast<int>(TxtMiru::TextType::DEL_LINE)]), TxtMiru::TextType::DEL_LINE, iIndex, 0, m_line_info.text_list.size(), -1));
 				break;
-			case HTMLTAG_EM      :
+			case HTMLTAGTYPE::HTMLTAG_EM      :
 				{
 					MSHTML::IHTMLElementPtr element(current_node);
 					if(!element){
@@ -1411,13 +1423,13 @@ private:
 						break;
 					}
 					auto text_type = GetTextType(bstr2char(bstr));
-					if(text_type != TxtMiru::TT_MaxNum && !m_line_info.text_list.empty()){
-						m_line_info.text_list.push_back(TextInfoSpec(static_cast<const TCHAR*>(test_type_name[text_type]), text_type, iIndex, 0, m_line_info.text_list.size(), -1));
+					if(text_type != TxtMiru::TextType::MaxNum && !m_line_info.text_list.empty()){
+						m_line_info.text_list.push_back(TextInfoSpec(static_cast<const TCHAR*>(test_type_name[static_cast<int>(text_type)]), text_type, iIndex, 0, m_line_info.text_list.size(), -1));
 					}
 					::SysFreeStringSetNull(bstr);
 				}
 				break;
-			case HTMLTAG_H1      :
+			case HTMLTAGTYPE::HTMLTAG_H1      :
 				{
 					bBlock = false;
 					addLineInfo();
@@ -1444,7 +1456,7 @@ private:
 					getInnerText(element, m_title);
 				}
 				break;
-			case HTMLTAG_H2      :
+			case HTMLTAGTYPE::HTMLTAG_H2      :
 				{
 					bBlock = false;
 					addLineInfo();
@@ -1454,11 +1466,11 @@ private:
 					}
 					::SysFreeStringSetNull(bstr);
 					if(m_iLine == 2 && !m_title.empty() && m_author.empty()){
-						if(m_curBoldState != preBoldState && m_curBoldState == BS_BOLD){
-							m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TT_BOLD_END, 0));
+						if(m_curBoldState != preBoldState && m_curBoldState == BoldState::BS_BOLD){
+							m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TextType::BOLD_END, 0));
 							m_curBoldState = preBoldState;
 						}
-						m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TT_NEXT_PAGE, 0));
+						m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TextType::NEXT_PAGE, 0));
 						addLineInfo();
 					} else if(SUCCEEDED(element->get_className(&bstr))){
 						std::tstring classname = bstr2char(bstr);
@@ -1475,29 +1487,29 @@ private:
 					getInnerText(element, m_author);
 				}
 				break;
-			case HTMLTAG_H3      :
-				{
-					if (m_iLine == 2 && !m_author.empty() && !m_title.empty()) {
+			case HTMLTAGTYPE::HTMLTAG_H3      : 
+			{
+				if (m_iLine == 2 && !m_author.empty() && !m_title.empty()) {
+					::SysFreeStringSetNull(bstr);
+					MSHTML::IHTMLElementPtr element(current_node);
+					if (!element) {
+						break;
+					}
+					if (SUCCEEDED(element->get_className(&bstr))) {
+						std::tstring classname = bstr2char(bstr);
 						::SysFreeStringSetNull(bstr);
-						MSHTML::IHTMLElementPtr element(current_node);
-						if (!element) {
+						if (_tcsicmp(classname.c_str(), _T("author")) == 0) {
 							break;
 						}
-						if (SUCCEEDED(element->get_className(&bstr))) {
-							std::tstring classname = bstr2char(bstr);
-							::SysFreeStringSetNull(bstr);
-							if (_tcsicmp(classname.c_str(), _T("author")) == 0) {
-								break;
-							}
-						}
 					}
-					addSubTitle(TxtMiru::TT_SUBTITLE1, iLine, iIndex);
-					break;
 				}
-			case HTMLTAG_H4      : addSubTitle(TxtMiru::TT_SUBTITLE2, iLine, iIndex); break;
-			case HTMLTAG_H5      :
-			case HTMLTAG_H6      : addSubTitle(TxtMiru::TT_SUBTITLE3, iLine, iIndex); break;
-			case HTMLTAG_IMG:
+				addSubTitle(TxtMiru::TextType::SUBTITLE1, iLine, iIndex);
+				break;
+			}
+			case HTMLTAGTYPE::HTMLTAG_H4      : addSubTitle(TxtMiru::TextType::SUBTITLE2, iLine, iIndex); break;
+			case HTMLTAGTYPE::HTMLTAG_H5      :
+			case HTMLTAGTYPE::HTMLTAG_H6      : addSubTitle(TxtMiru::TextType::SUBTITLE3, iLine, iIndex); break;
+			case HTMLTAGTYPE::HTMLTAG_IMG:
 				{
 					MSHTML::DispHTMLImgPtr elementdisp(current_node);
 					if(!elementdisp){
@@ -1530,7 +1542,7 @@ private:
 					if(GetUrlCacheFileName(href.c_str(), fileName, sizeof(fileName)/sizeof(TCHAR))){
 						const auto &param = CGrTxtMiru::theApp().Param();
 						SIZE size = {};
-						param.GetPoints(CGrTxtParam::SkipHTMLImgSize, (int*)&size, 2);
+						param.GetPoints(CGrTxtParam::PointsType::SkipHTMLImgSize, (int*)&size, 2);
 						long naturalWidth = 0;
 						long naturalHeight = 0;
 						MSHTML::IHTMLImgElement4Ptr img4(elementdisp); // Windows Vista with SP1, Windows 7 [desktop apps only]
@@ -1575,7 +1587,7 @@ private:
 						tt_str.append(1, '\0');
 						if(m_line_info.text_list.size() > 0){ // 画像を同一行では扱わない <img>text<img>の時 textが表示されないので
 							const auto &pre_ti = m_line_info.text_list.back();
-							if(pre_ti.textType == TxtMiru::TT_TEXT){
+							if(pre_ti.textType == TxtMiru::TextType::TEXT){
 								if(pre_ti.str.size() == 0 || pre_ti.str == _T(" ")){
 									; // タグ間に改行があると 空白文字が入るので無視する
 								} else {
@@ -1586,9 +1598,9 @@ private:
 						m_bAutoDetectPictureType = true;
 						TxtMiru::TextType tt;
 						if(naturalWidth > 0 && naturalHeight > 0 && 10 * naturalWidth / naturalHeight > 13){
-							tt = TxtMiru::TT_PICTURE_FULL_PAGE;
+							tt = TxtMiru::TextType::PICTURE_FULL_PAGE;
 						} else {
-							tt = TxtMiru::TT_PICTURE_HALF_PAGE;
+							tt = TxtMiru::TextType::PICTURE_HALF_PAGE;
 						}
 						do {
 							MSHTML::IHTMLElement2Ptr element2(current_node);
@@ -1610,11 +1622,11 @@ private:
 							width_str = bstr2char(var.bstrVal);
 							VariantClear(&var);
 							if(_tcsicmp(width_str.c_str(), L"100%") == 0){
-								tt = TxtMiru::TT_PICTURE_FULL_PAGE;
+								tt = TxtMiru::TextType::PICTURE_FULL_PAGE;
 							} else if(_tcsicmp(width_str.c_str(), L"50%") == 0){
-								tt = TxtMiru::TT_PICTURE_HALF_PAGE;
+								tt = TxtMiru::TextType::PICTURE_HALF_PAGE;
 							} else if(_tcsicmp(width_str.c_str(), L"25%") == 0){
-								tt = TxtMiru::TT_PICTURE_LAYOUT;
+								tt = TxtMiru::TextType::PICTURE_LAYOUT;
 							} else {
 								break;
 							}
@@ -1625,7 +1637,7 @@ private:
 					}
 				}
 				break;
-			case HTMLTAG_P       :
+			case HTMLTAGTYPE::HTMLTAG_P       :
 				bBlock = false;
 				if(!m_line_info.text_list.empty()){
 					nextLine();
@@ -1634,8 +1646,8 @@ private:
 					}
 				}
 				break;
-			case HTMLTAG_RUBY    : bBlock = false; break;
-			case HTMLTAG_RT      : // ルビ
+			case HTMLTAGTYPE::HTMLTAG_RUBY    : bBlock = false; break;
+			case HTMLTAGTYPE::HTMLTAG_RT      : // ルビ
 				bBlock = false;
 				if(iLine == m_iLine){
 					auto &&text_list = m_line_info.text_list;
@@ -1643,32 +1655,32 @@ private:
 					if(m_iRubyPos >= 0){
 						if(len > 0 && iIndex > 0 && iIndex < len){
 							std::tstring ruby(text_list[iIndex].str);
-							text_list[iIndex].textType = TxtMiru::TT_RUBY;
+							text_list[iIndex].textType = TxtMiru::TextType::RUBY;
 							text_list[iIndex].tpBegin  = TxtMiru::TextListPos{m_iRubyPos, 0};
 							text_list[iIndex].tpEnd    = TxtMiru::TextListPos{iIndex  -1, static_cast<signed int>(text_list[iIndex-1].str.size())-1};
 							for(int j=iIndex+1; j<len; ++j){
-								text_list[j].textType = TxtMiru::TT_COMMENT;
+								text_list[j].textType = TxtMiru::TextType::COMMENT;
 								ruby += text_list[j].str;
 							}
 							text_list[iIndex].str = ruby;
 						}
 					} else {
 						for(int j=iIndex; j<len; ++j){
-							text_list[j].textType = TxtMiru::TT_COMMENT;
+							text_list[j].textType = TxtMiru::TextType::COMMENT;
 						}
 					}
 				}
 				m_iRubyPos = -1;
 				break;
-			case HTMLTAG_SUB     : setTextTypeRange(TxtMiru::TT_SUB_NOTE, iIndex); break;
-			case HTMLTAG_SUP     : setTextTypeRange(TxtMiru::TT_SUP_NOTE, iIndex); break;
+			case HTMLTAGTYPE::HTMLTAG_SUB     : setTextTypeRange(TxtMiru::TextType::SUB_NOTE, iIndex); break;
+			case HTMLTAGTYPE::HTMLTAG_SUP     : setTextTypeRange(TxtMiru::TextType::SUP_NOTE, iIndex); break;
 			default:
 				break;
 			}
 			if(m_iFontSize !=  iFontSize){
 				m_iFontSize = iFontSize;
 				TxtMiru::TextInfo ti_size;
-				ti_size.textType = TxtMiru::TT_TEXT_SIZE;
+				ti_size.textType = TxtMiru::TextType::TEXT_SIZE;
 				ti_size.chrType  = iFontSize;
 				m_line_info.text_list.push_back(ti_size);
 			}
@@ -1679,10 +1691,10 @@ private:
 					addLineInfo();
 				}
 				if(m_curBoldState != preBoldState){
-					if(preBoldState == BS_BOLD){
-						m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TT_BOLD_START, 0));
+					if(preBoldState == BoldState::BS_BOLD){
+						m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TextType::BOLD_START, 0));
 					} else {
-						m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TT_BOLD_END, 0));
+						m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TextType::BOLD_END, 0));
 					}
 					m_curBoldState = preBoldState;
 				}
@@ -1691,7 +1703,7 @@ private:
 				if(!m_line_info.text_list.empty()){
 					nextLine();
 				}
-				m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TT_NEXT_PAGE, 0));
+				m_line_info.text_list.push_back(TextInfoSpec(TxtMiru::TextType::NEXT_PAGE, 0));
 				nextLine();
 			}
 			m_current_subtitle_no = current_subtitle_no;
@@ -1723,14 +1735,14 @@ private:
 					// 行の最中に 改段・改頁・改丁が見つかった場合、リストを分割
 					addLineInfo();
 				}
-				text_list.push_back(TextInfoSpec(TxtMiru::TT_NEXT_PAGE, 0));
+				text_list.push_back(TextInfoSpec(TxtMiru::TextType::NEXT_PAGE, 0));
 				addLineInfo();
 			} else if(CGrText::isMatchChar(lpSrc, _T("［＃改丁］"))){
 				if(!text_list.empty()){
 					// 行の最中に 改段・改頁・改丁が見つかった場合、リストを分割
 					addLineInfo();
 				}
-				text_list.push_back(TextInfoSpec(TxtMiru::TT_NEXT_PAPER, 0));
+				text_list.push_back(TextInfoSpec(TxtMiru::TextType::NEXT_PAPER, 0));
 				addLineInfo();
 			}
 			return;
@@ -1751,8 +1763,8 @@ private:
 			//
 			if(CGrText::isMatchChar(lpSrc, _T("底本："))){
 				addLineInfo();
-				text_list.push_back(TextInfoHalfChar(_T(""), TxtMiru::TT_ENDOFCONTENTS));
-				text_list.push_back(TextInfoSpec(TxtMiru::TT_COMMENT_BEGIN, 0));
+				text_list.push_back(TextInfoHalfChar(_T(""), TxtMiru::TextType::ENDOFCONTENTS));
+				text_list.push_back(TextInfoSpec(TxtMiru::TextType::COMMENT_BEGIN, 0));
 				m_bEndofContents = true;
 				addContents(lpSrc);
 				break;
@@ -1762,7 +1774,7 @@ private:
 				// LINEとかの特殊文字は、text_listを追加する(strに連続していれない)
 				const auto &ms = (*it_ps);
 				const auto textType = ms.type();
-				if(textType == TxtMiru::TT_RUBY_SEP || (textType == TxtMiru::TT_OVERLAP_CHAR && !m_bUseOverlapChar)){
+				if(textType == TxtMiru::TextType::RUBY_SEP || (textType == TxtMiru::TextType::OVERLAP_CHAR && !m_bUseOverlapChar)){
 					continue;
 				}
 				if(CGrText::isMatchChar(lpSrc, ms)){
@@ -1770,7 +1782,7 @@ private:
 						text_list.push_back(TextInfoLPTSTR(lpTextStart, lpSrc-1, chrType));
 					}
 					TxtMiru::TextListPos lastTLP;
-					CGrTxtParser::GetRFindTextType(lastTLP, text_list, TxtMiru::TT_TEXT);
+					CGrTxtParser::GetRFindTextType(lastTLP, text_list, TxtMiru::TextType::TEXT);
 					text_list.push_back(TxtMiru::TextInfo(static_cast<const TCHAR*>(ms), getCharType(lpSrc, lpNextSrc), textType, lastTLP));
 					lpTextStart = lpNextSrc = CGrText::CharNextN(lpSrc, ms.len());
 					chrType = 0xffff;
@@ -1856,13 +1868,13 @@ private:
 		char *charNoProxyAddress = nullptr;
 		do {
 			INTERNET_PROXY_INFO proxy = {0};
-			if(param.GetBoolean(CGrTxtParam::UseIESetting)){
+			if(param.GetBoolean(CGrTxtParam::PointsType::UseIESetting)){
 				proxy.dwAccessType = INTERNET_OPEN_TYPE_PRECONFIG;
-			} else if(param.GetBoolean(CGrTxtParam::UseProxy)){
+			} else if(param.GetBoolean(CGrTxtParam::PointsType::UseProxy)){
 				//プロクシの変更
 				std::tstring strProxyServer, strNoProxyAddress;
-				param.GetText(CGrTxtParam::ProxyServer   , strProxyServer   );
-				param.GetText(CGrTxtParam::NoProxyAddress, strNoProxyAddress);
+				param.GetText(CGrTxtParam::TextType::ProxyServer   , strProxyServer   );
+				param.GetText(CGrTxtParam::TextType::NoProxyAddress, strNoProxyAddress);
 				int lenStrProxyServer    = strProxyServer   .size() * 3;
 				int lenStrNoProxyAddress = strNoProxyAddress.size() * 3;
 				charProxyServer    = new char[lenStrProxyServer    + 1];

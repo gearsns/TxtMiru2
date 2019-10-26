@@ -100,43 +100,6 @@ public:
 			auto err =  mbstowcs_s(&cLen, &w[0], w.size()-1, c, _TRUNCATE);
 		}
 	}
-	bool utf82w(LPCSTR c, std::tstring &w)
-	{
-		if(c[0]==0xEF && c[1]==0xBB && c[2]==0xBF){ //BOM check
-			c+=3;
-		}
-		bool result = false;
-
-		int wlen = ::MultiByteToWideChar(CP_UTF8, 0, c, -1, nullptr, 0);
-		if(wlen == 0){
-			return false;
-		}
-		auto* buff = new WCHAR[wlen + 1];
-		if(::MultiByteToWideChar(CP_UTF8, 0, c, -1, buff, wlen)){
-			result = true;
-			buff[wlen] = L'\0';
-			w = buff;
-		}
-		delete[] buff;
-		return result;
-	}
-	bool w2utf8(LPCTSTR w, std::string &c)
-	{
-		bool result = false;
-
-		int clen = ::WideCharToMultiByte(CP_UTF8, 0, w, -1, nullptr, 0, nullptr, nullptr);
-		if(clen == 0){
-			return false;
-		}
-		auto* buff = new char[clen + 1];
-		if(::WideCharToMultiByte(CP_UTF8, 0, w, -1, buff, clen, nullptr, nullptr)){
-			result = true;
-			buff[clen] = L'\0';
-			c = buff;
-		}
-		delete[] buff;
-		return result;
-	}
 	virtual void c2conv(LPCTSTR w, std::string &c)
 	{
 		w2c(w, c);
@@ -170,7 +133,7 @@ public:
 		if(m_lpFName[FNI_UNARCHIVE] && m_lpFName[FNI_COMMAND_LINE]){
 			SetProcPtr(UnArchive, Function(FNI_UNARCHIVE));
 			if(!UnArchive){
-				return CGrArchive::ERCODE_ARCHIVERNOTFOUND;
+				return static_cast<int>(CGrArchive::ErrorCode::ARCHIVERNOTFOUND);
 			}
 			CGrShell::CreateFolder(to_dir);
 			char output[1024] = {0};
@@ -189,42 +152,42 @@ public:
 		//
 		auto dwAttr = ::GetFileAttributes(filename);
 		if(dwAttr == 0xFFFFFFFF){
-			return CGrArchive::ERCODE_FILENOTFOUND;
+			return CGrArchive::ErrorCode::FILENOTFOUND;
 		}
 		//
 		if(!Load()){
-			return CGrArchive::ERCODE_ARCHIVERNOTFOUND;
+			return CGrArchive::ErrorCode::ARCHIVERNOTFOUND;
 		}
 		// バージョン取得
 		if(m_lpFName[FNI_GETVERSION]){
 			SetProcPtr(GetVersion, Function(FNI_GETVERSION));
 			if(!GetVersion){
-				return CGrArchive::ERCODE_ARCHIVERNOTFOUND;
+				return CGrArchive::ErrorCode::ARCHIVERNOTFOUND;
 			}
 		}
 		// 動作中かチェック
 		if(m_lpFName[FNI_GETRUNNING]){
 			SetProcPtr(GetRunning, Function(FNI_GETRUNNING));
 			if(!GetRunning){
-				return CGrArchive::ERCODE_ARCHIVERNOTFOUND;
+				return CGrArchive::ErrorCode::ARCHIVERNOTFOUND;
 			}
 			if(GetRunning()){
-				return CGrArchive::ERCODE_ARCHIVERRUNNING;
+				return CGrArchive::ErrorCode::ARCHIVERRUNNING;
 			}
 		}
-		return CGrArchive::ERCODE_SUCCESS;
+		return CGrArchive::ErrorCode::SUCCESS;
 	}
 	virtual CGrArchive::ErrorCode ExtractFull(LPCTSTR filename, LPCTSTR to_dir, UINT iLimitMaxSize)
 	{
 		auto errcode = ArchiveDLLCheck(filename);
-		if(errcode != CGrArchive::ERCODE_SUCCESS){
+		if(errcode != CGrArchive::ErrorCode::SUCCESS){
 			return errcode;
 		}
 		if(m_lpFName[FNI_SETUNICODEMODE]){
 			SetProcPtr(SetUnicodeMode, Function(FNI_SETUNICODEMODE));
 			if(SetUnicodeMode){
 				if(!SetUnicodeMode(TRUE)){
-					return CGrArchive::ERCODE_ARCHIVERNOTFOUND;
+					return CGrArchive::ErrorCode::ARCHIVERNOTFOUND;
 				}
 			}
 		}
@@ -248,47 +211,47 @@ public:
 			if(m_lpFName[FNI_CHECKARCHIVE]){
 				SetProcPtr(CheckArchive, Function(FNI_CHECKARCHIVE));
 				if(!CheckArchive){
-					return CGrArchive::ERCODE_ARCHIVERNOTFOUND;
+					return CGrArchive::ErrorCode::ARCHIVERNOTFOUND;
 				}
 				if(!CheckArchive(filename_c.c_str(), 0)){
-					return CGrArchive::ERCODE_NOSUPPORT;
+					return CGrArchive::ErrorCode::NOSUPPORT;
 				}
 			}
 			{
 				TCHAR tempPath[MAX_PATH] = {};
 				if(::GetTempPath(sizeof(tempPath)/sizeof(TCHAR), tempPath) == 0){
-					return CGrArchive::ERCODE_NOSUPPORT;
+					return CGrArchive::ErrorCode::NOSUPPORT;
 				}
 				TCHAR tempFile[MAX_PATH] = {};
 				if(::GetTempFileName(tempPath, _T("txt"), 0, tempFile) == 0){
-					return CGrArchive::ERCODE_NOSUPPORT;
+					return CGrArchive::ErrorCode::NOSUPPORT;
 				}
 				auto hFile = ::CreateFile(tempFile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
 				if(INVALID_HANDLE_VALUE == hFile){
-					return CGrArchive::ERCODE_NOSUPPORT;
+					return CGrArchive::ErrorCode::NOSUPPORT;
 				}
 				DWORD dw = 0;
 				WriteFile(hFile, "*\r\n", 3, &dw, NULL);
 				::CloseHandle(hFile);
-				return (UnArchiveResFile(filename, to_dir, tempFile) == 0) ? CGrArchive::ERCODE_SUCCESS : CGrArchive::ERCODE_ERROR;
+				return (UnArchiveResFile(filename, to_dir, tempFile) == 0) ? CGrArchive::ErrorCode::SUCCESS : CGrArchive::ErrorCode::Error;
 			}
 		} else {
 			if(m_lpFName[FNI_CLOSEARCHIVE]){
 				SetProcPtr(CloseArchive, Function(FNI_CLOSEARCHIVE));
 				if(!CloseArchive){
-					return CGrArchive::ERCODE_NOSUPPORT;
+					return CGrArchive::ErrorCode::NOSUPPORT;
 				}
 			}
 			if(m_lpFName[FNI_FINDFIRST]){
 				SetProcPtr(FindFirst, Function(FNI_FINDFIRST));
 				if(!FindFirst){
-					return CGrArchive::ERCODE_NOSUPPORT;
+					return CGrArchive::ErrorCode::NOSUPPORT;
 				}
 			}
 			if(m_lpFName[FNI_FINDNEXT]){
 				SetProcPtr(FindNext, Function(FNI_FINDNEXT));
 				if(!FindNext){
-					return CGrArchive::ERCODE_NOSUPPORT;
+					return CGrArchive::ErrorCode::NOSUPPORT;
 				}
 			}
 			//
@@ -296,15 +259,15 @@ public:
 			if(harc){
 				TCHAR tempPath[MAX_PATH] = {};
 				if(::GetTempPath(sizeof(tempPath)/sizeof(TCHAR), tempPath) == 0){
-					return CGrArchive::ERCODE_NOSUPPORT;
+					return CGrArchive::ErrorCode::NOSUPPORT;
 				}
 				TCHAR tempFile[MAX_PATH] = {};
 				if(::GetTempFileName(tempPath, _T("txt"), 0, tempFile) == 0){
-					return CGrArchive::ERCODE_NOSUPPORT;
+					return CGrArchive::ErrorCode::NOSUPPORT;
 				}
 				auto hFile = ::CreateFile(tempFile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
 				if(INVALID_HANDLE_VALUE == hFile){
-					return CGrArchive::ERCODE_NOSUPPORT;
+					return CGrArchive::ErrorCode::NOSUPPORT;
 				}
 				INDIVIDUALINFO ii = {};
 				if(FindFirst(harc, "*", &ii) == 0){
@@ -314,10 +277,10 @@ public:
 				}
 				CloseArchive(harc);
 				::CloseHandle(hFile);
-				return (UnArchiveResFile(filename, to_dir, tempFile) == 0) ? CGrArchive::ERCODE_SUCCESS : CGrArchive::ERCODE_ERROR;
+				return (UnArchiveResFile(filename, to_dir, tempFile) == 0) ? CGrArchive::ErrorCode::SUCCESS : CGrArchive::ErrorCode::Error;
 			}
 		}
-		return CGrArchive::ERCODE_ERROR;
+		return CGrArchive::ErrorCode::Error;
 	}
 };
 class CGrArchiveUnLha : public CGrArchiveBase
@@ -370,7 +333,7 @@ public:
 		if(m_lpFName[FNI_UNARCHIVE] && m_lpFName[FNI_COMMAND_LINE]){
 			SetProcPtr(UnArchiveW, Function(FNI_UNARCHIVE));
 			if(!UnArchiveW){
-				return CGrArchive::ERCODE_ARCHIVERNOTFOUND;
+				return static_cast<int>(CGrArchive::ErrorCode::ARCHIVERNOTFOUND);
 			}
 			CGrShell::CreateFolder(to_dir);
 			TCHAR output[1024] = {0};
@@ -385,7 +348,7 @@ public:
 	virtual CGrArchive::ErrorCode ExtractFull(LPCTSTR filename, LPCTSTR to_dir, UINT iLimitMaxSize)
 	{
 		auto errcode = ArchiveDLLCheck(filename);
-		if(errcode != CGrArchive::ERCODE_SUCCESS){
+		if(errcode != CGrArchive::ErrorCode::SUCCESS){
 			return errcode;
 		}
 		bool bNoLimit = false;
@@ -406,64 +369,64 @@ public:
 			if(m_lpFName[FNI_CHECKARCHIVE]){
 				SetProcPtr(CheckArchiveW, Function(FNI_CHECKARCHIVE));
 				if(!CheckArchiveW){
-					return CGrArchive::ERCODE_ARCHIVERNOTFOUND;
+					return CGrArchive::ErrorCode::ARCHIVERNOTFOUND;
 				}
 				if(!CheckArchiveW(filename, 0)){
-					return CGrArchive::ERCODE_NOSUPPORT;
+					return CGrArchive::ErrorCode::NOSUPPORT;
 				}
 			}
 			{
 				TCHAR tempPath[MAX_PATH] = {0};
 				if(::GetTempPath(sizeof(tempPath)/sizeof(TCHAR), tempPath) == 0){
-					return CGrArchive::ERCODE_NOSUPPORT;
+					return CGrArchive::ErrorCode::NOSUPPORT;
 				}
 				TCHAR tempFile[MAX_PATH] = {0};
 				if(::GetTempFileName(tempPath, _T("txt"), 0, tempFile) == 0){
-					return CGrArchive::ERCODE_NOSUPPORT;
+					return CGrArchive::ErrorCode::NOSUPPORT;
 				}
 				auto hFile = ::CreateFile(tempFile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
 				if(INVALID_HANDLE_VALUE == hFile){
-					return CGrArchive::ERCODE_NOSUPPORT;
+					return CGrArchive::ErrorCode::NOSUPPORT;
 				}
 				DWORD dw = 0;
 				BYTE header[] = {0xff, 0xfe};
 				::WriteFile(hFile, header, sizeof(header), &dw, nullptr);
 				WriteFile(hFile, _T("*\r\n"), 3*sizeof(TCHAR), &dw, nullptr);
 				::CloseHandle(hFile);
-				return (UnArchiveResFile(filename, to_dir, tempFile) == 0) ? CGrArchive::ERCODE_SUCCESS : CGrArchive::ERCODE_ERROR;
+				return (UnArchiveResFile(filename, to_dir, tempFile) == 0) ? CGrArchive::ErrorCode::SUCCESS : CGrArchive::ErrorCode::Error;
 			}
 		} else {
 			if(m_lpFName[FNI_CLOSEARCHIVE]){
 				SetProcPtr(CloseArchive, Function(FNI_CLOSEARCHIVE));
 				if(!CloseArchive){
-					return CGrArchive::ERCODE_NOSUPPORT;
+					return CGrArchive::ErrorCode::NOSUPPORT;
 				}
 			}
 			if(m_lpFName[FNI_FINDFIRST]){
 				SetProcPtr(FindFirstW, Function(FNI_FINDFIRST));
 				if(!FindFirstW){
-					return CGrArchive::ERCODE_NOSUPPORT;
+					return CGrArchive::ErrorCode::NOSUPPORT;
 				}
 			}
 			if(m_lpFName[FNI_FINDNEXT]){
 				SetProcPtr(FindNextW, Function(FNI_FINDNEXT));
 				if(!FindNextW){
-					return CGrArchive::ERCODE_NOSUPPORT;
+					return CGrArchive::ErrorCode::NOSUPPORT;
 				}
 			}
 			auto harc = OpenArchiveW(NULL, filename, 0);
 			if(harc){
 				TCHAR tempPath[MAX_PATH] = {0};
 				if(::GetTempPath(sizeof(tempPath)/sizeof(TCHAR), tempPath) == 0){
-					return CGrArchive::ERCODE_NOSUPPORT;
+					return CGrArchive::ErrorCode::NOSUPPORT;
 				}
 				TCHAR tempFile[MAX_PATH] = {0};
 				if(::GetTempFileName(tempPath, _T("txt"), 0, tempFile) == 0){
-					return CGrArchive::ERCODE_NOSUPPORT;
+					return CGrArchive::ErrorCode::NOSUPPORT;
 				}
 				auto hFile = ::CreateFile(tempFile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
 				if(INVALID_HANDLE_VALUE == hFile){
-					return CGrArchive::ERCODE_NOSUPPORT;
+					return CGrArchive::ErrorCode::NOSUPPORT;
 				}
 				DWORD dw = 0;
 				BYTE header[] = {0xff, 0xfe};
@@ -476,10 +439,10 @@ public:
 				}
 				CloseArchive(harc);
 				::CloseHandle(hFile);
-				return (UnArchiveResFile(filename, to_dir, tempFile) == 0) ? CGrArchive::ERCODE_SUCCESS : CGrArchive::ERCODE_ERROR;
+				return (UnArchiveResFile(filename, to_dir, tempFile) == 0) ? CGrArchive::ErrorCode::SUCCESS : CGrArchive::ErrorCode::Error;
 			}
 		}
-		return CGrArchive::ERCODE_ERROR;
+		return CGrArchive::ErrorCode::Error;
 	}
 };
 class CGrArchiveUnZip : public CGrArchiveBase
@@ -586,12 +549,12 @@ struct ArchiveTypeMap {
 	LPCTSTR pext;
 	CGrArchive::ArchiveType at;
 } l_archivetypemap[] = { // pextでソートしておくこと
-	{_T("7Z" ), CGrArchive::ARTYPE_7Z },
-	{_T("CAB"), CGrArchive::ARTYPE_CAB},
-	{_T("LZH"), CGrArchive::ARTYPE_LZH},
-	{_T("RAR"), CGrArchive::ARTYPE_RAR},
-	{_T("R01"), CGrArchive::ARTYPE_RAR},
-	{_T("ZIP"), CGrArchive::ARTYPE_ZIP},
+	{_T("7Z" ), CGrArchive::ArchiveType::SevenZ},
+	{_T("CAB"), CGrArchive::ArchiveType::CAB},
+	{_T("LZH"), CGrArchive::ArchiveType::LZH},
+	{_T("RAR"), CGrArchive::ArchiveType::RAR},
+	{_T("R01"), CGrArchive::ArchiveType::RAR},
+	{_T("ZIP"), CGrArchive::ArchiveType::ZIP},
 };
 static int ArchiveTypeMapCompare(const void *key, const void *pdata)
 {
@@ -613,57 +576,57 @@ bool CGrArchive::IsSupportFile(LPCTSTR filename)
 }
 CGrArchive::ErrorCode CGrArchive::ExtractFull(CGrArchive::ArchiveType at, LPCTSTR filename, LPCTSTR to_dir, UINT iLimitMaxSize)
 {
-	auto ec = ERCODE_NOSUPPORT;
+	auto ec = ErrorCode::NOSUPPORT;
 	switch(at){
-	case ARTYPE_LZH:
+	case ArchiveType::LZH:
 		{
 			CGrArchiveUnLha lha;
 			ec=lha.ExtractFull(filename, to_dir, iLimitMaxSize);
-			if(ec != ERCODE_SUCCESS){
+			if(ec != ErrorCode::SUCCESS){
 				_tcscpy_s(m_last_error_archiver, lha.GetName());
 			}
 		}
 		break;
-	case ARTYPE_ZIP:
+	case ArchiveType::ZIP:
 		{
 			CGrArchiveUn7Zip sevenzip;
 			if(sevenzip.Load()){
 				ec = sevenzip.ExtractFull(filename, to_dir, iLimitMaxSize);
-				if(ec != ERCODE_SUCCESS){
+				if(ec != ErrorCode::SUCCESS){
 					_tcscpy_s(m_last_error_archiver, sevenzip.GetName());
 				}
 			} else {
 				CGrArchiveUnZip zip;
 				ec = zip.ExtractFull(filename, to_dir, iLimitMaxSize);
-				if(ec != ERCODE_SUCCESS){
+				if(ec != ErrorCode::SUCCESS){
 					_tcscpy_s(m_last_error_archiver, zip.GetName());
 				}
 			}
 		}
 		break;
-	case ARTYPE_7Z:
+	case ArchiveType::SevenZ:
 		{
 			CGrArchiveUn7Zip zip;
 			ec = zip.ExtractFull(filename, to_dir, iLimitMaxSize);
-			if(ec != ERCODE_SUCCESS){
+			if(ec != ErrorCode::SUCCESS){
 				_tcscpy_s(m_last_error_archiver, zip.GetName());
 			}
 		}
 		break;
-	case ARTYPE_RAR:
+	case ArchiveType::RAR:
 		{
 			CGrArchiveUnRAR rar;
 			ec = rar.ExtractFull(filename, to_dir, iLimitMaxSize);
-			if(ec != ERCODE_SUCCESS){
+			if(ec != ErrorCode::SUCCESS){
 				_tcscpy_s(m_last_error_archiver, rar.GetName());
 			}
 		}
 		break;
-	case ARTYPE_CAB:
+	case ArchiveType::CAB:
 		{
 			CGrArchiveCab cab;
 			ec = cab.ExtractFull(filename, to_dir, iLimitMaxSize);
-			if(ec != ERCODE_SUCCESS){
+			if(ec != ErrorCode::SUCCESS){
 				_tcscpy_s(m_last_error_archiver, cab.GetName());
 			}
 		}
@@ -680,7 +643,7 @@ CGrArchive::ErrorCode CGrArchive::ExtractFull(LPCTSTR filename, LPCTSTR to_dir, 
 			return ExtractFull(patm->at, filename, to_dir, iLimitMaxSize);
 		}
 	}
-	return ERCODE_NOSUPPORT;
+	return ErrorCode::NOSUPPORT;
 }
 
 LPCTSTR CGrArchive::GetLastErrorArchiverName()

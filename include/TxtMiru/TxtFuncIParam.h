@@ -5,19 +5,19 @@
 class CGrTxtFuncIParam
 {
 public:
-	enum FunCallType {
-		FncCT_UpdateCheck          ,
-		FncCT_GetCurrentPage       ,
-		FncCT_SetActiveModelessDlg ,
-		FunCT_InstallHook          ,
-		FunCT_UninstallHook        ,
-		FunCT_AddBookmark          ,
-		FunCT_DeleteBookmark       ,
-		FncCT_GetCurrentDisplayPage,
-		FncCT_GetSinglePage        ,
-		FncCT_MaxNum              ,
+	enum class FunCallType {
+		UpdateCheck          ,
+		GetCurrentPage       ,
+		SetActiveModelessDlg ,
+		InstallHook          ,
+		UninstallHook        ,
+		AddBookmark          ,
+		DeleteBookmark       ,
+		GetCurrentDisplayPage,
+		GetSinglePage        ,
+		MaxNum              ,
 	};
-	enum ValueType {
+	enum class ValueType {
 		HangingCharacters      , // ぶら下げ文字
 		LineStartNGCharacters  , // 行頭禁止
 		LineEndNGCharacters    , // 行末禁止文字
@@ -25,18 +25,18 @@ public:
 		SeparateNGCharacters   , // 分割禁止文字
 		RotateCharacters       , // 回転させて表示する文字
 		RRotateCharacters      , // 逆回転させて表示する文字
-		VT_MaxNum              ,
+		MaxNum                 ,
 	};
-	enum CharType {
+	enum class CharType {
 		Text        ,
 		Ruby        ,
 		Note        ,
 		Nombre      ,
 		RunningHeads,
 		Bold        ,
-		CT_MaxNum   ,
+		MaxNum      ,
 	};
-	enum TextType {
+	enum class TextType {
 		LastFolder        ,
 		LastFile          ,
 		HistFile1         ,
@@ -95,28 +95,28 @@ public:
 		TitleFormat       , // タイトル書式
 		OpenLinkExe       , // リンククリック時に起動する 外部プログラム
 		OpenLinkPrm       , // リンククリック時に起動するプログラム名、引数
-		RubyListIgnore  , // ルビ一覧への除外設定
-		TT_MaxNum         ,
+		RubyListIgnore    , // ルビ一覧への除外設定
+		MaxNum            ,
 	};
-	enum FileType {
-		FT_Html  , // HTM, HTML, MHT, MHTML, XHTML
-		FT_Text  , // TXT
-		FT_Link  , // LNK
-		FT_Siori , // SIORI
-		FT_Arc7z , // 7Z
-		FT_ArcCab, // CAB
-		FT_ArcLzh, // LZH
-		FT_ArcRar, // RAR, R01
-		FT_ArcZip, // ZIP
-		FT_MaxNum, //
+	enum class FileType {
+		Html  , // HTM, HTML, MHT, MHTML, XHTML
+		Text  , // TXT
+		Link  , // LNK
+		Siori , // SIORI
+		Arc7z , // 7Z
+		ArcCab, // CAB
+		ArcLzh, // LZH
+		ArcRar, // RAR, R01
+		ArcZip, // ZIP
+		MaxNum, //
 	};
-	enum AntiAliasType {
-		AA_None   ,
-		AA_Normal ,
-		AA_LCD    ,
-		AA_MaxNum
+	enum class AntiAliasType {
+		None   ,
+		Normal ,
+		LCD    ,
+		MaxNum
 	};
-	enum PointsType {
+	enum class PointsType {
 		PageColor       ,
 		WindowSize      , // ウインドウサイズ
 		TateChuNum      , // 縦中横の最大字数
@@ -168,7 +168,7 @@ public:
 		KeyRepeat       , // キーリピートの使用有無
 		AozoraSetting   , // 青空文庫設定
 		UseFont         , // フォントファイルのロード
-		PT_MaxNum       ,
+		MaxNum          ,
 	};
 public:
 	CGrTxtFuncIParam(){};

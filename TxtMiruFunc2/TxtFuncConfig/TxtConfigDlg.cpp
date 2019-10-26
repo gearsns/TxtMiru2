@@ -185,11 +185,11 @@ void CGrTxtConfigDlg::showPage(int page)
 	setWindowSize(-1, -1);
 	ShowWindow(m_list[page]->GetWnd(), SW_SHOW);
 	m_menuButton[page].SetCheck(true);
-	for(const auto &prop : m_list){
-		auto hProp = prop.second->GetWnd();
-		if(prop.first != page){
+	for(const auto &[it_page, it_pProp] : m_list){
+		auto hProp = it_pProp->GetWnd();
+		if(it_page != page){
 			ShowWindow(hProp, SW_HIDE);
-			m_menuButton[prop.first].SetCheck(false);
+			m_menuButton[it_page].SetCheck(false);
 		}
 	}
 }

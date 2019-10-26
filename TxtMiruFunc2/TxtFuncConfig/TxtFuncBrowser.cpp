@@ -83,8 +83,8 @@ static LPTSTR getURLinDDE(LPCTSTR browser)
 				}
 			}
 		}
-		//ウィンドウに取得した情報を送信
-		int nLen = ::MultiByteToWideChar(CP_THREAD_ACP, 0, pStart, -1, nullptr,0);
+		// ウィンドウに取得した情報を送信
+		auto nLen = ::MultiByteToWideChar(CP_THREAD_ACP, 0, pStart, -1, nullptr, 0);
 		if(nLen != 0){
 			::MultiByteToWideChar(CP_THREAD_ACP, 0, pStart, -1, result, nLen);
 		}

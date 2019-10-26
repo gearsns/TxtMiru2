@@ -62,7 +62,7 @@ bool CGrJScript::Run(std::tstring &outstr, LPCTSTR funcName, LPCTSTR args[], int
 		if(!ret){
 			const auto &param = CGrTxtMiru::theApp().Param();
 			int usePreParser[2] = {}; /* 0:Pre-Parserを使用する, 1:Pre-Parserのエラーを表示しない */
-			param.GetPoints(CGrTxtParam::UsePreParser, usePreParser, sizeof(usePreParser)/sizeof(int));
+			param.GetPoints(CGrTxtParam::PointsType::UsePreParser, usePreParser, sizeof(usePreParser)/sizeof(int));
 			if(usePreParser[1] != 1){
 				IScriptError *pse = nullptr;
 				if(SUCCEEDED(pScriptCtrl->get_Error(&pse)) && pse){

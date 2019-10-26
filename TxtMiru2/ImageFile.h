@@ -6,8 +6,8 @@
 class CGrImageFile
 {
 public:
-	enum FOLDER_TYPE { FT_DATA, FT_EXEPATH, FT_NONE };
-	enum IMAGE_TYPE { IT_EMF, IT_OLE, IT_NONE };
+	enum class FOLDER_TYPE { DATA, EXEPATH, NONE };
+	enum class IMAGE_TYPE { EMF, OLE, NONE };
 
 	CGrImageFile(LPCTSTR lpBasePath);
 	virtual ~CGrImageFile();
@@ -16,8 +16,8 @@ public:
 private:
 	std::tstring base_path;
 	int         ext_no = -1;
-	FOLDER_TYPE ft = FT_NONE;
-	IMAGE_TYPE  im = IT_NONE;
+	FOLDER_TYPE ft = FOLDER_TYPE::NONE;
+	IMAGE_TYPE  im = IMAGE_TYPE::NONE;
 	CGrPictEmfRenderer pict_emf;
 	CGrPictOleRenderer pict_ole;
 	bool getImagePath(LPCTSTR lpDir, int icon_no, LPCTSTR lpExt, std::tstring &outFileName);

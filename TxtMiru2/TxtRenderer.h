@@ -10,13 +10,13 @@ class CGrTxtDocument;
 class CGrTxtRendererMgr
 {
 public:
-	enum error_code {err_char_renderer_notfound};
-	enum FontType {
+	enum class error_code {char_renderer_notfound};
+	enum class FontType {
 		Text    , HalfText    , RotateText    , HalfRotateText    , TurnText    , HalfTurnText    ,
 		BoldText, BoldHalfText, BoldRotateText, BoldHalfRotateText, BoldTurnText, BoldHalfTurnText,
 		RubyText, TurnRubyText, Note, Nombre, RunningHeads,
-		FT_MaxNum };
-	enum PictRenderType { PRT_Ole, PRT_Spi, PRT_Emf, PRT_MaxNum };
+		MaxNum };
+	enum class PictRenderType { Ole, Spi, Emf, MaxNum };
 	struct BorderType {
 		bool top;
 		bool left;
@@ -50,7 +50,8 @@ public:
 
 	bool DrawText(FontType ft, int x, int y, LPCTSTR lpSrc, LPCTSTR lpSrcEnd);
 	bool DrawText(FontType ft, int x, int y, LPCTSTR lpSrc, int len);
-	void PatternFill(FontType ft, int x, int y, int w, int h, LPCTSTR lpSrc, int len);
+	void PatternFillVert(FontType ft, int x, int y, int w, int h, LPCTSTR lpSrc, int len);
+	void PatternFillHorz(FontType ft, int x, int y, int w, int h, LPCTSTR lpSrc, int len);
 	void DrawPict(int x, int y, int w, int h, LPCTSTR lpFileName);
 	bool DrawBorder(int x, int y, int w, int h, BorderType borderType);
 	void StretchBlt(int x, int y, int w, int h, LPCTSTR lpFileName);
@@ -69,12 +70,12 @@ private:
 	// フォントサイズに応じた最適な CharRenderer を選択
 	CGrCharRenderer &selectCharRenderer(int font_size, LPCGrCharRenderer *pcr);
 	void createCharRenderer(int text_size, int ruby_size, int note_size, int nombre_size, int running_heads_size);
-	void createCharRenderer(FontType ft, CGrTxtParam &param, CGrTxtParam::CharType ct, int size, int iRotate);
-	void createFlexCharRenderer(FontType ft, CGrTxtParam &param, CGrTxtParam::CharType ct, int size, int iRotate);
+	void createCharRenderer(FontType ft, CGrTxtParam &param, CGrTxtParam::CharType ct, int size, int iRotate/*, bool bBold*/);
+	void createFlexCharRenderer(FontType ft, CGrTxtParam &param, CGrTxtParam::CharType ct, int size, int iRotate/*, bool bBold*/);
 private:
-	LPCGrCharRenderer m_charRendererMap    [FT_MaxNum ] = {};
-	LPCGrCharRenderer m_flexCharRendererMap[FT_MaxNum ] = {};
-	LPCGrPictRenderer m_pictRendererMap    [PRT_MaxNum] = {};
+	LPCGrCharRenderer m_charRendererMap    [static_cast<int>(FontType::MaxNum)] = {};
+	LPCGrCharRenderer m_flexCharRendererMap[static_cast<int>(FontType::MaxNum)] = {};
+	LPCGrPictRenderer m_pictRendererMap    [static_cast<int>(PictRenderType::MaxNum)] = {};
 	LPCGrCharRenderer *m_currentCharRendererMap = m_charRendererMap;
 	std::map<std::tstring,LPCGrPictRenderer> m_pictFileRendererMap;  // ファイル名から m_pictRendererMap で Loadした CGrPictRenderer のマップ
 	CGrBitmap *m_pBmpCanvas = nullptr;

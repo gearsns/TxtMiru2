@@ -40,9 +40,9 @@ BOOL CGrTxtSearchDlg::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	refreshList();
 
 	const auto &param = CGrTxtFunc::Param();
-	bool bLoop = param.GetBoolean(CGrTxtFuncIParam::SearchLoop);
+	bool bLoop = param.GetBoolean(CGrTxtFuncIParam::PointsType::SearchLoop);
 	Button_SetCheck(GetDlgItem(m_hWnd, IDC_CHECK_LOOP), bLoop);
-	bool bRegExp = param.GetBoolean(CGrTxtFuncIParam::UseRegExp);
+	bool bRegExp = param.GetBoolean(CGrTxtFuncIParam::PointsType::UseRegExp);
 	Button_SetCheck(GetDlgItem(m_hWnd, IDC_USE_REGEXP), bRegExp);
 	//
 	TxtMiruTheme_SetWindowSubclass(m_hWnd);
@@ -70,7 +70,7 @@ void CGrTxtSearchDlg::refreshList()
 	} else {
 		for(int idx=0; idx<9; ++idx){
 			TCHAR buf[2048] = {};
-			param.GetText((CGrTxtFuncIParam::TextType)(CGrTxtFuncIParam::HistSearchWord9-idx), buf, _countof(buf));
+			param.GetText((CGrTxtFuncIParam::TextType)(static_cast<int>(CGrTxtFuncIParam::TextType::HistSearchWord9)-idx), buf, _countof(buf));
 			if(buf[0]){
 				ComboBox_AddString(chWnd, buf);
 			}
@@ -96,9 +96,9 @@ void CGrTxtSearchDlg::OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify
 		}
 		db.Close();
 		bool bLoop = Button_GetCheck(GetDlgItem(m_hWnd, IDC_CHECK_LOOP)) == TRUE;
-		param.SetBoolean(CGrTxtFuncIParam::SearchLoop, bLoop);
+		param.SetBoolean(CGrTxtFuncIParam::PointsType::SearchLoop, bLoop);
 		bool bRegExp = Button_GetCheck(GetDlgItem(m_hWnd, IDC_USE_REGEXP)) == TRUE;
-		param.SetBoolean(CGrTxtFuncIParam::UseRegExp, bRegExp);
+		param.SetBoolean(CGrTxtFuncIParam::PointsType::UseRegExp, bRegExp);
 		refreshList();
 		auto func = reinterpret_cast<TxtMiruFunc_SearchCurrent>(GetProcAddress(GetModuleHandle(NULL), "TxtMiruFunc_SearchCurrent"));
 		if(!func){

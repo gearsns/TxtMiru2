@@ -246,32 +246,32 @@ BOOL CGrTxtSearchFiles::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	TCHAR buf[2048];
 	if(!loadSetteing()){
 		std::tstring type = _T("TXT");
-		param.GetText(CGrTxtFuncIParam::FileTypeHtml  , buf, sizeof(buf)/sizeof(TCHAR));
+		param.GetText(CGrTxtFuncIParam::TextType::FileTypeHtml  , buf, sizeof(buf)/sizeof(TCHAR));
 		if(lstrlen(buf) > 0){
 			type += _T(",");
 			type += buf;
 		}
-		param.GetText(CGrTxtFuncIParam::FileTypeArc7z , buf, sizeof(buf)/sizeof(TCHAR));
+		param.GetText(CGrTxtFuncIParam::TextType::FileTypeArc7z , buf, sizeof(buf)/sizeof(TCHAR));
 		if(lstrlen(buf) > 0){
 			type += _T(",");
 			type += buf;
 		}
-		param.GetText(CGrTxtFuncIParam::FileTypeArcCab, buf, sizeof(buf)/sizeof(TCHAR));
+		param.GetText(CGrTxtFuncIParam::TextType::FileTypeArcCab, buf, sizeof(buf)/sizeof(TCHAR));
 		if(lstrlen(buf) > 0){
 			type += _T(",");
 			type += buf;
 		}
-		param.GetText(CGrTxtFuncIParam::FileTypeArcLzh, buf, sizeof(buf)/sizeof(TCHAR));
+		param.GetText(CGrTxtFuncIParam::TextType::FileTypeArcLzh, buf, sizeof(buf)/sizeof(TCHAR));
 		if(lstrlen(buf) > 0){
 			type += _T(",");
 			type += buf;
 		}
-		param.GetText(CGrTxtFuncIParam::FileTypeArcRar, buf, sizeof(buf)/sizeof(TCHAR));
+		param.GetText(CGrTxtFuncIParam::TextType::FileTypeArcRar, buf, sizeof(buf)/sizeof(TCHAR));
 		if(lstrlen(buf) > 0){
 			type += _T(",");
 			type += buf;
 		}
-		param.GetText(CGrTxtFuncIParam::FileTypeArcZip, buf, sizeof(buf)/sizeof(TCHAR));
+		param.GetText(CGrTxtFuncIParam::TextType::FileTypeArcZip, buf, sizeof(buf)/sizeof(TCHAR));
 		if(lstrlen(buf) > 0){
 			type += _T(",");
 			type += buf;
@@ -490,7 +490,7 @@ void CGrTxtSearchFiles::OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNoti
 					std::map<std::tstring,int> ext_map;
 					auto &&param = CGrTxtFunc::Param();
 					CGrCSVText text;
-					param.GetText(CGrTxtFuncIParam::FileTypeHtml, buf, sizeof(buf)/sizeof(TCHAR)); text.AddTail(buf);
+					param.GetText(CGrTxtFuncIParam::TextType::FileTypeHtml, buf, sizeof(buf)/sizeof(TCHAR)); text.AddTail(buf);
 					for(const auto &row : text.GetCSVROW()){
 						for(const auto &item : row){
 							ext_map[item] = 1;

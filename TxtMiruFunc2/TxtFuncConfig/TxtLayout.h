@@ -36,35 +36,35 @@ public:
 	//
 	virtual int ConfigurationDlg(HWND hWnd, LPCTSTR type, LPCTSTR name, LPCTSTR lpFileName) = 0;
 	//
-	enum FormatType {
-		FT_Nombre1 = 0,
-		FT_Nombre2    ,
-		FT_MaxNum     ,
+	enum class FormatType {
+		Nombre1 = 0,
+		Nombre2    ,
+		MaxNum     ,
 	};
-	const std::tstring &GetFormat(enum FormatType ft) const { return m_format[ft]; }
-	enum LineSizeType {
-		LST_Text = 0    ,
-		LST_Ruby        ,
-		LST_Nombre      ,
-		LST_Note        ,
-		LST_RunningHeads,
-		LST_MaxNum      ,
+	const std::tstring& GetFormat(FormatType ft) const { return m_format[static_cast<unsigned int>(ft)]; }
+	enum class LineSizeType {
+		Text = 0    ,
+		Ruby        ,
+		Nombre      ,
+		Note        ,
+		RunningHeads,
+		MaxNum      ,
 	};
-	virtual void SetLineSize(LineSizeType lst, const TxtMiru::LineSize &ls){ m_ls[lst] = ls;}
-	virtual TxtMiru::LineSize GetLineSize(LineSizeType ls) const { return m_ls[ls]; }
-	enum LayoutListType {
-		LLT_Text = 0    ,
-		LLT_Note        ,
-		LLT_Nombre      ,
-		LLT_RunningHeads,
-		LLT_MaxNum      ,
+	virtual void SetLineSize(LineSizeType lst, const TxtMiru::LineSize& ls) { m_ls[static_cast<unsigned int>(lst)] = ls; }
+	virtual TxtMiru::LineSize GetLineSize(LineSizeType ls) const { return m_ls[static_cast<unsigned int>(ls)]; }
+	enum class LayoutListType {
+		Text = 0    ,
+		Note        ,
+		Nombre      ,
+		RunningHeads,
+		MaxNum      ,
 	};
-	virtual TxtMiru::TxtLayoutList &GetLayoutList(LayoutListType llt){ return m_ll[llt]; }
-	virtual const TxtMiru::TxtLayoutList &GetConstLayoutList(LayoutListType llt) const { return m_ll[llt]; }
-	virtual void AddLayout(LayoutListType llt, const TxtMiru::TxtLayout &layout){ m_ll[llt].push_back(layout); }
+	virtual TxtMiru::TxtLayoutList& GetLayoutList(LayoutListType llt) { return m_ll[static_cast<unsigned int>(llt)]; }
+	virtual const TxtMiru::TxtLayoutList& GetConstLayoutList(LayoutListType llt) const { return m_ll[static_cast<unsigned int>(llt)]; }
+	virtual void AddLayout(LayoutListType llt, const TxtMiru::TxtLayout& layout) { m_ll[static_cast<unsigned int>(llt)].push_back(layout); }
 	//
-	enum NombreFormatType {
-		NFT_outside, NFT_center, NFT_inside
+	enum class NombreFormatType {
+		outside, center, inside
 	};
 	void SetNombreFormatType(NombreFormatType lft);
 	NombreFormatType GetNombreFormatType() const { return m_nombreFormatType; }
@@ -72,9 +72,9 @@ public:
 protected:
 	virtual void getItem(const CSV_COLMN &csv_col);
 	virtual void setItem(CGrCSVText &csv);
-	TxtMiru::TxtLayoutList m_ll    [LLT_MaxNum] = {};
-	TxtMiru::LineSize      m_ls    [LST_MaxNum] = {};
-	std::tstring           m_format[FT_MaxNum ];
+	TxtMiru::TxtLayoutList m_ll[static_cast<unsigned int>(LayoutListType::MaxNum)] = {};
+	TxtMiru::LineSize      m_ls[static_cast<unsigned int>(LineSizeType::MaxNum)] = {};
+	std::tstring           m_format[static_cast<unsigned int>(FormatType::MaxNum)];
 
 	NombreFormatType m_nombreFormatType;
 	SIZE m_szPaper = {};

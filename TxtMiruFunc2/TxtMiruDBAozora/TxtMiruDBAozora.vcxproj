@@ -60,7 +60,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>TxtMiruTheme.lib;TxtMiruFuncLib.lib;libpng.lib;zlibstat.lib;sqlite3.lib;strsafe.lib;WinINet.lib;comdlg32.lib;comctl32.lib;imm32.lib;version.lib;urlmon.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>TxtMiruTheme.lib;libpng.lib;zlibstat.lib;sqlite3.lib;strsafe.lib;WinINet.lib;comdlg32.lib;comctl32.lib;imm32.lib;version.lib;urlmon.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>../lib;%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -83,7 +83,7 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>zip.lib;TxtMiruTheme.lib;TxtMiruFuncLib.lib;libpng.lib;zlibstat.lib;sqlite3.lib;strsafe.lib;WinINet.lib;comdlg32.lib;comctl32.lib;imm32.lib;version.lib;urlmon.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>zip.lib;TxtMiruTheme.lib;libpng.lib;zlibstat.lib;sqlite3.lib;strsafe.lib;WinINet.lib;comdlg32.lib;comctl32.lib;imm32.lib;version.lib;urlmon.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>../../lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -98,6 +98,15 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\Bitmap.cpp" />
+    <ClCompile Include="..\..\src\CSVText.cpp" />
+    <ClCompile Include="..\..\src\Ctrl\ListView.cpp" />
+    <ClCompile Include="..\..\src\Ctrl\SplitWnd.cpp" />
+    <ClCompile Include="..\..\src\Ctrl\stdwin.cpp" />
+    <ClCompile Include="..\..\src\Ctrl\WindowCtrl.cpp" />
+    <ClCompile Include="..\..\src\shell.cpp" />
+    <ClCompile Include="..\..\src\stlutil.cpp" />
+    <ClCompile Include="..\..\src\text.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ndc.cpp" />
     <ClCompile Include="TxtMiru.cpp" />

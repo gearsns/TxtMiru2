@@ -91,6 +91,10 @@
       <GenerateMapFile>true</GenerateMapFile>
       <MapExports>true</MapExports>
     </Link>
+    <PostBuildEvent>
+      <Command>copy $(MSBuildProjectDirectory)\Release\TxtMiruTheme.dll ..\..\bin\
+copy $(MSBuildProjectDirectory)\Release\TxtMiruTheme.lib ..\..\lib\</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\Ctrl\ComonCtrl.h" />

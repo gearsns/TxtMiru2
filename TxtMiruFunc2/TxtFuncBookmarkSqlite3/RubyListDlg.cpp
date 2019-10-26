@@ -187,19 +187,19 @@ BOOL CGrRubyListDlg::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	lvc.fmt = LVCFMT_LEFT;
 	lvc.cx = 100;
 	lvc.pszText = const_cast<LPTSTR>(str_text_name.c_str());
-	lvc.iSubItem = RLC_STR;
+	lvc.iSubItem = static_cast<int>(RubyListColumn::RLC_STR);
 	m_listView.InsertColumn(lvc.iSubItem, &lvc);
 
 	std::tstring str_ruby_name;
 	CGrText::LoadString(IDS_TITLE_RUBY, str_ruby_name);
 	lvc.pszText = const_cast<LPTSTR>(str_ruby_name.c_str());
-	lvc.iSubItem = RLC_RUBY;
+	lvc.iSubItem = static_cast<int>(RubyListColumn::RLC_RUBY);
 	m_listView.InsertColumn(lvc.iSubItem, &lvc);
 
 	std::tstring str_page_name;
 	CGrText::LoadString(IDS_BMH_TOTALPAGE, str_page_name);
 	lvc.pszText = const_cast<LPTSTR>(str_page_name.c_str());
-	lvc.iSubItem = RLC_PAGE;
+	lvc.iSubItem = static_cast<int>(RubyListColumn::RLC_PAGE);
 	m_listView.InsertColumn(lvc.iSubItem, &lvc);
 
 	auto styleex = m_listView.GetExtendedListViewStyle();
@@ -234,7 +234,7 @@ static bool isEqualRubyListCompare(const CGrRubyListDlg::RubyInfo& left, const C
 
 void __stdcall CGrRubyListDlg::DocEachAllProcCallbak(CGrTxtFuncIEachAllTool *pTool, LPARAM lParam)
 {
-	if(pTool && pTool->TextType() == TxtMiru::TT_RUBY){
+	if(pTool && pTool->TextType() == static_cast<WORD>(TxtMiru::TextType::RUBY)){
 		auto *pDlg = reinterpret_cast<CGrRubyListDlg*>(lParam);
 		if (!pDlg) {
 			return;
@@ -286,12 +286,12 @@ void CGrRubyListDlg::SetFilter(std::tstring &filtertext)
 
 		item.iItem    = m_listView.GetItemCount();
 		item.mask     = LVIF_TEXT | LVIF_PARAM;
-		item.iSubItem = RLC_STR;
+		item.iSubItem = static_cast<int>(RubyListColumn::RLC_STR);
 		item.lParam   = reinterpret_cast<LPARAM>(&info);
 		item.pszText  = const_cast<LPTSTR>(info.str.c_str());
 		item.iItem    = m_listView.InsertItem(&item);
 		item.mask     = LVIF_TEXT;
-		item.iSubItem = RLC_RUBY;
+		item.iSubItem = static_cast<int>(RubyListColumn::RLC_RUBY);
 		item.pszText  = const_cast<LPTSTR>(info.ruby.c_str());
 		m_listView.SetItem(&item);
 		{
@@ -303,7 +303,7 @@ void CGrRubyListDlg::SetFilter(std::tstring &filtertext)
 				page_str += buf;
 				sep[0] = _T(',');
 			}
-			item.iSubItem = RLC_PAGE;
+			item.iSubItem = static_cast<int>(RubyListColumn::RLC_PAGE);
 			item.pszText  = const_cast<LPTSTR>(page_str.c_str());
 			m_listView.SetItem(&item);
 		}
@@ -317,11 +317,10 @@ void CGrRubyListDlg::Refresh()
 	try {
 		const auto &param = CGrTxtFunc::Param();
 		TCHAR val[2048];
-		param.GetText(CGrTxtFuncIParam::RubyListIgnore, val, _countof(val));
+		param.GetText(CGrTxtFuncIParam::TextType::RubyListIgnore, val, _countof(val));
 		m_ignore_pattern = std::wregex(val, std::regex_constants::icase);
 	} catch(...){}
-
-
+	
 	auto hListWnd = GetDlgItem(m_hWnd, IDC_LIST_RUBY);
 	if(!hListWnd){ return; }
 	int top = m_listView.GetTopIndex();
@@ -339,12 +338,12 @@ void CGrRubyListDlg::Refresh()
 	for(const auto &info : m_rubyInfoList){
 		item.iItem    = m_listView.GetItemCount();
 		item.mask     = LVIF_TEXT | LVIF_PARAM;
-		item.iSubItem = RLC_STR;
+		item.iSubItem = static_cast<int>(RubyListColumn::RLC_STR);
 		item.lParam   = reinterpret_cast<LPARAM>(&info);
 		item.pszText  = const_cast<LPTSTR>(info.str.c_str());
 		item.iItem    = m_listView.InsertItem(&item);
 		item.mask     = LVIF_TEXT;
-		item.iSubItem = RLC_RUBY;
+		item.iSubItem = static_cast<int>(RubyListColumn::RLC_RUBY);
 		item.pszText  = const_cast<LPTSTR>(info.ruby.c_str());
 		m_listView.SetItem(&item);
 		{
@@ -356,7 +355,7 @@ void CGrRubyListDlg::Refresh()
 				page_str += buf;
 				sep[0] = _T(',');
 			}
-			item.iSubItem = RLC_PAGE;
+			item.iSubItem = static_cast<int>(RubyListColumn::RLC_PAGE);
 			item.pszText  = const_cast<LPTSTR>(page_str.c_str());
 			m_listView.SetItem(&item);
 		}
@@ -402,8 +401,8 @@ static int CALLBACK rubyListCompare(LPARAM lp1, LPARAM lp2, LPARAM param)
 	const auto &info1 = *reinterpret_cast<const CGrRubyListDlg::RubyInfo*>(lp1);
 	const auto &info2 = *reinterpret_cast<const CGrRubyListDlg::RubyInfo*>(lp2);
 	int ret = 0;
-	switch(pParam->column){
-	case CGrRubyListDlg::RLC_STR:
+	switch(static_cast<CGrRubyListDlg::RubyListColumn>(pParam->column)){
+	case CGrRubyListDlg::RubyListColumn::RLC_STR:
 		ret = _tcscmp(info1.str.c_str(), info2.str.c_str());
 		if(ret == 0){
 			ret = _tcscmp(info1.ruby.c_str(), info2.ruby.c_str());
@@ -412,7 +411,7 @@ static int CALLBACK rubyListCompare(LPARAM lp1, LPARAM lp2, LPARAM param)
 			ret = info1.page_list[0] - info2.page_list[0];
 		}
 		break;
-	case CGrRubyListDlg::RLC_RUBY:
+	case CGrRubyListDlg::RubyListColumn::RLC_RUBY:
 		ret = _tcscmp(info1.ruby.c_str(), info2.ruby.c_str());
 		if(ret == 0){
 			ret = _tcscmp(info1.str.c_str(), info2.str.c_str());
@@ -421,7 +420,7 @@ static int CALLBACK rubyListCompare(LPARAM lp1, LPARAM lp2, LPARAM param)
 			ret = info1.page_list[0] - info2.page_list[0];
 		}
 		break;
-	case CGrRubyListDlg::RLC_PAGE:
+	case CGrRubyListDlg::RubyListColumn::RLC_PAGE:
 		ret = info1.page_list[0] - info2.page_list[0];
 		if(ret == 0){
 			ret = _tcscmp(info1.str.c_str(), info2.str.c_str());
@@ -460,7 +459,7 @@ LRESULT CGrRubyListDlg::OnNotify(HWND hWnd, int idFrom, NMHDR FAR *lpnmhdr)
 					m_bAsc[lpnmlist->iSubItem] = !m_bAsc[lpnmlist->iSubItem];
 					RubyListCompareParam param = {
 						lpnmlist->iSubItem, m_bAsc[lpnmlist->iSubItem]
-						};
+					};
 					m_listView.SortItems(rubyListCompare, reinterpret_cast<LPARAM>(&param));
 				}
 				break;

@@ -110,7 +110,7 @@ public:
 
 namespace TxtFuncBookmark
 {
-	enum ImageIcon {
+	enum class ImageIcon {
 		ii_none           ,
 		ii_stat_tag_favorite           ,
 		ii_max
@@ -216,7 +216,7 @@ private:
 	CGrWinCtrl m_editBox;
 	HIMAGELIST m_hImg = NULL;
 
-	enum WorkerType {
+	enum class WorkerType {
 		wt_update,
 		wt_import
 	};

@@ -8,9 +8,9 @@
 class CGrLupeWnd : public CGrWinCtrl
 {
 public:
-	enum SelectType {
-		ST_MousePos,
-		ST_WindowPos
+	enum class SelectType {
+		MousePos,
+		WindowPos
 	};
 	CGrLupeWnd();
 	virtual ~CGrLupeWnd();
@@ -50,7 +50,7 @@ private:
 	POINT m_offset;
 	int m_lupeSize = -1;
 	int m_canvasLupeSize = -1;
-	SelectType m_selectType = ST_WindowPos;
+	SelectType m_selectType = SelectType::WindowPos;
 	int m_windowOffsetX     = 0;
 	int m_windowOffsetY     = 0;
 };

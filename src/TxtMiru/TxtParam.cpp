@@ -100,7 +100,7 @@ static void setStringArray(CGrTxtParam::StringArray &array, LPCTSTR lpNextSrc)
 		array.push_back(std::tstring(lpSrc, lpNextSrc-lpSrc));
 	}
 }
-static LPCTSTR l_ValueTypeName[CGrTxtParam::VT_MaxNum] = {
+static LPCTSTR l_ValueTypeName[static_cast<int>(CGrTxtParam::ValueType::MaxNum)] = {
 	_T("HangingChar"  ),
 	_T("ConfListStart"),
 	_T("ConfListEnd"  ),
@@ -111,10 +111,10 @@ static LPCTSTR l_ValueTypeName[CGrTxtParam::VT_MaxNum] = {
 };
 static void initValueTypeMap(CGrTxtParam::Value *vtm, CGrTxtParam::ValueType type, LPCTSTR val)
 {
-	vtm[type].key = l_ValueTypeName[type];
-	setStringArray(vtm[type].array, val);
+	vtm[static_cast<int>(type)].key = l_ValueTypeName[static_cast<int>(type)];
+	setStringArray(vtm[static_cast<int>(type)].array, val);
 }
-static LPCTSTR l_CharTypeName[CGrTxtParam::CT_MaxNum] = {
+static LPCTSTR l_CharTypeName[static_cast<int>(CGrTxtParam::CharType::MaxNum)] = {
 	_T("TextFont"        ),
 	_T("RubyFont"        ),
 	_T("NoteFont"        ),
@@ -124,10 +124,10 @@ static LPCTSTR l_CharTypeName[CGrTxtParam::CT_MaxNum] = {
 };
 static void initCharInfoMap(CGrTxtParam::CharInfo *cim, CGrTxtParam::CharType type, LPCTSTR fontName)
 {
-	cim[type].key     = l_CharTypeName[type];
-	_tcscpy_s(cim[type].fontName, fontName);
+	cim[static_cast<int>(type)].key     = l_CharTypeName[static_cast<int>(type)];
+	_tcscpy_s(cim[static_cast<int>(type)].fontName, fontName);
 }
-static LPCTSTR l_PointsTypeName[CGrTxtParam::PT_MaxNum] = {
+static LPCTSTR l_PointsTypeName[static_cast<int>(CGrTxtParam::PointsType::MaxNum)] = {
 	_T("PageColor"       ),
 	_T("WindowSize"      ),
 	_T("TateNakaNum"     ),
@@ -184,15 +184,15 @@ static LPCTSTR l_PointsTypeName[CGrTxtParam::PT_MaxNum] = {
 static void initPointMap(CGrTxtParam::Points *pm, CGrTxtParam::PointsType type, int n, ...)
 {
 	va_list argptr;
-	auto &&points = pm[type];
-	points.key = l_PointsTypeName[type];
+	auto &&points = pm[static_cast<int>(type)];
+	points.key = l_PointsTypeName[static_cast<int>(type)];
 	va_start(argptr, n);
 	for(;n > 0; --n){
 		points.array.push_back(va_arg(argptr, int));
 	}
 	va_end(argptr);
 }
-static LPCTSTR l_TextTypeName[CGrTxtParam::TT_MaxNum] = {
+static LPCTSTR l_TextTypeName[static_cast<int>(CGrTxtParam::TextType::MaxNum)] = {
 	_T("LastFolder"        ),
 	_T("LastFile"          ),
 	_T("HistFile1"         ),
@@ -255,8 +255,8 @@ static LPCTSTR l_TextTypeName[CGrTxtParam::TT_MaxNum] = {
 };
 static void initTextInfoMap(CGrTxtParam::TextInfo *tim, CGrTxtParam::TextType type, LPCTSTR str = nullptr)
 {
-	tim[type].key = l_TextTypeName[type];
-	if(str){ tim[type].str = str; }
+	tim[static_cast<int>(type)].key = l_TextTypeName[static_cast<int>(type)];
+	if(str){ tim[static_cast<int>(type)].str = str; }
 }
 static void initCharOffsetMap(CGrTxtParam::CharOffsetMap &com, LPCTSTR name, int x, int y)
 {
@@ -308,15 +308,15 @@ static void setFileTypeMap(CGrTxtParam::FileTypeMap &ftMap,
 		LPCTSTR               val      ;
 		CSV_COLMN             csv_colmn;
 	} workList[] = {
-		{CGrTxtParam::FT_Html  ,valHtml  ,CSV_COLMN()},
-		{CGrTxtParam::FT_Text  ,valText  ,CSV_COLMN()},
-		{CGrTxtParam::FT_Link  ,valLink  ,CSV_COLMN()},
-		{CGrTxtParam::FT_Siori ,valSiori ,CSV_COLMN()},
-		{CGrTxtParam::FT_Arc7z ,valArc7z ,CSV_COLMN()},
-		{CGrTxtParam::FT_ArcCab,valArcCab,CSV_COLMN()},
-		{CGrTxtParam::FT_ArcLzh,valArcLzh,CSV_COLMN()},
-		{CGrTxtParam::FT_ArcRar,valArcRar,CSV_COLMN()},
-		{CGrTxtParam::FT_ArcZip,valArcZip,CSV_COLMN()},
+		{CGrTxtParam::FileType::Html  ,valHtml  ,CSV_COLMN()},
+		{CGrTxtParam::FileType::Text  ,valText  ,CSV_COLMN()},
+		{CGrTxtParam::FileType::Link  ,valLink  ,CSV_COLMN()},
+		{CGrTxtParam::FileType::Siori ,valSiori ,CSV_COLMN()},
+		{CGrTxtParam::FileType::Arc7z ,valArc7z ,CSV_COLMN()},
+		{CGrTxtParam::FileType::ArcCab,valArcCab,CSV_COLMN()},
+		{CGrTxtParam::FileType::ArcLzh,valArcLzh,CSV_COLMN()},
+		{CGrTxtParam::FileType::ArcRar,valArcRar,CSV_COLMN()},
+		{CGrTxtParam::FileType::ArcZip,valArcZip,CSV_COLMN()},
 	};
 	for(auto &&item : workList){
 		CGrCSVText::toColumns(item.csv_colmn, item.val, _T(','));
@@ -342,133 +342,133 @@ static void setFileTypeMap(CGrTxtParam::FileTypeMap &ftMap,
 
 CGrTxtParam::CGrTxtParam()
 {
-	::initValueTypeMap(m_valueTypeMap, HangingCharacters      , _T(""                                                                                 )); // Ç‘ÇÁâ∫Ç∞ï∂éö
-	::initValueTypeMap(m_valueTypeMap, LineStartNGCharacters  , _T(",.§°ÅAÅBÅCÅD£ÅvÅx]}):;?!ﬁﬂ•~ÅEÅFÅGÅHÅIÅJÅKÅ]ÅfÅhÅjÅlÅnÅpÅrÅtÅz¨≠ÆÇ·Ç„ÇÂÉÉÉÖÉáÇ¡Éb")); // çsì™ã÷é~
-	::initValueTypeMap(m_valueTypeMap, LineEndNGCharacters    , _T("ÅuÅwÅiÅoÅkÅmÅy(["                                                                 )); // çsññã÷é~ï∂éö
-	::initValueTypeMap(m_valueTypeMap, LineStartSkipCharacters, _T(" Å@"                                                                              )); // çsì™ÉXÉLÉbÉvï∂éö
-	::initValueTypeMap(m_valueTypeMap, SeparateNGCharacters   , _T("ÅcÅd"                                                                             )); // ï™äÑã÷é~ï∂éö
-	::initValueTypeMap(m_valueTypeMap, RotateCharacters       , _T("ÅFÅGÅeÅfÅgÅhÅ|ÅÄÅÇÅÉÅÑÅÖÅÜ"                                                       )); // âÒì]Ç≥ÇπÇƒï\é¶Ç∑ÇÈï∂éö
-	::initValueTypeMap(m_valueTypeMap, RRotateCharacters      , _T(""                                                                                 )); // ãtâÒì]Ç≥ÇπÇƒï\é¶Ç∑ÇÈï∂éö
+	::initValueTypeMap(m_valueTypeMap, ValueType::HangingCharacters      , _T(""/*",.§°ÅAÅBÅCÅD"*/                                                               )); // Ç‘ÇÁâ∫Ç∞ï∂éö
+	::initValueTypeMap(m_valueTypeMap, ValueType::LineStartNGCharacters  , _T(",.§°ÅAÅBÅCÅD£ÅvÅx]}):;?!ﬁﬂ•~ÅEÅFÅGÅHÅIÅJÅKÅ]ÅfÅhÅjÅlÅnÅpÅrÅtÅz¨≠ÆÇ·Ç„ÇÂÉÉÉÖÉáÇ¡Éb")); // çsì™ã÷é~
+	::initValueTypeMap(m_valueTypeMap, ValueType::LineEndNGCharacters    , _T("ÅuÅwÅiÅoÅkÅmÅy(["                                                                 )); // çsññã÷é~ï∂éö
+	::initValueTypeMap(m_valueTypeMap, ValueType::LineStartSkipCharacters, _T(" Å@"                                                                              )); // çsì™ÉXÉLÉbÉvï∂éö
+	::initValueTypeMap(m_valueTypeMap, ValueType::SeparateNGCharacters   , _T("ÅcÅd"                                                                             )); // ï™äÑã÷é~ï∂éö
+	::initValueTypeMap(m_valueTypeMap, ValueType::RotateCharacters       , _T("ÅFÅGÅeÅfÅgÅhÅ|ÅÄÅÇÅÉÅÑÅÖÅÜ"                                                       )); // âÒì]Ç≥ÇπÇƒï\é¶Ç∑ÇÈï∂éö
+	::initValueTypeMap(m_valueTypeMap, ValueType::RRotateCharacters      , _T(""                                                                                 )); // ãtâÒì]Ç≥ÇπÇƒï\é¶Ç∑ÇÈï∂éö
 	//
-	::initCharInfoMap(m_charInfoMap, Text        , _T("@ÇlÇr ñæí©"));
-	::initCharInfoMap(m_charInfoMap, Ruby        , _T("@ÇlÇr ñæí©"));
-	::initCharInfoMap(m_charInfoMap, Note        , _T("@ÇlÇr ñæí©"));
-	::initCharInfoMap(m_charInfoMap, Bold        , _T("@ÇlÇr ÉSÉVÉbÉN"));
+	::initCharInfoMap(m_charInfoMap, CharType::Text        , _T("@ÇlÇr ñæí©"));
+	::initCharInfoMap(m_charInfoMap, CharType::Ruby        , _T("@ÇlÇr ñæí©"));
+	::initCharInfoMap(m_charInfoMap, CharType::Note        , _T("@ÇlÇr ñæí©"));
+	::initCharInfoMap(m_charInfoMap, CharType::Bold        , _T("@ÇlÇr ÉSÉVÉbÉN"));
 	// à»â∫ÇÕÅAâ°èëÇ´
-	::initCharInfoMap(m_charInfoMap, Nombre      , _T("ÇlÇr ñæí©"));
-	::initCharInfoMap(m_charInfoMap, RunningHeads, _T("ÇlÇr ñæí©"));
+	::initCharInfoMap(m_charInfoMap, CharType::Nombre      , _T("ÇlÇr ñæí©"));
+	::initCharInfoMap(m_charInfoMap, CharType::RunningHeads, _T("ÇlÇr ñæí©"));
 	//
-	::initPointMap(m_pointsMap, PageColor       , 3, 0xffffff,0xe0e0e0,0xd0d0d0);
-	::initPointMap(m_pointsMap, WindowSize      , 0         );
-	::initPointMap(m_pointsMap, TateChuNum      , 1,  3     );
-	::initPointMap(m_pointsMap, ShowHScroll     , 1,  0     );
-	::initPointMap(m_pointsMap, ShowVScroll     , 1,  0     );
-	::initPointMap(m_pointsMap, SearchLoop      , 1,  1     );
-	::initPointMap(m_pointsMap, BookMarkAutoSave, 2,  1,-1  );
-	::initPointMap(m_pointsMap, BookMarkToFolder, 1,  1     );
-	::initPointMap(m_pointsMap, BookMarkNum     , 1,  10    );
-	::initPointMap(m_pointsMap, SaveWindowSize  , 1,  1     );
-	::initPointMap(m_pointsMap, BookmarkPos     , 5,  0,-1,-1,-1,-1); // Bookmar,left,top,width,height
-	::initPointMap(m_pointsMap, SubtitlePos     , 5,  0,-1,-1,-1,-1); // Subtitle,left,top,width,height
-	::initPointMap(m_pointsMap, FullScreen      , 1,  0     );
-	::initPointMap(m_pointsMap, WzMemoMode      , 1,  1     );
-	::initPointMap(m_pointsMap, PageFlip        , 1,  1     );
-	::initPointMap(m_pointsMap, PageFlipInterval, 1,  30    );
-	::initPointMap(m_pointsMap, AntiAlias       , 1,  1     );
-	::initPointMap(m_pointsMap, SelectionMode   , 1,  0     );
-	::initPointMap(m_pointsMap, SkipHTMLImgSize , 2,  100,100);
-	::initPointMap(m_pointsMap, UseIESetting    , 1,  1     );
-	::initPointMap(m_pointsMap, UseProxy        , 1,  1     );
-	::initPointMap(m_pointsMap, LinkTextColor   , 1,  RGB(0x00,0x00,0xff));
-	::initPointMap(m_pointsMap, WhiteTrans      , 1,  1     );
-	::initPointMap(m_pointsMap, WhiteTransRate  , 1,  20    );
-	::initPointMap(m_pointsMap, UsePreParser    , 3,  1, 1, 0  );
-	::initPointMap(m_pointsMap, ArcMaxFileSize  , 1,  10    );
-	::initPointMap(m_pointsMap, LupePos         , 5, 0x08,-1,-1,-1,-1);
-	::initPointMap(m_pointsMap, FileAutoReload  , 1,  0,0,1000);
-	::initPointMap(m_pointsMap, UseOverlapChar  , 1,  1     );
-	::initPointMap(m_pointsMap, PictPaddingNone , 1,  0     );
-	::initPointMap(m_pointsMap, SpSelectionMode , 2,  1,0   );
-	::initPointMap(m_pointsMap, AutoCopyMode    , 1,  1     );
-	::initPointMap(m_pointsMap, AutoHideMenu    , 1,  0     );
-	::initPointMap(m_pointsMap, LinkPos         , 6,  0,1,-1,-1,-1,-1); // LinkDlg(Showed),StayOn,left,top,width,height
-	::initPointMap(m_pointsMap, RunExecCopyText , 1,  0     );
-	::initPointMap(m_pointsMap, CopyRuby        , 1,  0     );
-	::initPointMap(m_pointsMap, ImageNextLayout , 1,  1     );
-	::initPointMap(m_pointsMap, IEOption        , 2,  1,1   ); // IEÇÃê›íË, DLCTL_SILENT,DLCTL_NO_SCRIPTS
-	::initPointMap(m_pointsMap, UnicodeIni      , 1,  0     );
-	::initPointMap(m_pointsMap, RubyPosition    , 1,  0     );
-	::initPointMap(m_pointsMap, PageMode        , 1,  0     );
-	::initPointMap(m_pointsMap, FavoritePos     , 1,  0     );
-	::initPointMap(m_pointsMap, TouchMenu       , 1,  1     );
-	::initPointMap(m_pointsMap, TopMost         , 1,  0     );
-	::initPointMap(m_pointsMap, UseRegExp       , 1,  0     );
-	::initPointMap(m_pointsMap, KeyInterval     , 1,  1000  );
-	::initPointMap(m_pointsMap, WebFilter       , 2,  0,0   ); // WebFilterÇÃégóp, CacheÇÃégóp
-	::initPointMap(m_pointsMap, RunningHeadLevel, 2,  1,1   );
-	::initPointMap(m_pointsMap, KeyRepeat       , 1,  1     );
-	::initPointMap(m_pointsMap, AozoraSetting   , 1,  0     );
-	::initPointMap(m_pointsMap, UseFont         , 1,  0     );
-
-	::initTextInfoMap(m_textInfoMap, LastFolder        );
-	::initTextInfoMap(m_textInfoMap, LastFile          );
-	::initTextInfoMap(m_textInfoMap, HistFile1         );
-	::initTextInfoMap(m_textInfoMap, HistFile2         );
-	::initTextInfoMap(m_textInfoMap, HistFile3         );
-	::initTextInfoMap(m_textInfoMap, HistFile4         );
-	::initTextInfoMap(m_textInfoMap, HistFile5         );
-	::initTextInfoMap(m_textInfoMap, HistFile6         );
-	::initTextInfoMap(m_textInfoMap, HistFile7         );
-	::initTextInfoMap(m_textInfoMap, HistFile8         );
-	::initTextInfoMap(m_textInfoMap, HistFile9         );
-	::initTextInfoMap(m_textInfoMap, HistFileTitle1    );
-	::initTextInfoMap(m_textInfoMap, HistFileTitle2    );
-	::initTextInfoMap(m_textInfoMap, HistFileTitle3    );
-	::initTextInfoMap(m_textInfoMap, HistFileTitle4    );
-	::initTextInfoMap(m_textInfoMap, HistFileTitle5    );
-	::initTextInfoMap(m_textInfoMap, HistFileTitle6    );
-	::initTextInfoMap(m_textInfoMap, HistFileTitle7    );
-	::initTextInfoMap(m_textInfoMap, HistFileTitle8    );
-	::initTextInfoMap(m_textInfoMap, HistFileTitle9    );
-	::initTextInfoMap(m_textInfoMap, HistSearchWord1   );
-	::initTextInfoMap(m_textInfoMap, HistSearchWord2   );
-	::initTextInfoMap(m_textInfoMap, HistSearchWord3   );
-	::initTextInfoMap(m_textInfoMap, HistSearchWord4   );
-	::initTextInfoMap(m_textInfoMap, HistSearchWord5   );
-	::initTextInfoMap(m_textInfoMap, HistSearchWord6   );
-	::initTextInfoMap(m_textInfoMap, HistSearchWord7   );
-	::initTextInfoMap(m_textInfoMap, HistSearchWord8   );
-	::initTextInfoMap(m_textInfoMap, HistSearchWord9   );
-	::initTextInfoMap(m_textInfoMap, LayoutFile        , _T("Layout/Bunko.lay"));
-	::initTextInfoMap(m_textInfoMap, LayoutType        , _T("BUNKO 1.0"       ));
-	::initTextInfoMap(m_textInfoMap, BookMarkFolder    , _T("./Bookmark"      ));
-	::initTextInfoMap(m_textInfoMap, NoteFormat        , _T("Å¶%d"            ));
-	::initTextInfoMap(m_textInfoMap, RunningHeadsFormat);
-	::initTextInfoMap(m_textInfoMap, BackgroundImage   , _T("Image/background.png"));
-	::initTextInfoMap(m_textInfoMap, SpiPluginFolder   );
-	::initTextInfoMap(m_textInfoMap, ProxyServer       , _T("localhost:8080"  ));
-	::initTextInfoMap(m_textInfoMap, NoProxyAddress    , _T("128.0.0.1;"      ));
-	::initTextInfoMap(m_textInfoMap, PreParserFolder   , _T("Script"          ));
-	::initTextInfoMap(m_textInfoMap, BrowserAppName    , _T("ApplicationFrameWindow,Chrome_WidgetWin_0,Chrome_WidgetWin_1,Maxthon3Cls_MainFrm,Slimjet_WidgetWin_1,MozillaWindowClass,IEXPLORE,Firefox,Sleipnir,Sleipnir2,Mozilla,Opera,Flock,NETSCAPE"));
-	::initTextInfoMap(m_textInfoMap, FileTypeHtml      , _T("HTM,HTML,MHT,MHTML,XHTML"));
-	::initTextInfoMap(m_textInfoMap, FileTypeArc7z     , _T("7Z"                      ));
-	::initTextInfoMap(m_textInfoMap, FileTypeArcCab    , _T("CAB"                     ));
-	::initTextInfoMap(m_textInfoMap, FileTypeArcLzh    , _T("LZH"                     ));
-	::initTextInfoMap(m_textInfoMap, FileTypeArcRar    , _T("RAR,R01"                 ));
-	::initTextInfoMap(m_textInfoMap, FileTypeArcZip    , _T("ZIP"                     ));
-	::initTextInfoMap(m_textInfoMap, CopyTextExe       );
-	::initTextInfoMap(m_textInfoMap, CopyTextPrm       );
-	::initTextInfoMap(m_textInfoMap, OpenFileExe       , _T("notepad"));
-	::initTextInfoMap(m_textInfoMap, OpenFilePrm       , _T("\"%1\""));
-	::initTextInfoMap(m_textInfoMap, OpenFileExe1      , _T(""));
-	::initTextInfoMap(m_textInfoMap, OpenFilePrm1      , _T(""));
-	::initTextInfoMap(m_textInfoMap, OpenFileExe2      , _T(""));
-	::initTextInfoMap(m_textInfoMap, OpenFilePrm2      , _T(""));
-	::initTextInfoMap(m_textInfoMap, GuessEncodingDLL  );
-	::initTextInfoMap(m_textInfoMap, TitleFormat       , _T("%p %T - %A (%P/%N)"));
-	::initTextInfoMap(m_textInfoMap, OpenLinkExe       , _T("microsoft-edge:%1"));
-	::initTextInfoMap(m_textInfoMap, OpenLinkPrm       , _T(""));
-	::initTextInfoMap(m_textInfoMap, RubyListIgnore    , _T("^[ÅE\\.Åc\\*Å`Å|\\-Å]Å\~]+$"));
+	::initPointMap(m_pointsMap, PointsType::PageColor       , 3, 0xffffff,0xe0e0e0,0xd0d0d0);
+	::initPointMap(m_pointsMap, PointsType::WindowSize      , 0         );
+	::initPointMap(m_pointsMap, PointsType::TateChuNum      , 1,  3     );
+	::initPointMap(m_pointsMap, PointsType::ShowHScroll     , 1,  0     );
+	::initPointMap(m_pointsMap, PointsType::ShowVScroll     , 1,  0     );
+	::initPointMap(m_pointsMap, PointsType::SearchLoop      , 1,  1     );
+	::initPointMap(m_pointsMap, PointsType::BookMarkAutoSave, 2,  1,-1  );
+	::initPointMap(m_pointsMap, PointsType::BookMarkToFolder, 1,  1     );
+	::initPointMap(m_pointsMap, PointsType::BookMarkNum     , 1,  10    );
+	::initPointMap(m_pointsMap, PointsType::SaveWindowSize  , 1,  1     );
+	::initPointMap(m_pointsMap, PointsType::BookmarkPos     , 5,  0,-1,-1,-1,-1); // Bookmar,left,top,width,height
+	::initPointMap(m_pointsMap, PointsType::SubtitlePos     , 5,  0,-1,-1,-1,-1); // Subtitle,left,top,width,height
+	::initPointMap(m_pointsMap, PointsType::FullScreen      , 1,  0     );
+	::initPointMap(m_pointsMap, PointsType::WzMemoMode      , 1,  1     );
+	::initPointMap(m_pointsMap, PointsType::PageFlip        , 1,  1     );
+	::initPointMap(m_pointsMap, PointsType::PageFlipInterval, 1,  30    );
+	::initPointMap(m_pointsMap, PointsType::AntiAlias       , 1,  1     );
+	::initPointMap(m_pointsMap, PointsType::SelectionMode   , 1,  0     );
+	::initPointMap(m_pointsMap, PointsType::SkipHTMLImgSize , 2,  100,100);
+	::initPointMap(m_pointsMap, PointsType::UseIESetting    , 1,  1     );
+	::initPointMap(m_pointsMap, PointsType::UseProxy        , 1,  1     );
+	::initPointMap(m_pointsMap, PointsType::LinkTextColor   , 1,  RGB(0x00,0x00,0xff));
+	::initPointMap(m_pointsMap, PointsType::WhiteTrans      , 1,  1     );
+	::initPointMap(m_pointsMap, PointsType::WhiteTransRate  , 1,  20    );
+	::initPointMap(m_pointsMap, PointsType::UsePreParser    , 3,  1, 1, 0  );
+	::initPointMap(m_pointsMap, PointsType::ArcMaxFileSize  , 1,  10    );
+	::initPointMap(m_pointsMap, PointsType::LupePos         , 5, 0x08,-1,-1,-1,-1); // 200%Ç…ïœçX
+	::initPointMap(m_pointsMap, PointsType::FileAutoReload  , 1,  0,0,1000);
+	::initPointMap(m_pointsMap, PointsType::UseOverlapChar  , 1,  1     );
+	::initPointMap(m_pointsMap, PointsType::PictPaddingNone , 1,  0     );
+	::initPointMap(m_pointsMap, PointsType::SpSelectionMode , 2,  1,0   );
+	::initPointMap(m_pointsMap, PointsType::AutoCopyMode    , 1,  1     );
+	::initPointMap(m_pointsMap, PointsType::AutoHideMenu    , 1,  0     );
+	::initPointMap(m_pointsMap, PointsType::LinkPos         , 6,  0,1,-1,-1,-1,-1); // LinkDlg(Showed),StayOn,left,top,width,height
+	::initPointMap(m_pointsMap, PointsType::RunExecCopyText , 1,  0     );
+	::initPointMap(m_pointsMap, PointsType::CopyRuby        , 1,  0     );
+	::initPointMap(m_pointsMap, PointsType::ImageNextLayout , 1,  1     );
+	::initPointMap(m_pointsMap, PointsType::IEOption        , 2,  1,1   ); // IEÇÃê›íË, DLCTL_SILENT,DLCTL_NO_SCRIPTS
+	::initPointMap(m_pointsMap, PointsType::UnicodeIni      , 1,  0     ); 
+	::initPointMap(m_pointsMap, PointsType::RubyPosition    , 1,  0     ); 
+	::initPointMap(m_pointsMap, PointsType::PageMode        , 1,  0     ); 
+	::initPointMap(m_pointsMap, PointsType::FavoritePos     , 1,  0     ); 
+	::initPointMap(m_pointsMap, PointsType::TouchMenu       , 1,  1     ); 
+	::initPointMap(m_pointsMap, PointsType::TopMost         , 1,  0     ); 
+	::initPointMap(m_pointsMap, PointsType::UseRegExp       , 1,  0     ); 
+	::initPointMap(m_pointsMap, PointsType::KeyInterval     , 1,  1000  ); 
+	::initPointMap(m_pointsMap, PointsType::WebFilter       , 2,  0,0   ); // WebFilterÇÃégóp, CacheÇÃégóp
+	::initPointMap(m_pointsMap, PointsType::RunningHeadLevel, 2,  1,1   ); 
+	::initPointMap(m_pointsMap, PointsType::KeyRepeat       , 1,  1     ); 
+	::initPointMap(m_pointsMap, PointsType::AozoraSetting   , 1,  0     ); 
+	::initPointMap(m_pointsMap, PointsType::UseFont         , 1,  0     ); 
+	//
+	::initTextInfoMap(m_textInfoMap, TextType::LastFolder        );
+	::initTextInfoMap(m_textInfoMap, TextType::LastFile          );
+	::initTextInfoMap(m_textInfoMap, TextType::HistFile1         );
+	::initTextInfoMap(m_textInfoMap, TextType::HistFile2         );
+	::initTextInfoMap(m_textInfoMap, TextType::HistFile3         );
+	::initTextInfoMap(m_textInfoMap, TextType::HistFile4         );
+	::initTextInfoMap(m_textInfoMap, TextType::HistFile5         );
+	::initTextInfoMap(m_textInfoMap, TextType::HistFile6         );
+	::initTextInfoMap(m_textInfoMap, TextType::HistFile7         );
+	::initTextInfoMap(m_textInfoMap, TextType::HistFile8         );
+	::initTextInfoMap(m_textInfoMap, TextType::HistFile9         );
+	::initTextInfoMap(m_textInfoMap, TextType::HistFileTitle1    );
+	::initTextInfoMap(m_textInfoMap, TextType::HistFileTitle2    );
+	::initTextInfoMap(m_textInfoMap, TextType::HistFileTitle3    );
+	::initTextInfoMap(m_textInfoMap, TextType::HistFileTitle4    );
+	::initTextInfoMap(m_textInfoMap, TextType::HistFileTitle5    );
+	::initTextInfoMap(m_textInfoMap, TextType::HistFileTitle6    );
+	::initTextInfoMap(m_textInfoMap, TextType::HistFileTitle7    );
+	::initTextInfoMap(m_textInfoMap, TextType::HistFileTitle8    );
+	::initTextInfoMap(m_textInfoMap, TextType::HistFileTitle9    );
+	::initTextInfoMap(m_textInfoMap, TextType::HistSearchWord1   );
+	::initTextInfoMap(m_textInfoMap, TextType::HistSearchWord2   );
+	::initTextInfoMap(m_textInfoMap, TextType::HistSearchWord3   );
+	::initTextInfoMap(m_textInfoMap, TextType::HistSearchWord4   );
+	::initTextInfoMap(m_textInfoMap, TextType::HistSearchWord5   );
+	::initTextInfoMap(m_textInfoMap, TextType::HistSearchWord6   );
+	::initTextInfoMap(m_textInfoMap, TextType::HistSearchWord7   );
+	::initTextInfoMap(m_textInfoMap, TextType::HistSearchWord8   );
+	::initTextInfoMap(m_textInfoMap, TextType::HistSearchWord9   );
+	::initTextInfoMap(m_textInfoMap, TextType::LayoutFile        , _T("Layout/Bunko.lay"));
+	::initTextInfoMap(m_textInfoMap, TextType::LayoutType        , _T("BUNKO 1.0"       ));
+	::initTextInfoMap(m_textInfoMap, TextType::BookMarkFolder    , _T("./Bookmark"      ));
+	::initTextInfoMap(m_textInfoMap, TextType::NoteFormat        , _T("Å¶%d"            ));
+	::initTextInfoMap(m_textInfoMap, TextType::RunningHeadsFormat);
+	::initTextInfoMap(m_textInfoMap, TextType::BackgroundImage   , _T("Image/background.png"));
+	::initTextInfoMap(m_textInfoMap, TextType::SpiPluginFolder   );
+	::initTextInfoMap(m_textInfoMap, TextType::ProxyServer       , _T("localhost:8080"  ));
+	::initTextInfoMap(m_textInfoMap, TextType::NoProxyAddress    , _T("128.0.0.1;"      ));
+	::initTextInfoMap(m_textInfoMap, TextType::PreParserFolder   , _T("Script"          ));
+	::initTextInfoMap(m_textInfoMap, TextType::BrowserAppName    , _T("ApplicationFrameWindow,Chrome_WidgetWin_0,Chrome_WidgetWin_1,Maxthon3Cls_MainFrm,Slimjet_WidgetWin_1,MozillaWindowClass,IEXPLORE,Firefox,Sleipnir,Sleipnir2,Mozilla,Opera,Flock,NETSCAPE"));
+	::initTextInfoMap(m_textInfoMap, TextType::FileTypeHtml      , _T("HTM,HTML,MHT,MHTML,XHTML"));
+	::initTextInfoMap(m_textInfoMap, TextType::FileTypeArc7z     , _T("7Z"                      ));
+	::initTextInfoMap(m_textInfoMap, TextType::FileTypeArcCab    , _T("CAB"                     ));
+	::initTextInfoMap(m_textInfoMap, TextType::FileTypeArcLzh    , _T("LZH"                     ));
+	::initTextInfoMap(m_textInfoMap, TextType::FileTypeArcRar    , _T("RAR,R01"                 ));
+	::initTextInfoMap(m_textInfoMap, TextType::FileTypeArcZip    , _T("ZIP"                     ));
+	::initTextInfoMap(m_textInfoMap, TextType::CopyTextExe       );
+	::initTextInfoMap(m_textInfoMap, TextType::CopyTextPrm       );
+	::initTextInfoMap(m_textInfoMap, TextType::OpenFileExe       , _T("notepad"));
+	::initTextInfoMap(m_textInfoMap, TextType::OpenFilePrm       , _T("\"%1\""));
+	::initTextInfoMap(m_textInfoMap, TextType::OpenFileExe1      , _T(""));
+	::initTextInfoMap(m_textInfoMap, TextType::OpenFilePrm1      , _T(""));
+	::initTextInfoMap(m_textInfoMap, TextType::OpenFileExe2      , _T(""));
+	::initTextInfoMap(m_textInfoMap, TextType::OpenFilePrm2      , _T(""));
+	::initTextInfoMap(m_textInfoMap, TextType::GuessEncodingDLL  );
+	::initTextInfoMap(m_textInfoMap, TextType::TitleFormat       , _T("%p %T - %A (%P/%N)"));
+	::initTextInfoMap(m_textInfoMap, TextType::OpenLinkExe       , _T("microsoft-edge:%1"));
+	::initTextInfoMap(m_textInfoMap, TextType::OpenLinkPrm       , _T(""));
+	::initTextInfoMap(m_textInfoMap, TextType::RubyListIgnore    , _T("^[ÅE\\.Åc\\*Å`Å|\\-Å]Å\~]+$"));
 	// %p: ÉvÉçÉOÉâÉÄñº
 	// %v: ÉoÅ[ÉWÉáÉì
 	// %T: É^ÉCÉgÉã
@@ -479,15 +479,15 @@ CGrTxtParam::CGrTxtParam()
 	// %f: ÉtÉ@ÉCÉãñº
 	// %%: %
 	setFileTypeMap(m_fileTypeMap,
-				   m_textInfoMap[FileTypeHtml  ].str.c_str(),
-				   _T("TXT"                                ),
-				   _T("LNK"                                ),
-				   _T("SIORI"                              ),
-				   m_textInfoMap[FileTypeArc7z ].str.c_str(),
-				   m_textInfoMap[FileTypeArcCab].str.c_str(),
-				   m_textInfoMap[FileTypeArcLzh].str.c_str(),
-				   m_textInfoMap[FileTypeArcRar].str.c_str(),
-				   m_textInfoMap[FileTypeArcZip].str.c_str());
+				   m_textInfoMap[static_cast<int>(TextType::FileTypeHtml  )].str.c_str(),
+				   _T("TXT"),
+				   _T("LNK"),
+				   _T("SIORI"),
+				   m_textInfoMap[static_cast<int>(TextType::FileTypeArc7z )].str.c_str(),
+				   m_textInfoMap[static_cast<int>(TextType::FileTypeArcCab)].str.c_str(),
+				   m_textInfoMap[static_cast<int>(TextType::FileTypeArcLzh)].str.c_str(),
+				   m_textInfoMap[static_cast<int>(TextType::FileTypeArcRar)].str.c_str(),
+				   m_textInfoMap[static_cast<int>(TextType::FileTypeArcZip)].str.c_str());
 	//
 	::initCharOffsetMap(m_charOffsetMap, _T("ÅK"), 75,   0);
 	::initCharOffsetMap(m_charOffsetMap, _T("ÅJ"), 75,   0);
@@ -637,9 +637,9 @@ struct WriteValue : public CGrTxtParam::ValueSetter {
 
 bool CGrTxtParam::Save(LPCTSTR lpFileName)
 {
-	if(!GetBoolean(UnicodeIni)){
+	if(!GetBoolean(PointsType::UnicodeIni)){
 		if(ConvertToUTF16LE(lpFileName)){
-			SetBoolean(UnicodeIni, true);
+			SetBoolean(PointsType::UnicodeIni, true);
 		}
 	}
 	WriteValue wv(lpFileName);
@@ -782,15 +782,15 @@ bool CGrTxtParam::Load(LPCTSTR lpFileName)
 	ForEachTextInfo (lv);
 	ForEachPoints   (lv);
 	setFileTypeMap(m_fileTypeMap,
-				   m_textInfoMap[FileTypeHtml  ].str.c_str(),
-				   _T("TXT"                                ),
-				   _T("LNK"                                ),
-				   _T("SIORI"                              ),
-				   m_textInfoMap[FileTypeArc7z ].str.c_str(),
-				   m_textInfoMap[FileTypeArcCab].str.c_str(),
-				   m_textInfoMap[FileTypeArcLzh].str.c_str(),
-				   m_textInfoMap[FileTypeArcRar].str.c_str(),
-				   m_textInfoMap[FileTypeArcZip].str.c_str());
+				   m_textInfoMap[static_cast<int>(TextType::FileTypeHtml  )].str.c_str(),
+				   _T("TXT"),
+				   _T("LNK"),
+				   _T("SIORI"),
+				   m_textInfoMap[static_cast<int>(TextType::FileTypeArc7z )].str.c_str(),
+				   m_textInfoMap[static_cast<int>(TextType::FileTypeArcCab)].str.c_str(),
+				   m_textInfoMap[static_cast<int>(TextType::FileTypeArcLzh)].str.c_str(),
+				   m_textInfoMap[static_cast<int>(TextType::FileTypeArcRar)].str.c_str(),
+				   m_textInfoMap[static_cast<int>(TextType::FileTypeArcZip)].str.c_str());
 
 	TCHAR path[512], offset_file[512];
 	CGrShell::GetParentDir((TCHAR*)lpFileName, path);
@@ -840,7 +840,7 @@ bool CGrTxtParam::Load(LPCTSTR lpFileName)
 
 int CGrTxtParam::FindIF(CGrTxtParam::ValueType type, CGrTxtParam::CGrStringCompare &&sc) const
 {
-	for(const auto &item : m_valueTypeMap[type].array){
+	for(const auto &item : m_valueTypeMap[static_cast<int>(type)].array){
 		if(sc == item.c_str()){
 			return 1;
 		}
@@ -850,73 +850,73 @@ int CGrTxtParam::FindIF(CGrTxtParam::ValueType type, CGrTxtParam::CGrStringCompa
 
 void CGrTxtParam::SetFontName(CGrTxtParam::CharType type, LPCTSTR fontName)
 {
-	_tcscpy_s(m_charInfoMap[type].fontName, fontName);
+	_tcscpy_s(m_charInfoMap[static_cast<int>(type)].fontName, fontName);
 }
 
 LPCTSTR CGrTxtParam::GetFontName(CGrTxtParam::CharType type)
 {
-	return m_charInfoMap[type].fontName;
+	return m_charInfoMap[static_cast<int>(type)].fontName;
 }
 
 void CGrTxtParam::SetColor(CharType type, COLORREF color)
 {
-	m_charInfoMap[type].color = color;
+	m_charInfoMap[static_cast<int>(type)].color = color;
 }
 
 void CGrTxtParam::SetFontSpacing(CharType type, double fontSpacing)
 {
-	m_charInfoMap[type].fontSpacing = fontSpacing;
+	m_charInfoMap[static_cast<int>(type)].fontSpacing = fontSpacing;
 }
 
 void CGrTxtParam::SetFontCentering(CharType type, bool fontCentering)
 {
-	m_charInfoMap[type].fontCentering = fontCentering;
+	m_charInfoMap[static_cast<int>(type)].fontCentering = fontCentering;
 }
 
 void CGrTxtParam::SetFontWeight(CharType type, long weight)
 {
-	m_charInfoMap[type].weight = weight;
+	m_charInfoMap[static_cast<int>(type)].weight = weight;
 }
 
 void CGrTxtParam::SetText(TextType type, LPCTSTR lpStr)
 {
-	m_textInfoMap[type].str = lpStr;
-	auto &&str = m_textInfoMap[type].str;
+	m_textInfoMap[static_cast<int>(type)].str = lpStr;
+	auto &&str = m_textInfoMap[static_cast<int>(type)].str;
 	if(!str.empty()){
 		std::replaceCRLF(str, _T(" "));
 	}
-	if(type == FileTypeArcZip){ // ÉtÉ@ÉCÉãÇÃägí£éqèCê≥ÇµÇƒÇ‡ éüâÒãNìÆÇ‹Ç≈îΩâfÇ≥ÇÍÇ»Ç¢ÇÃÇ≈
+	if(type == TextType::FileTypeArcZip){ // ÉtÉ@ÉCÉãÇÃägí£éqèCê≥ÇµÇƒÇ‡ éüâÒãNìÆÇ‹Ç≈îΩâfÇ≥ÇÍÇ»Ç¢ÇÃÇ≈
 		setFileTypeMap(m_fileTypeMap,
-					   m_textInfoMap[FileTypeHtml  ].str.c_str(),
-					   _T("TXT"                                ),
-					   _T("LNK"                                ),
-					   _T("SIORI"                              ),
-					   m_textInfoMap[FileTypeArc7z ].str.c_str(),
-					   m_textInfoMap[FileTypeArcCab].str.c_str(),
-					   m_textInfoMap[FileTypeArcLzh].str.c_str(),
-					   m_textInfoMap[FileTypeArcRar].str.c_str(),
-					   m_textInfoMap[FileTypeArcZip].str.c_str());
+					   m_textInfoMap[static_cast<int>(TextType::FileTypeHtml  )].str.c_str(),
+					   _T("TXT"),
+					   _T("LNK"),
+					   _T("SIORI"),
+					   m_textInfoMap[static_cast<int>(TextType::FileTypeArc7z )].str.c_str(),
+					   m_textInfoMap[static_cast<int>(TextType::FileTypeArcCab)].str.c_str(),
+					   m_textInfoMap[static_cast<int>(TextType::FileTypeArcLzh)].str.c_str(),
+					   m_textInfoMap[static_cast<int>(TextType::FileTypeArcRar)].str.c_str(),
+					   m_textInfoMap[static_cast<int>(TextType::FileTypeArcZip)].str.c_str());
 	}
 }
 
 COLORREF CGrTxtParam::GetColor(CharType type)
 {
-	return m_charInfoMap[type].color;
+	return m_charInfoMap[static_cast<int>(type)].color;
 }
 
 double CGrTxtParam::GetFontSpacing(CharType type)
 {
-	return m_charInfoMap[type].fontSpacing;
+	return m_charInfoMap[static_cast<int>(type)].fontSpacing;
 }
 
 bool CGrTxtParam::GetFontCentering(CharType type)
 {
-	return m_charInfoMap[type].fontCentering;
+	return m_charInfoMap[static_cast<int>(type)].fontCentering;
 }
 
 long CGrTxtParam::GetFontWeight(CharType type)
 {
-	return m_charInfoMap[type].weight;
+	return m_charInfoMap[static_cast<int>(type)].weight;
 }
 
 void CGrTxtParam::SetBoolean(CGrTxtParam::PointsType type, bool val)
@@ -934,17 +934,17 @@ bool CGrTxtParam::GetBoolean(CGrTxtParam::PointsType type) const
 
 void CGrTxtParam::SetPoints(PointsType type, const int points[], int size)
 {
-	m_pointsMap[type].array.assign(points, points+size);
+	m_pointsMap[static_cast<int>(type)].array.assign(points, points+size);
 }
 
 int CGrTxtParam::GetPoints(PointsType type, int points[], int size) const
 {
-	return m_pointsMap[type].toIntArray(points, size);
+	return m_pointsMap[static_cast<int>(type)].toIntArray(points, size);
 }
 
 void CGrTxtParam::SetTextList(ValueType type, LPCTSTR lpStr)
 {
-	::setStringArray(m_valueTypeMap[type].array, lpStr);
+	::setStringArray(m_valueTypeMap[static_cast<int>(type)].array, lpStr);
 }
 
 void CGrTxtParam::GetTextList(ValueType type, LPTSTR outstr, int numberOfElements)
@@ -963,12 +963,12 @@ void CGrTxtParam::GetText(TextType type, LPTSTR outstr, int numberOfElements) co
 
 void CGrTxtParam::GetTextList(ValueType type, std::tstring &out) const
 {
-	m_valueTypeMap[type].toString(out);
+	m_valueTypeMap[static_cast<int>(type)].toString(out);
 }
 
 void CGrTxtParam::GetText(TextType type, std::tstring &out) const
 {
-	out = m_textInfoMap[type].str.c_str();
+	out = m_textInfoMap[static_cast<int>(type)].str.c_str();
 }
 
 POINT CGrTxtParam::GetCharOffset(LPCTSTR str) const
@@ -1032,7 +1032,7 @@ CGrTxtParam::FileType CGrTxtParam::GetFileType(LPCTSTR lpExt) const
 			return pfti->ft;
 		}
 	}
-	return FT_MaxNum;
+	return FileType::MaxNum;
 }
 
 LPCTSTR CGrTxtParam::GetCookie(LPCTSTR lpURL) const

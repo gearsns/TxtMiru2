@@ -6,7 +6,7 @@
 
 class CGrPictRendererMgr
 {
-	enum PictRenderType { PRT_Ole, PRT_Spi, PRT_Emf, PRT_MaxNum };
+	enum class PictRenderType { Ole, Spi, Emf, MaxNum };
 public:
 	CGrPictRendererMgr();
 	virtual ~CGrPictRendererMgr();
@@ -19,7 +19,7 @@ public:
 private:
 	CGrPictRenderer *getPictRenderer(LPCTSTR lpFileName);
 	typedef CGrPictRenderer *LPCGrPictRenderer;
-	LPCGrPictRenderer m_pictRendererMap[PRT_MaxNum] = {};
+	LPCGrPictRenderer m_pictRendererMap[static_cast<int>(PictRenderType::MaxNum)] = {};
 	std::tstring m_filename;
 	LPCGrPictRenderer m_curPictRenderer = nullptr;
 };

@@ -15,8 +15,8 @@
 #include "MessageBox.h"
 
 static struct PointSet l_html_point_set[] = {
-	{IDC_EDIT_SKIPIMAGESIZE_WIDTH , CGrTxtFuncIParam::SkipHTMLImgSize },
-	{IDC_EDIT_SKIPIMAGESIZE_HEIGHT, CGrTxtFuncIParam::SkipHTMLImgSize },
+	{IDC_EDIT_SKIPIMAGESIZE_WIDTH , CGrTxtFuncIParam::PointsType::SkipHTMLImgSize },
+	{IDC_EDIT_SKIPIMAGESIZE_HEIGHT, CGrTxtFuncIParam::PointsType::SkipHTMLImgSize },
 };
 static struct PointRange l_html_point_range[] = {
 	{IDC_SPIN_SKIPIMAGESIZE_WIDTH , 0, 1000, 0                         },
@@ -60,18 +60,18 @@ BOOL CGrPropPageHtml::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	::SetDlgItemPointSet(hwnd, l_html_point_set, sizeof(l_html_point_set)/sizeof(PointSet));
 	::SetDlgItemPointRange(hwnd, l_html_point_range, sizeof(l_html_point_range)/sizeof(PointRange));
 	// DDE
-	::SetDlgItemTextType(hwnd, param, IDC_EDIT_BROWSER_LIST, CGrTxtFuncIParam::BrowserAppName);
+	::SetDlgItemTextType(hwnd, param, IDC_EDIT_BROWSER_LIST, CGrTxtFuncIParam::TextType::BrowserAppName);
 	// IEの設定を使用する
-	bool bUseIESetting = param.GetBoolean(CGrTxtFuncIParam::UseIESetting);
+	bool bUseIESetting = param.GetBoolean(CGrTxtFuncIParam::PointsType::UseIESetting);
 	::SetCheckDlgItemID(hwnd, IDC_CHECKBOX_IESETTING, bUseIESetting);
 	// 直接接続(Proxyを使用しない)
-	bool bUseProxy = param.GetBoolean(CGrTxtFuncIParam::UseProxy);
+	bool bUseProxy = param.GetBoolean(CGrTxtFuncIParam::PointsType::UseProxy);
 	::SetCheckDlgItemID(hwnd, IDC_RADIO_USEPROXY, bUseProxy );
 	::SetCheckDlgItemID(hwnd, IDC_RADIO_NOPROXY , !bUseProxy);
 	// 使用するプロキシのアドレス
-	::SetDlgItemTextType(hwnd, param, IDC_EDIT_PROXY, CGrTxtFuncIParam::ProxyServer);
+	::SetDlgItemTextType(hwnd, param, IDC_EDIT_PROXY, CGrTxtFuncIParam::TextType::ProxyServer);
 	// 例外
-	::SetDlgItemTextType(hwnd, param, IDC_EDIT_NOPROXY, CGrTxtFuncIParam::NoProxyAddress);
+	::SetDlgItemTextType(hwnd, param, IDC_EDIT_NOPROXY, CGrTxtFuncIParam::TextType::NoProxyAddress);
 
 	if(bUseIESetting){
 		// IEの設定を使用する場合は、独自の接続設定は編集不可
@@ -85,11 +85,11 @@ BOOL CGrPropPageHtml::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 		::EnableDlgItemID(hwnd, IDC_EDIT_NOPROXY  , FALSE);
 	}
 	int ieOptions[2] = {};
-	param.GetPoints(CGrTxtFuncIParam::IEOption, ieOptions, sizeof(ieOptions)/sizeof(int));
+	param.GetPoints(CGrTxtFuncIParam::PointsType::IEOption, ieOptions, sizeof(ieOptions)/sizeof(int));
 	::SetCheckDlgItemID(hwnd, IDC_CHECKBOX_DLCTL_SILENT    , (ieOptions[0] == 1)); // ダイアログを表示しない
 	::SetCheckDlgItemID(hwnd, IDC_CHECKBOX_DLCTL_NO_SCRIPTS, (ieOptions[1] == 1)); // スクリプトを実行しない
 	int iWebFilter[2] = {};
-	param.GetPoints(CGrTxtFuncIParam::WebFilter, iWebFilter, sizeof(iWebFilter)/sizeof(int));
+	param.GetPoints(CGrTxtFuncIParam::PointsType::WebFilter, iWebFilter, sizeof(iWebFilter)/sizeof(int));
 	::SetCheckDlgItemID(hwnd, IDC_CHECKBOX_FILTER, (iWebFilter[0] == 1)); // URLのブロックを有効化
 	::SetCheckDlgItemID(hwnd, IDC_CHECKBOX_CACHE, (iWebFilter[1] == 1)); // キャッシュからの読み込みを有効化
 
@@ -175,23 +175,23 @@ bool CGrPropPageHtml::Apply()
 	// ページ設定 NxN
 	::GetDlgItemPointSet(m_hWnd, l_html_point_set, sizeof(l_html_point_set)/sizeof(PointSet));
 	// DDE
-	::GetDlgItemTextType(m_hWnd, param, IDC_EDIT_BROWSER_LIST, CGrTxtFuncIParam::BrowserAppName);
+	::GetDlgItemTextType(m_hWnd, param, IDC_EDIT_BROWSER_LIST, CGrTxtFuncIParam::TextType::BrowserAppName);
 	// IEの設定を使用する
-	param.SetBoolean(CGrTxtFuncIParam::UseIESetting, ::GetCheckDlgItemID(m_hWnd, IDC_CHECKBOX_IESETTING) == BST_CHECKED);
+	param.SetBoolean(CGrTxtFuncIParam::PointsType::UseIESetting, ::GetCheckDlgItemID(m_hWnd, IDC_CHECKBOX_IESETTING) == BST_CHECKED);
 	// 直接接続(Proxyを使用しない)
-	param.SetBoolean(CGrTxtFuncIParam::UseProxy, ::GetCheckDlgItemID(m_hWnd, IDC_RADIO_USEPROXY) == BST_CHECKED);
+	param.SetBoolean(CGrTxtFuncIParam::PointsType::UseProxy, ::GetCheckDlgItemID(m_hWnd, IDC_RADIO_USEPROXY) == BST_CHECKED);
 	// 使用するプロキシのアドレス
-	::GetDlgItemTextType(m_hWnd, param, IDC_EDIT_PROXY, CGrTxtFuncIParam::ProxyServer);
+	::GetDlgItemTextType(m_hWnd, param, IDC_EDIT_PROXY, CGrTxtFuncIParam::TextType::ProxyServer);
 	// 例外
-	::GetDlgItemTextType(m_hWnd, param, IDC_EDIT_NOPROXY, CGrTxtFuncIParam::NoProxyAddress);
+	::GetDlgItemTextType(m_hWnd, param, IDC_EDIT_NOPROXY, CGrTxtFuncIParam::TextType::NoProxyAddress);
 	int ieOptions[2] = {};
 	ieOptions[0] = (::GetCheckDlgItemID(m_hWnd, IDC_CHECKBOX_DLCTL_SILENT    ) == BST_CHECKED) ? 1 : 0; // ダイアログを表示しない
 	ieOptions[1] = (::GetCheckDlgItemID(m_hWnd, IDC_CHECKBOX_DLCTL_NO_SCRIPTS) == BST_CHECKED) ? 1 : 0; // スクリプトを実行しない
-	param.SetPoints(CGrTxtFuncIParam::IEOption, ieOptions, sizeof(ieOptions)/sizeof(int));
+	param.SetPoints(CGrTxtFuncIParam::PointsType::IEOption, ieOptions, sizeof(ieOptions)/sizeof(int));
 	int iWebFilter[2] = {};
 	iWebFilter[0] = (::GetCheckDlgItemID(m_hWnd, IDC_CHECKBOX_FILTER) == BST_CHECKED) ? 1 : 0; // URLのブロックを有効化
 	iWebFilter[1] = (::GetCheckDlgItemID(m_hWnd, IDC_CHECKBOX_CACHE) == BST_CHECKED) ? 1 : 0; // キャッシュからの読み込みを有効化
-	param.SetPoints(CGrTxtFuncIParam::WebFilter, iWebFilter, sizeof(iWebFilter)/sizeof(int));
+	param.SetPoints(CGrTxtFuncIParam::PointsType::WebFilter, iWebFilter, sizeof(iWebFilter)/sizeof(int));
 	//
 	param.UpdateConfig(GetParent(GetParent(m_hWnd)));
 	//

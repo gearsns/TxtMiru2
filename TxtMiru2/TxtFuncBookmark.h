@@ -15,9 +15,9 @@ class CGrTxtDocument;
 class CGrTxtFuncBookmark : public CGrLoadDllFunc
 {
 public:
-	enum ModelWindowID {
-		MWID_LINKDLG,
-		MWID_BOOKDLG,
+	enum class ModelWindowID {
+		LINKDLG,
+		BOOKDLG,
 	};
 private:
 	bool (cdecl *m_fOpen)(LPCTSTR lpFileName, CGrTxtFuncIBookmark *pBookmark, CGrTxtFuncISubTitle *pSubTitle, LPCTSTR lpDataDir, CGrTxtFuncIParam *pParam) = nullptr;

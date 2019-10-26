@@ -24,12 +24,12 @@ class CGrTxtDocument
 {
 public:
 	enum error_code {err_out_of_range};
-	enum TXTMIRU_FT {
-		TXTMIRU_FT_ARCHIVE,
-		TXTMIRU_FT_SIORI  ,
-		TXTMIRU_FT_TEXT   ,
-		TXTMIRU_FT_LINK   ,
-		TXTMIRU_FT_NONE   ,
+	enum class TXTMIRU_FT {
+		ARCHIVE,
+		SIORI  ,
+		TEXT   ,
+		LINK   ,
+		NONE   ,
 	};
 	static TXTMIRU_FT GetFileType(LPCTSTR lpFileName);
 public:
@@ -70,7 +70,7 @@ public:
 	// žx’Ç‰Á
 	void AddBookmark(int page);
 	void SetLastPage(int page){ m_bookMark.SetLastPage(page); }
-	int GetBookmarkCount(){ return m_bookMark.Count(); }
+	int GetBookmarkCount(){ return m_bookMark.Count(); } 
 	int GetLastPage(){ return m_bookMark.GetLastPage(); }
 	int GetBookmarkPage(int idx);
 	const std::tstring &GetBookmarkName(int idx) const { return m_bookMark.GetName(idx); }

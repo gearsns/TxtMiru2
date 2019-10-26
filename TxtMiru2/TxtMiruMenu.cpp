@@ -30,10 +30,10 @@ static void addMenuItem(HMENU hMenu, TxtMiru::FuncNameID id)
 {
 	MENUITEMINFO mii = {sizeof(MENUITEMINFO)};
 	mii.fMask  = MIIM_ID | MIIM_TYPE;
-	mii.wID    = id+1;
+	mii.wID    = static_cast<int>(id)+1;
 
 	std::tstring str;
-	auto str_id = l_funcNameMap[id];
+	auto str_id = l_funcNameMap[static_cast<int>(id)];
 	if(str_id > 0){
 		CGrText::LoadString(str_id, str);
 		mii.fType      = MFT_STRING;
@@ -61,7 +61,7 @@ void CGrTxtMiruMenu::Load()
 				continue;
 			}
 			const auto &str = item[0];
-			for(int i=0; i<TxtMiru::FnN_MaxNum; ++i){
+			for(int i=0; i<static_cast<int>(TxtMiru::FuncNameID::MaxNum); ++i){
 				if(lstrcmp(TxtMiru::l_TxtMiruFuncNameList[i], str.c_str()) == 0){
 					l_menu_list[static_cast<TxtMiru::FuncNameID>(i)] = item[1];
 					break;
@@ -73,13 +73,13 @@ void CGrTxtMiruMenu::Load()
 void CGrTxtMiruMenu::ConvertMenuString(HMENU hMenu, UINT *funcMenuNameMap)
 {
 	for(const auto &item : l_menu_list){
-		auto id = item.first;
+		auto id = static_cast<int>(item.first);
 		const auto &str = item.second;
 		MENUITEMINFO mi = {sizeof(MENUITEMINFO)};
 		mi.fMask = MIIM_STRING;
 		mi.dwTypeData = const_cast<TCHAR*>(str.c_str());
 		mi.cch        = str.size();
-		if(funcMenuNameMap && id >= 0 && id <= TxtMiru::FnN_MaxNum && funcMenuNameMap[id] > 0){
+		if(funcMenuNameMap && id >= 0 && id <= static_cast<int>(TxtMiru::FuncNameID::MaxNum) && funcMenuNameMap[id] > 0){
 			::SetMenuItemInfo(hMenu, funcMenuNameMap[id], FALSE, &mi);
 		} else {
 			::SetMenuItemInfo(hMenu, id+1, FALSE, &mi);
@@ -100,7 +100,7 @@ bool CGrTxtMiruMenu::Open()
 	if(csv.Open(filename.c_str())){
 		for(const auto &item : csv.GetCSVROW()){
 			const auto &str = item[0];
-			for(int i=0; i<TxtMiru::FnN_MaxNum; ++i){
+			for(int i=0; i< static_cast<int>(TxtMiru::FuncNameID::MaxNum); ++i){
 				if(lstrcmp(TxtMiru::l_TxtMiruFuncNameList[i], str.c_str()) == 0){
 					m_list.push_back(static_cast<TxtMiru::FuncNameID>(i));
 					break;
@@ -110,16 +110,16 @@ bool CGrTxtMiruMenu::Open()
 	}
 	if(m_list.empty()){
 		m_list = {
-			TxtMiru::FnN_Copy, TxtMiru::FnN_ToggleSelectionMode, TxtMiru::FnN_Nop,
-			TxtMiru::FnN_PrevPage, TxtMiru::FnN_NextPage, TxtMiru::FnN_Nop,
-			TxtMiru::FnN_ShowSubtitleBookmark, TxtMiru::FnN_AddBookmark, TxtMiru::FnN_Nop,
-			TxtMiru::FnN_ShowBookList, TxtMiru::FnN_Nop,
-			TxtMiru::FnN_ShowDocInfo, TxtMiru::FnN_ShowProperty, TxtMiru::FnN_Nop,
-			TxtMiru::FnN_ExecOpenFiile, TxtMiru::FnN_FullScreen, TxtMiru::FnN_Nop,
-			TxtMiru::FnN_MaxNum};
+			TxtMiru::FuncNameID::Copy, TxtMiru::FuncNameID::ToggleSelectionMode, TxtMiru::FuncNameID::Nop,
+			TxtMiru::FuncNameID::PrevPage, TxtMiru::FuncNameID::NextPage, TxtMiru::FuncNameID::Nop,
+			TxtMiru::FuncNameID::ShowSubtitleBookmark, TxtMiru::FuncNameID::AddBookmark, TxtMiru::FuncNameID::Nop,
+			TxtMiru::FuncNameID::ShowBookList, TxtMiru::FuncNameID::Nop,
+			TxtMiru::FuncNameID::ShowDocInfo, TxtMiru::FuncNameID::ShowProperty, TxtMiru::FuncNameID::Nop,
+			TxtMiru::FuncNameID::ExecOpenFiile, TxtMiru::FuncNameID::FullScreen, TxtMiru::FuncNameID::Nop,
+			TxtMiru::FuncNameID::MaxNum};
 	} else {
-		m_list.push_back(TxtMiru::FnN_Nop   );
-		m_list.push_back(TxtMiru::FnN_MaxNum);
+		m_list.push_back(TxtMiru::FuncNameID::Nop   );
+		m_list.push_back(TxtMiru::FuncNameID::MaxNum);
 	}
 	return true;
 }
@@ -132,24 +132,24 @@ TxtMiru::FuncNameID CGrTxtMiruMenu::Show(HWND hWnd, int x, int y, bool bSelectio
 	}
 	CGrTxtMiruMenu::ConvertMenuString(hMenu, nullptr);
 	auto &&param = CGrTxtMiru::theApp().Param();
-	if(param.GetBoolean(CGrTxtParam::TouchMenu)){
+	if(param.GetBoolean(CGrTxtParam::PointsType::TouchMenu)){
 		// タッチ操作でメニューを出したときは、OwnerDrawで幅を広げる
 		TxtMiruTheme_SetTouchMenu(hMenu);
 	}
 	//
 	UINT clipFormat = CF_TEXT;
 	if(::GetPriorityClipboardFormat(&clipFormat, 1) <= 0){
-		CGrMenuFunc::SetMenuItemState(hMenu, TxtMiru::FnN_Copy+1, MFS_DISABLED);
+		CGrMenuFunc::SetMenuItemState(hMenu, static_cast<int>(TxtMiru::FuncNameID::Copy)+1, MFS_DISABLED);
 	}
-	CGrMenuFunc::SetMenuItemState(hMenu, TxtMiru::FnN_ToggleSelectionMode+1, bSelectionMode ? MFS_CHECKED : MFS_UNCHECKED);
+	CGrMenuFunc::SetMenuItemState(hMenu, static_cast<int>(TxtMiru::FuncNameID::ToggleSelectionMode)+1, bSelectionMode ? MFS_CHECKED : MFS_UNCHECKED);
 	if(!bLinkHover){
-		CGrMenuFunc::SetMenuItemState(hMenu, TxtMiru::FnN_LinkGoto+1, MFS_DISABLED);
-		CGrMenuFunc::SetMenuItemState(hMenu, TxtMiru::FnN_LinkOpen+1, MFS_DISABLED);
+		CGrMenuFunc::SetMenuItemState(hMenu, static_cast<int>(TxtMiru::FuncNameID::LinkGoto)+1, MFS_DISABLED);
+		CGrMenuFunc::SetMenuItemState(hMenu, static_cast<int>(TxtMiru::FuncNameID::LinkOpen)+1, MFS_DISABLED);
 	}
 	UINT ret = ::TrackPopupMenu(hMenu, TPM_LEFTALIGN|TPM_LEFTBUTTON|TPM_VERTICAL|TPM_RETURNCMD, x, y, 0, hWnd, NULL);
 	::DestroyMenu(hMenu);
 	if(ret == 0){
-		return TxtMiru::FnN_Nop;
+		return TxtMiru::FuncNameID::Nop;
 	} else {
 		return static_cast<TxtMiru::FuncNameID>(ret-1);
 	}

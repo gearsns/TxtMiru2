@@ -3,7 +3,6 @@
 
 #include "stltchar.h"
 #include "stlutil.h"
-// 2.0.23.0
 #include "TxtMiruFunc.h"
 #include "FunctionKeyMap.h"
 #include "KeyState.h"
@@ -47,11 +46,10 @@ static void LoadKeyMap(bool bForce = false)
 	_stprintf_s(keyBindFileName, _T("%s/%s"), CGrTxtFunc::GetDataPath(), KEYBIND_FILE);
 	CGrFunctionKeyMap::FunctionMap fmap;
 	if(!CGrFunctionKeyMap::Load(keyBindFileName, fmap)){
+		;
 	}
 	g_key_id_map.clear();
-	for(const auto &item : fmap){
-		const auto &ks = item.first;
-		const auto &fn = item.second;
+	for(const auto &[ks, fn] : fmap){
 		UINT id = 0;
 		for(const auto name : TxtMiru::l_TxtMiruFuncNameList){
 			if(fn == name){
@@ -84,9 +82,9 @@ static unsigned int __stdcall ModelessProc(void *lpParam)
 			auto vk = static_cast<UINT>(msg.wParam);
 			auto it = g_key_id_map.find(CGrKeyboardState(vk));
 			if(it != g_key_id_map.end()){
-				if(/**/it->second == TxtMiru::FnN_ShowBookList
-				   ||  it->second == TxtMiru::FnN_ShowRubyList
-				   ||  it->second == TxtMiru::FnN_ShowSubtitleBookmark
+				if(/**/it->second == static_cast<UINT>(TxtMiru::FuncNameID::ShowBookList)
+				   ||  it->second == static_cast<UINT>(TxtMiru::FuncNameID::ShowRubyList)
+				   ||  it->second == static_cast<UINT>(TxtMiru::FuncNameID::ShowSubtitleBookmark)
 				   ){
 					::PostMessage(pWnd->GetParentWnd(), msg.message, msg.wParam, msg.lParam);
 					continue;

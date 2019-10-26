@@ -10,12 +10,12 @@
 
 template <typename T> inline void Swap(T &a, T &b) { T tmp = a; a=b; b=tmp; }
 
-static CGrTxtRendererMgr::FontType l_FTRotateText    [] = { CGrTxtRendererMgr::RotateText    , CGrTxtRendererMgr::BoldRotateText     };
-static CGrTxtRendererMgr::FontType l_FTTurnText      [] = { CGrTxtRendererMgr::TurnText      , CGrTxtRendererMgr::BoldTurnText       };
-static CGrTxtRendererMgr::FontType l_FTText          [] = { CGrTxtRendererMgr::Text          , CGrTxtRendererMgr::BoldText           };
-static CGrTxtRendererMgr::FontType l_FTHalfText      [] = { CGrTxtRendererMgr::HalfText      , CGrTxtRendererMgr::BoldHalfText       };
-static CGrTxtRendererMgr::FontType l_FTRotateHalfText[] = { CGrTxtRendererMgr::HalfRotateText, CGrTxtRendererMgr::BoldHalfRotateText };
-enum ROTATE_TYPE { ROTP_NONE, ROTP_ROTATE, ROTP_REV };
+static CGrTxtRendererMgr::FontType l_FTRotateText    [] = { CGrTxtRendererMgr::FontType::RotateText    , CGrTxtRendererMgr::FontType::BoldRotateText     };
+static CGrTxtRendererMgr::FontType l_FTTurnText      [] = { CGrTxtRendererMgr::FontType::TurnText      , CGrTxtRendererMgr::FontType::BoldTurnText       };
+static CGrTxtRendererMgr::FontType l_FTText          [] = { CGrTxtRendererMgr::FontType::Text          , CGrTxtRendererMgr::FontType::BoldText           };
+static CGrTxtRendererMgr::FontType l_FTHalfText      [] = { CGrTxtRendererMgr::FontType::HalfText      , CGrTxtRendererMgr::FontType::BoldHalfText       };
+static CGrTxtRendererMgr::FontType l_FTRotateHalfText[] = { CGrTxtRendererMgr::FontType::HalfRotateText, CGrTxtRendererMgr::FontType::BoldHalfRotateText };
+enum class ROTATE_TYPE { NONE, ROTATE, REV };
 static ROTATE_TYPE getRotateType(const CGrTxtParam &param, LPCTSTR lpChar)
 {
 	struct CGrRotateStrCheck : public CGrTxtParam::CGrStringCompare
@@ -24,12 +24,12 @@ static ROTATE_TYPE getRotateType(const CGrTxtParam &param, LPCTSTR lpChar)
 		CGrRotateStrCheck(LPCTSTR c) : lpChar(c) {}
 		bool operator == (LPCTSTR lpSrc){return _tcscmp(lpChar, lpSrc) == 0;}
 	};
-	if(param.FindIF(CGrTxtParam::RotateCharacters, static_cast<CGrTxtParam::CGrStringCompare &&>(CGrRotateStrCheck(lpChar))) >= 0){
-		return ROTP_ROTATE;
-	} else if(param.FindIF(CGrTxtParam::RRotateCharacters, static_cast<CGrTxtParam::CGrStringCompare &&>(CGrRotateStrCheck(lpChar))) >= 0){
-		return ROTP_REV;
+	if(param.FindIF(CGrTxtParam::ValueType::RotateCharacters, static_cast<CGrTxtParam::CGrStringCompare &&>(CGrRotateStrCheck(lpChar))) >= 0){
+		return ROTATE_TYPE::ROTATE;
+	} else if(param.FindIF(CGrTxtParam::ValueType::RRotateCharacters, static_cast<CGrTxtParam::CGrStringCompare &&>(CGrRotateStrCheck(lpChar))) >= 0){
+		return ROTATE_TYPE::REV;
 	}
-	return ROTP_NONE;
+	return ROTATE_TYPE::NONE;
 }
 
 class CGrCalcSize {
@@ -105,7 +105,7 @@ class CGrTxtCanvasDraw {
 	CGrTxtRendererMgr::FontType *FTTurnText   = l_FTTurnText;
 	CGrTxtRendererMgr::FontType *FTText       = l_FTText;
 	CGrTxtRendererMgr::FontType *FTHalfText   = l_FTHalfText;
-	CGrTxtRendererMgr::FontType FTRubyText    = CGrTxtRendererMgr::RubyText;
+	CGrTxtRendererMgr::FontType FTRubyText    = CGrTxtRendererMgr::FontType::RubyText;
 public:
 	CGrTxtCanvasDraw(CGrTxtCanvas *pCanvas, RECT &rcCanvas, TxtMiru::TextInfoList &til_layout) :
 	m_txtMap(pCanvas->m_txtMap),
@@ -127,7 +127,7 @@ public:
 		FTTurnText = l_FTTurnText;
 		FTText = l_FTTurnText;
 		FTHalfText = l_FTRotateHalfText;
-		FTRubyText = CGrTxtRendererMgr::TurnRubyText;
+		FTRubyText = CGrTxtRendererMgr::FontType::TurnRubyText;
 	}
 	void UnSetHorz()
 	{
@@ -135,7 +135,7 @@ public:
 		FTTurnText = l_FTTurnText;
 		FTText = l_FTText;
 		FTHalfText = l_FTHalfText;
-		FTRubyText = CGrTxtRendererMgr::RubyText;
+		FTRubyText = CGrTxtRendererMgr::FontType::RubyText;
 	}
 	void Draw(int lines)
 	{
@@ -196,33 +196,33 @@ public:
 
 				const auto &text = ti.str;
 				switch (ti.textType) {
-				case TxtMiru::TT_TEXT_SIZE:
+				case TxtMiru::TextType::TEXT_SIZE:
 					setFontSize(static_cast<signed short>(ti.chrType));
 					break;
-				case TxtMiru::TT_HORZ_START:
+				case TxtMiru::TextType::HORZ_START:
 					bHorz = true;
 					break;
-				case TxtMiru::TT_HORZ_END:
+				case TxtMiru::TextType::HORZ_END:
 					bHorz = false;
 					break;
 				}
 				if(text.empty()){ continue; }
 				auto lpNextSrc = text.c_str();
 				switch(ti.textType){
-				case TxtMiru::TT_OTHER             :
+				case TxtMiru::TextType::OTHER             :
 					if(drawOthr(lpNextSrc)){
 						break;
 					}
 					++m_tp.iPos;
 					// through
-				case TxtMiru::TT_NOTE              : // through
-				case TxtMiru::TT_ERROR             : // through
-				case TxtMiru::TT_OTHER_NOTE        : // through
-				case TxtMiru::TT_NO_READ           :
+				case TxtMiru::TextType::NOTE              : // through
+				case TxtMiru::TextType::ERROR_STR         : // through
+				case TxtMiru::TextType::OTHER_NOTE        : // through
+				case TxtMiru::TextType::NO_READ           :
 					{
 						++note_num;
 						std::tstring fmt;
-						param.GetText(CGrTxtParam::NoteFormat, fmt);
+						param.GetText(CGrTxtParam::TextType::NoteFormat, fmt);
 						TCHAR buf[512];
 						_stprintf_s(buf, fmt.c_str(), note_num);
 						drawRuby(buf);
@@ -246,20 +246,20 @@ public:
 						drawNote(lpNextSrc);
 					}
 					break;
-				case TxtMiru::TT_LINK              :
+				case TxtMiru::TextType::LINK              :
 					if(ti.tpEnd.iIndex == -1 && ti.tpEnd.iPos == -1){
 						COLORREF link_color = {0}; /* paper, shadow, back */
-						param.GetPoints(CGrTxtParam::LinkTextColor, (int*)&link_color, 1);
+						param.GetPoints(CGrTxtParam::PointsType::LinkTextColor, (int*)&link_color, 1);
 						m_txtRenderer.SetTextColor(link_color);
 					} else {
 						drawLink(_T("傍線") , ti, text_list);
 						m_txtRenderer.ResetTextColor();
 					}
 					break;
-				case TxtMiru::TT_ROTATE_NUM        : // through // 縦中横
-				case TxtMiru::TT_ROTATE_NUM_AUTO   : drawRNum(lpNextSrc); break;
-				case TxtMiru::TT_TEXT              : // through
-				case TxtMiru::TT_OVERLAP_CHAR      :
+				case TxtMiru::TextType::ROTATE_NUM        : // through // 縦中横
+				case TxtMiru::TextType::ROTATE_NUM_AUTO   : drawRNum(lpNextSrc); break;
+				case TxtMiru::TextType::TEXT              : // through
+				case TxtMiru::TextType::OVERLAP_CHAR      :
 					if (bHorz && !IgnoreHorzChar(ti.chrType)) {
 						SetHorz();
 						drawText(lpNextSrc);
@@ -269,15 +269,15 @@ public:
 						drawText(lpNextSrc);
 					}
 					break;
-				case TxtMiru::TT_SMALL_NOTE        : // through
-				case TxtMiru::TT_SMALL_NOTE_R      : // through
-				case TxtMiru::TT_SMALL_NOTE_L      : // through
-				case TxtMiru::TT_GUID_MARK         : // through
-				case TxtMiru::TT_SUP_NOTE          : // through
-				case TxtMiru::TT_SUB_NOTE          : drawSTxt(lpNextSrc); break;
-				case TxtMiru::TT_KU1_CHAR          : drawKuCh(_T("／"  )); break;
-				case TxtMiru::TT_KU2_CHAR          : drawKuCh(_T("／″")); break;
-				case TxtMiru::TT_LINE_CHAR         :
+				case TxtMiru::TextType::SMALL_NOTE        : // through
+				case TxtMiru::TextType::SMALL_NOTE_R      : // through
+				case TxtMiru::TextType::SMALL_NOTE_L      : // through
+				case TxtMiru::TextType::GUID_MARK         : // through
+				case TxtMiru::TextType::SUP_NOTE          : // through
+				case TxtMiru::TextType::SUB_NOTE          : drawSTxt(lpNextSrc); break;
+				case TxtMiru::TextType::KU1_CHAR          : drawKuCh(_T("／"  )); break;
+				case TxtMiru::TextType::KU2_CHAR          : drawKuCh(_T("／″")); break;
+				case TxtMiru::TextType::LINE_CHAR         :
 					{ // 先読みして、線が途切れないようにする
 						int to_iIndex = m_tp.iIndex;
 						auto prefetch_tp = m_tp;
@@ -285,7 +285,7 @@ public:
 						const auto *pref_it = it;
 						for(int prefetch = it_len; prefetch>0; --prefetch, ++pref_it, ++prefetch_tp.iIndex){
 							const auto &pref_ti = (*pref_it);
-							if(pref_ti.textType != TxtMiru::TT_LINE_CHAR){ break; }
+							if(pref_ti.textType != TxtMiru::TextType::LINE_CHAR){ break; }
 							if(pref_ti.str != lpNextSrc){ break; }
 							if(cp.zx != m_txtMap.GetCharPoint(prefetch_tp).zx){ break; }
 							to_iIndex = prefetch_tp.iIndex;
@@ -312,7 +312,7 @@ public:
 									if(x < 0){
 										y = cp.zy;
 									} else if(x != cp.zx){
-										m_txtRenderer.PatternFill(CGrTxtRendererMgr::Text, x, y, w, h, lpNextSrc, -1);
+										m_txtRenderer.PatternFillVert(CGrTxtRendererMgr::FontType::Text, x, y, w, h, lpNextSrc, -1);
 										y = cp.zy;
 									}
 									x = cp.zx;
@@ -322,16 +322,16 @@ public:
 							}
 						}
 						h -= (m_fontTextSize / 4); // padding
-						m_txtRenderer.PatternFill(CGrTxtRendererMgr::Text, x, y, w, h, lpNextSrc, -1);
-					}
+						m_txtRenderer.PatternFillVert(CGrTxtRendererMgr::FontType::Text, x, y, w, h, lpNextSrc, -1);
+				}
 					break;
-				case TxtMiru::TT_MOVING_BORDER       :
+				case TxtMiru::TextType::MOVING_BORDER       :
 					// 文字囲み   ※文文章の囲みとは別
 					drawBorder(_T("傍線") , ti, text_list);
 					break;
 					// 文字囲み   ※文章の囲みとは別
-				case TxtMiru::TT_LINE_BOX_START: // through
-				case TxtMiru::TT_LINE_BOX_END  :
+				case TxtMiru::TextType::LINE_BOX_START: // through
+				case TxtMiru::TextType::LINE_BOX_END  :
 					// 文字囲み   ※文章の囲みとは別
 					for(; m_txtMap.GetCharPoint(m_tp).h != 0; ++m_tp.iPos){
 						CGrTxtRendererMgr::BorderType borderType = {true,false,true,false};
@@ -350,38 +350,38 @@ public:
 					}
 					// 文字囲み   ※文章の囲みとは別
 					break;
-				case TxtMiru::TT_LINE                : // through
-				case TxtMiru::TT_WAVE_LINE           : // through
-				case TxtMiru::TT_DOT_LINE            : // through
-				case TxtMiru::TT_SHORT_DASHED_LINE   : // through
-				case TxtMiru::TT_DOUBLE_LINE         : // through
-				case TxtMiru::TT_DEL_LINE            : // through
-				case TxtMiru::TT_LINE_L              : // through
-				case TxtMiru::TT_WAVE_LINE_L         : // through
-				case TxtMiru::TT_SHORT_DASHED_LINE_L : // through
-				case TxtMiru::TT_DOT_LINE_L          : // through
-				case TxtMiru::TT_DOUBLE_LINE_L       : // through
-				case TxtMiru::TT_UNDER_LINE          : drawLine(lpNextSrc , ti, text_list); break;
-				case TxtMiru::TT_WHITE_DOT_L         : // through
-				case TxtMiru::TT_ROUND_DOT_L         : // through
-				case TxtMiru::TT_WHITE_ROUND_DOT_L   : // through
-				case TxtMiru::TT_BLACK_TRIANGLE_DOT_L: // through
-				case TxtMiru::TT_WHITE_TRIANGLE_DOT_L: // through
-				case TxtMiru::TT_DOUBLE_ROUND_DOT_L  : // through
-				case TxtMiru::TT_BULLS_EYE_DOT_L     : // through
-				case TxtMiru::TT_SALTIRE_DOT_L       : // through
-				case TxtMiru::TT_DOT_L               : // through
-				case TxtMiru::TT_WHITE_DOT           : // through
-				case TxtMiru::TT_ROUND_DOT           : // through
-				case TxtMiru::TT_WHITE_ROUND_DOT     : // through
-				case TxtMiru::TT_BLACK_TRIANGLE_DOT  : // through
-				case TxtMiru::TT_WHITE_TRIANGLE_DOT  : // through
-				case TxtMiru::TT_DOUBLE_ROUND_DOT    : // through
-				case TxtMiru::TT_BULLS_EYE_DOT       : // through
-				case TxtMiru::TT_SALTIRE_DOT         : // through
-				case TxtMiru::TT_DOT                 : drawMark(lpNextSrc , ti, text_list); break;
-				case TxtMiru::TT_RUBY                : // through
-				case TxtMiru::TT_RUBY_L              :
+				case TxtMiru::TextType::LINE                : // through
+				case TxtMiru::TextType::WAVE_LINE           : // through
+				case TxtMiru::TextType::DOT_LINE            : // through
+				case TxtMiru::TextType::SHORT_DASHED_LINE   : // through
+				case TxtMiru::TextType::DOUBLE_LINE         : // through
+				case TxtMiru::TextType::DEL_LINE            : // through
+				case TxtMiru::TextType::LINE_L              : // through
+				case TxtMiru::TextType::WAVE_LINE_L         : // through
+				case TxtMiru::TextType::SHORT_DASHED_LINE_L : // through
+				case TxtMiru::TextType::DOT_LINE_L          : // through
+				case TxtMiru::TextType::DOUBLE_LINE_L       : // through
+				case TxtMiru::TextType::UNDER_LINE          : drawLine(lpNextSrc , ti, text_list); break;
+				case TxtMiru::TextType::WHITE_DOT_L         : // through
+				case TxtMiru::TextType::ROUND_DOT_L         : // through
+				case TxtMiru::TextType::WHITE_ROUND_DOT_L   : // through
+				case TxtMiru::TextType::BLACK_TRIANGLE_DOT_L: // through
+				case TxtMiru::TextType::WHITE_TRIANGLE_DOT_L: // through
+				case TxtMiru::TextType::DOUBLE_ROUND_DOT_L  : // through
+				case TxtMiru::TextType::BULLS_EYE_DOT_L     : // through
+				case TxtMiru::TextType::SALTIRE_DOT_L       : // through
+				case TxtMiru::TextType::DOT_L               : // through
+				case TxtMiru::TextType::WHITE_DOT           : // through
+				case TxtMiru::TextType::ROUND_DOT           : // through
+				case TxtMiru::TextType::WHITE_ROUND_DOT     : // through
+				case TxtMiru::TextType::BLACK_TRIANGLE_DOT  : // through
+				case TxtMiru::TextType::WHITE_TRIANGLE_DOT  : // through
+				case TxtMiru::TextType::DOUBLE_ROUND_DOT    : // through
+				case TxtMiru::TextType::BULLS_EYE_DOT       : // through
+				case TxtMiru::TextType::SALTIRE_DOT         : // through
+				case TxtMiru::TextType::DOT                 : drawMark(lpNextSrc , ti, text_list); break;
+				case TxtMiru::TextType::RUBY                : // through
+				case TxtMiru::TextType::RUBY_L              :
 					if (bHorz && !IgnoreHorzChar(ti.chrType)) {
 						SetHorz();
 						drawRuby(lpNextSrc);
@@ -391,8 +391,8 @@ public:
 						drawRuby(lpNextSrc);
 					}
 					break;
-				case TxtMiru::TT_NOTE_L              : // through
-				case TxtMiru::TT_UNKOWN_ERROR        : drawRuby(lpNextSrc); break;
+				case TxtMiru::TextType::NOTE_L              : // through
+				case TxtMiru::TextType::UNKOWN_ERROR        : drawRuby(lpNextSrc); break;
 				}
 			}
 		}
@@ -403,11 +403,11 @@ private:
 		CGrCalcSize calcSize(m_pDoc->GetConstLayout());
 		if(calcSize.initialize(m_rectWindow)){
 			m_txtRenderer.SetFontSize(iFont,
-									  calcSize.getFontSize(CGrTxtLayout::LST_Text        , iFont),
-									  calcSize.getFontSize(CGrTxtLayout::LST_Ruby               ),
-									  calcSize.getFontSize(CGrTxtLayout::LST_Note               ),
-									  calcSize.getFontSize(CGrTxtLayout::LST_Nombre             ),
-									  calcSize.getFontSize(CGrTxtLayout::LST_RunningHeads       )
+									  calcSize.getFontSize(CGrTxtLayout::LineSizeType::Text        , iFont),
+									  calcSize.getFontSize(CGrTxtLayout::LineSizeType::Ruby               ),
+									  calcSize.getFontSize(CGrTxtLayout::LineSizeType::Note               ),
+									  calcSize.getFontSize(CGrTxtLayout::LineSizeType::Nombre             ),
+									  calcSize.getFontSize(CGrTxtLayout::LineSizeType::RunningHeads       )
 									  );
 		}
 	}
@@ -452,8 +452,8 @@ private:
 				offset_point.y = cp.h * offset_point.y / 100;
 				offset_point.x = cp.w * offset_point.x / 100;
 				switch(getRotateType(param, ofch.c_str())){
-				case ROTP_ROTATE: m_txtRenderer.DrawText(FTTurnText[m_pDoc->IsBold(m_tp)], cp.zx + offset_point.x, cp.zy + offset_point.y, lpSrc, lpNextSrc); break;
-				case ROTP_REV   : m_txtRenderer.DrawText(FTRotateText[m_pDoc->IsBold(m_tp)], cp.zx + offset_point.x, cp.zy + offset_point.y, lpSrc, lpNextSrc); break;
+				case ROTATE_TYPE::ROTATE: m_txtRenderer.DrawText(FTTurnText[m_pDoc->IsBold(m_tp)], cp.zx + offset_point.x, cp.zy + offset_point.y, lpSrc, lpNextSrc); break;
+				case ROTATE_TYPE::REV   : m_txtRenderer.DrawText(FTRotateText[m_pDoc->IsBold(m_tp)], cp.zx + offset_point.x, cp.zy + offset_point.y, lpSrc, lpNextSrc); break;
 				default         : m_txtRenderer.DrawText(FTText[m_pDoc->IsBold(m_tp)], cp.zx + offset_point.x, cp.zy + offset_point.y, lpSrc, lpNextSrc); break;
 				}
 			}
@@ -490,7 +490,7 @@ private:
 	{
 		const auto &cp = m_txtMap.GetCharPoint(tp);
 		if(isDrawArea(cp)){
-			m_txtRenderer.PatternFill(CGrTxtRendererMgr::Text, cp.zx, cp.zy, cp.w, cp.h, lpNextSrc, -1);
+			m_txtRenderer.PatternFillVert(CGrTxtRendererMgr::FontType::Text, cp.zx, cp.zy, cp.w, cp.h, lpNextSrc, -1);
 		}
 	}
 	void drawLink(LPCTSTR lpNextSrc, const TxtMiru::TextInfo &ti, const TxtMiru::TextInfoList &text_list)
@@ -522,7 +522,7 @@ private:
 					// データは、上から順に配置されることを前提にしているので y座標が小さくなったら 改行したとみなし そこまでの線を描画する
 					// ※半角文字の場合、x座標の一致でチェックすると線ががたがたになるので(以下の max(cp.zx,x)も同様
 					if(m_iHoverLink == lb.id){
-						m_txtRenderer.PatternFill(CGrTxtRendererMgr::Text, x, y, w, b - y, lpNextSrc, -1);
+						m_txtRenderer.PatternFillVert(CGrTxtRendererMgr::FontType::Text, x, y, w, b - y, lpNextSrc, -1);
 					}
 					lb.rect.top = y;
 					lb.rect.bottom = b;
@@ -552,7 +552,7 @@ private:
 			}
 		}
 		if(m_iHoverLink == lb.id){
-			m_txtRenderer.PatternFill(CGrTxtRendererMgr::Text, x, y, w, b - y, lpNextSrc, -1);
+			m_txtRenderer.PatternFillVert(CGrTxtRendererMgr::FontType::Text, x, y, w, b - y, lpNextSrc, -1);
 		}
 		lb.rect.top = y;
 		lb.rect.bottom = b;
@@ -617,7 +617,7 @@ private:
 				} else if(y > cp.zy || (prelcol >= 0 && prelcol != cp.lcol)){
 					// データは、上から順に配置されることを前提にしているので y座標が小さくなったら 改行したとみなし そこまでの線を描画する
 					// ※半角文字の場合、x座標の一致でチェックすると線ががたがたになるので(以下の max(cp.zx,x)も同様
-					m_txtRenderer.PatternFill(CGrTxtRendererMgr::Text, x, y, w, b - y, lpNextSrc, -1);
+					m_txtRenderer.PatternFillVert(CGrTxtRendererMgr::FontType::Text, x, y, w, b - y, lpNextSrc, -1);
 					y = cp.zy;
 					b = cp.zy + cp.h;// - y;
 				}
@@ -627,18 +627,18 @@ private:
 				prelcol = cp.lcol;
 			}
 		}
-		m_txtRenderer.PatternFill(CGrTxtRendererMgr::Text, x, y, w, b - y, lpNextSrc, -1);
+		m_txtRenderer.PatternFillVert(CGrTxtRendererMgr::FontType::Text, x, y, w, b - y, lpNextSrc, -1);
 	}
 	void drawMark(LPCTSTR lpNextSrc, const TxtMiru::TextInfo &ti, const TxtMiru::TextInfoList &text_list)
 	{
 		TxtMiru::TextPoint ref_tp = TxtMiru::TextParserPoint(m_tp.iLine, ti.tpBegin);
 		TxtMiru::TextPoint end_tp = TxtMiru::TextParserPoint(m_tp.iLine, ti.tpEnd  );
-		int h = m_txtRenderer.GetFontHeight(CGrTxtRendererMgr::Text);
+		int h = m_txtRenderer.GetFontHeight(CGrTxtRendererMgr::FontType::Text);
 		for(;ref_tp <= end_tp; ++m_tp.iPos){
 			const auto &cp = m_txtMap.GetCharPoint(m_tp);
 			ref_tp = CGrTxtMapper::NextTextPoint(ref_tp, text_list);
 			if(isDrawArea(cp)){
-				m_txtRenderer.DrawText(CGrTxtRendererMgr::Text, cp.zx, (cp.zy * 2 + cp.h - h) / 2, lpNextSrc, -1);
+				m_txtRenderer.DrawText(CGrTxtRendererMgr::FontType::Text, cp.zx, (cp.zy * 2 + cp.h - h) / 2, lpNextSrc, -1);
 			}
 		}
 	}
@@ -660,7 +660,7 @@ private:
 			lpNextSrc = CGrText::CharNext(lpSrc);
 			const auto &cp = m_txtMap.GetCharPoint(m_tp);
 			if(isDrawArea(cp)){
-				m_txtRenderer.DrawText(CGrTxtRendererMgr::Note, cp.zx, cp.zy, lpSrc, lpNextSrc);
+				m_txtRenderer.DrawText(CGrTxtRendererMgr::FontType::Note, cp.zx, cp.zy, lpSrc, lpNextSrc);
 			}
 		}
 	}
@@ -705,11 +705,11 @@ void CGrTxtCanvas::setFontSize(int iFont)
 	CGrCalcSize calcSize(m_pDoc->GetConstLayout());
 	if(calcSize.initialize(m_rectWindow)){
 		m_txtRenderer.SetFontSize(iFont,
-								  calcSize.getFontSize(CGrTxtLayout::LST_Text        , iFont),
-								  calcSize.getFontSize(CGrTxtLayout::LST_Ruby               ),
-								  calcSize.getFontSize(CGrTxtLayout::LST_Note               ),
-								  calcSize.getFontSize(CGrTxtLayout::LST_Nombre             ),
-								  calcSize.getFontSize(CGrTxtLayout::LST_RunningHeads       )
+								  calcSize.getFontSize(CGrTxtLayout::LineSizeType::Text        , iFont),
+								  calcSize.getFontSize(CGrTxtLayout::LineSizeType::Ruby               ),
+								  calcSize.getFontSize(CGrTxtLayout::LineSizeType::Note               ),
+								  calcSize.getFontSize(CGrTxtLayout::LineSizeType::Nombre             ),
+								  calcSize.getFontSize(CGrTxtLayout::LineSizeType::RunningHeads       )
 								  );
 	}
 }
@@ -738,16 +738,16 @@ void CGrTxtCanvas::Resize(int cx, int cy)
 	try {
 		//
 		setFontSize(0); // m_fontTextSizeが変わっている場合があるので、カレントを一旦通常フォントに戻して フォント再作成
-		int fontTextSize         = calcSize.getFontSize(CGrTxtLayout::LST_Text        );
-		int fontRubySize         = calcSize.getFontSize(CGrTxtLayout::LST_Ruby        );
-		int fontNoteSize         = calcSize.getFontSize(CGrTxtLayout::LST_Note        );
-		int fontNombreSize       = calcSize.getFontSize(CGrTxtLayout::LST_Nombre      );
-		int fontRunningHeadsSize = calcSize.getFontSize(CGrTxtLayout::LST_RunningHeads);
+		int fontTextSize         = calcSize.getFontSize(CGrTxtLayout::LineSizeType::Text        );
+		int fontRubySize         = calcSize.getFontSize(CGrTxtLayout::LineSizeType::Ruby        );
+		int fontNoteSize         = calcSize.getFontSize(CGrTxtLayout::LineSizeType::Note        );
+		int fontNombreSize       = calcSize.getFontSize(CGrTxtLayout::LineSizeType::Nombre      );
+		int fontRunningHeadsSize = calcSize.getFontSize(CGrTxtLayout::LineSizeType::RunningHeads);
 		m_txtRenderer.Create(*m_pDoc, fontTextSize, fontRubySize, fontNoteSize, fontNombreSize, fontRunningHeadsSize);
 		m_txtRenderer.ClearFlexChar();
 		m_fontTextSize = fontTextSize;
 
-		const auto &txt_layout = layout.GetConstLayoutList(CGrTxtLayout::LLT_Text);
+		const auto &txt_layout = layout.GetConstLayoutList(CGrTxtLayout::LayoutListType::Text);
 		int txt_layout_len = txt_layout.size();
 		if(m_layoutBox.size() != txt_layout_len){
 			m_layoutBox.resize(txt_layout_len);
@@ -807,7 +807,7 @@ void CGrTxtCanvas::UpdateParam()
 	// 背景画像フルパス変換
 	CGrCurrentDirectory curDir;
 	const auto &param = CGrTxtMiru::theApp().Param();
-	param.GetText(CGrTxtParam::BackgroundImage, m_bkImageFilename);
+	param.GetText(CGrTxtParam::TextType::BackgroundImage, m_bkImageFilename);
 
 	TCHAR fullpath[MAX_PATH] = {0};
 	TCHAR *filename;
@@ -820,12 +820,12 @@ static void setNombre(TxtMiru::TextInfoList &til_layout, int page, int total_pag
 {
 	if(page <= 0){ return; }
 	TxtMiru::TextInfo ti;
-	auto ft = CGrTxtLayout::FT_Nombre1;
+	auto ft = CGrTxtLayout::FormatType::Nombre1;
 	if(page & 0x01){
-		ti.textType = TxtMiru::TT_NOMBRE1;
+		ti.textType = TxtMiru::TextType::NOMBRE1;
 	} else {
-		ti.textType = TxtMiru::TT_NOMBRE2;
-		ft = CGrTxtLayout::FT_Nombre2;
+		ti.textType = TxtMiru::TextType::NOMBRE2;
+		ft = CGrTxtLayout::FormatType::Nombre2;
 	}
 	const auto &txtlayout = doc.GetConstLayout();
 	CGrText::FormatMessage(ti.str, txtlayout.GetFormat(ft).c_str(), page, total_page);
@@ -921,7 +921,7 @@ int CGrTxtCanvas::Update(int page)
 	m_txtRenderer.SetBitmap(m_bmpCanvas);
 	{
 		COLORREF page_color[3] = {}; /* paper, shadow, back */
-		param.GetPoints(CGrTxtParam::PageColor, reinterpret_cast<int*>(page_color), sizeof(page_color)/sizeof(COLORREF));
+		param.GetPoints(CGrTxtParam::PointsType::PageColor, reinterpret_cast<int*>(page_color), sizeof(page_color)/sizeof(COLORREF));
 		auto hbkHDC = ::CreateCompatibleDC(NULL);
 		auto holdBitmap = static_cast<HBITMAP>(::SelectObject(hbkHDC, m_bmpCanvas));
 		auto oldclr = ::SetBkColor(hbkHDC, page_color[2]);
@@ -974,7 +974,7 @@ int CGrTxtCanvas::Update(int page)
 	// 見出し
 	{
 		TxtMiru::TextInfo ti;
-		ti.textType = TxtMiru::TT_RUNNINGHEADS;
+		ti.textType = TxtMiru::TextType::RUNNINGHEADS;
 
 		const auto &subtitle = m_pDoc->GetSubtitle();
 		int len=subtitle.Count();
@@ -994,7 +994,7 @@ int CGrTxtCanvas::Update(int page)
 		m_draw.Draw(lines);
 	}
 	RECT *prcNoDispArea = nullptr;
-	if(param.GetBoolean(CGrTxtFuncIParam::PictPaddingNone)){ // 画像をページいっぱいに
+	if(param.GetBoolean(CGrTxtFuncIParam::PointsType::PictPaddingNone)){ // 画像をページいっぱいに
 		prcNoDispArea = static_cast<RECT*>(calloc(m_layoutBox.size(), sizeof(RECT)));
 	}
 	// 挿し絵
@@ -1077,7 +1077,7 @@ int CGrTxtCanvas::Update(int page)
 						auto lpSrc = lpNextSrc;
 						lpNextSrc = CGrText::CharNext(lpSrc);
 						const auto &cp = m_txtMap.GetCharPoint(tmp_tp);
-						m_txtRenderer.DrawText(CGrTxtRendererMgr::RunningHeads, cp.zx, cp.zy+offset_y, lpSrc, lpNextSrc);
+						m_txtRenderer.DrawText(CGrTxtRendererMgr::FontType::RunningHeads, cp.zx, cp.zy+offset_y, lpSrc, lpNextSrc);
 						++tmp_tp.iPos;
 					}
 				}
@@ -1112,9 +1112,9 @@ int CGrTxtCanvas::Update(int page)
 			const auto &text = ti.str;
 			if(text.empty()){ ++tp.iIndex; continue; }
 			auto lpNextSrc = text.c_str();
-			auto ft = CGrTxtRendererMgr::Nombre;
-			if(ti.textType == TxtMiru::TT_RUNNINGHEADS){
-				ft = CGrTxtRendererMgr::RunningHeads;
+			auto ft = CGrTxtRendererMgr::FontType::Nombre;
+			if(ti.textType == TxtMiru::TextType::RUNNINGHEADS){
+				ft = CGrTxtRendererMgr::FontType::RunningHeads;
 			}
 			RECT rect = {-1,-1,-1,-1};
 			for(tp.iPos=0; *lpNextSrc; ++tp.iPos){
@@ -1151,7 +1151,7 @@ int CGrTxtCanvas::Update(int page)
 				}
 			}
 			// 総ページ数
-			if(ti.textType == TxtMiru::TT_NOMBRE1 || ti.textType == TxtMiru::TT_NOMBRE2){
+			if(ti.textType == TxtMiru::TextType::NOMBRE1 || ti.textType == TxtMiru::TextType::NOMBRE2){
 				CGrToolTips::TipsInfo tips;
 				tips.rect = rect;
 				CGrText::FormatMessage(tips.str, _T("%1!s!/%2!d!"), text.c_str(), m_totalPage);
@@ -1207,10 +1207,10 @@ void CGrTxtCanvas::Draw(HDC hdc, const RECT &rect, const RECT &paintRect, int of
 static bool isText(TxtMiru::TextType tt)
 {
 	return TxtMiruType::isTextOrRotateNumOrKuChar(tt)
-		|| tt == TxtMiru::TT_SMALL_NOTE
-			|| tt == TxtMiru::TT_GUID_MARK
-				|| tt == TxtMiru::TT_SUP_NOTE
-					|| tt == TxtMiru::TT_SUB_NOTE
+		|| tt == TxtMiru::TextType::SMALL_NOTE
+			|| tt == TxtMiru::TextType::GUID_MARK
+				|| tt == TxtMiru::TextType::SUP_NOTE
+					|| tt == TxtMiru::TextType::SUB_NOTE
 						;
 }
 
@@ -1255,9 +1255,7 @@ bool CGrTxtCanvas::getHitCharPointMap(int x, int y, TextCharPoint &out_tcp)
 {
 	int lines = m_pDoc->GetConstLayout().GetMaxLine();
 	int line_width = m_fontTextSize;
-	for(const auto &charpoint : m_txtMap.GetCharPointMap()){
-		const auto &tp = charpoint.first;
-		const auto &cp = charpoint.second;
+	for(const auto & [tp, cp] : m_txtMap.GetCharPointMap()){
 		if(cp.ch_h <= 0){ // 注記を除外するために 高さ 0 の文字は選択しないように
 			continue;
 		}
@@ -1335,9 +1333,7 @@ bool CGrTxtCanvas::getHitLastCharPointMap(int x, int y, TextCharPoint &out_tcp)
 	layoutbox.max_line += m_startLine;
 	const auto &cpMap = m_txtMap.GetCharPointMap();
 	{ // 縦中横の選択対応
-		for (const auto& item : cpMap) {
-			const auto& tp = item.first;
-			const auto& cp = item.second;
+		for (const auto& [tp, cp] : cpMap) {
 			if (point.y >= cp.y && point.y <= (cp.y + cp.h)
 				&& point.x >= cp.x && point.x <= (cp.x + cp.w)) {
 				try {
@@ -1360,9 +1356,7 @@ bool CGrTxtCanvas::getHitLastCharPointMap(int x, int y, TextCharPoint &out_tcp)
 	bool b_prev = (x > begin_rect.right || (x > begin_rect.left && y < begin_rect.top));
 	if(b_prev){
 		// 右へドラッグ
-		for(const auto &item : cpMap){
-			const auto &tp = item.first;
-			const auto &cp = item.second;
+		for(const auto &[tp, cp] : cpMap){
 			if(cp.ch_h <= 0 || // 注記を除外するために 高さ 0 の文字は選択しないように
 			   !isDrawArea(cp.lcol, lines) || layoutbox.min_line > cp.lcol || cp.lcol > layoutbox.max_line){
 				continue;
@@ -1385,9 +1379,7 @@ bool CGrTxtCanvas::getHitLastCharPointMap(int x, int y, TextCharPoint &out_tcp)
 		return false;
 	} else {
 		// 左へドラッグ
-		for(const auto &item : cpMap){
-			const auto &tp = item.first;
-			const auto &cp = item.second;
+		for(const auto & [tp, cp] : cpMap){
 			if(cp.ch_h <= 0 || // 注記を除外するために 高さ 0 の文字は選択しないように
 			   !isDrawArea(cp.lcol, lines) || layoutbox.min_line > cp.lcol || cp.lcol > layoutbox.max_line){
 				continue;
@@ -1492,9 +1484,7 @@ void CGrTxtCanvas::invertSelectRect(HDC hdc, const RECT &rect)
 		Swap(selectBeginPoint, selectEndPoint);
 	}
 	int lines = m_pDoc->GetConstLayout().GetMaxLine(); // lines = size.cx
-	for(const auto &item : m_txtMap.GetCharPointMap()){
-		const auto &tp = item.first;
-		const auto &cp = item.second;
+	for(const auto & [tp, cp] : m_txtMap.GetCharPointMap()){
 		if(cp.ch_h > 0 && isDrawArea(cp.lcol, lines) && selectBeginPoint.tp <= tp && tp <= selectEndPoint.tp){
 			try {
 				const auto &li = m_pDoc->GetLineInfo(tp.iLine);

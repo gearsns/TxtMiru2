@@ -33,9 +33,9 @@ public:
 	static LPCTSTR GetDataPath();
 	static void MoveDataDir();
 	static LPCTSTR GetWorkPath();
-	enum DLLFncType {
-		DLLFNC_TxtFuncBookmark,
-		DLLFNC_MaxNum
+	enum class DLLFncType {
+		TxtFuncBookmark,
+		MaxNum
 	};
 	HRESULT InstallDLLFunc(DLLFncType id, CGrLoadDllFunc *pdll);
 	HRESULT UninstallDLLFunc(DLLFncType id);
@@ -48,7 +48,7 @@ private:
 	bool m_bWatting   = false;
 	HACCEL m_haccel   = NULL;
 	HWND m_hMouseCaptureWnd = NULL;
-	CGrLoadDllFunc* m_dllList[DLLFNC_MaxNum] = {};
+	CGrLoadDllFunc* m_dllList[static_cast<int>(DLLFncType::MaxNum)] = {};
 };
 
 #endif // __TXTMIRU_H__

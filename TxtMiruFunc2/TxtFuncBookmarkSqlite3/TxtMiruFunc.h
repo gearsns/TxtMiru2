@@ -14,10 +14,10 @@
 #define TXTMIRUFUNCNAMELIST_END
 #define TXTMIRUFUNCNAMELIST_EXTERN
 #else
-#define TXTMIRUFUNCNAMELIST enum FuncNameID
-#define TXTMIRUFL(__a__) FnN_##__a__
-#define TXTMIRUFUNCNAMELIST_END    FnN_MaxNum
-#define TXTMIRUFUNCNAMELIST_EXTERN extern LPCTSTR l_TxtMiruFuncNameList[FnN_MaxNum];
+#define TXTMIRUFUNCNAMELIST enum class FuncNameID
+#define TXTMIRUFL(__a__) __a__
+#define TXTMIRUFUNCNAMELIST_END    MaxNum
+#define TXTMIRUFUNCNAMELIST_EXTERN extern LPCTSTR l_TxtMiruFuncNameList[static_cast<int>(FuncNameID::MaxNum)];
 #endif
 
 namespace TxtMiru

@@ -42,120 +42,120 @@ namespace TxtDocMessage
 
 namespace TxtMiru
 {
-	enum TextType {
-		TT_TEXT                  ,
-		TT_RUBY                  , // 《--》
-		TT_RUBY_L                , // ［＃「--」の左に「...」のルビ］
-		TT_RUBY_L_START          , // ［＃左にルビ付き］
-		TT_RUBY_L_END            , // ［＃左に「...」のルビ付き終わり］
-		TT_WHITE_DOT             , // ［＃「--」に白ゴマ傍点］
-		TT_ROUND_DOT             , // ［＃「--」に丸傍点］
-		TT_WHITE_ROUND_DOT       , // ［＃「--」に白丸傍点］
-		TT_BLACK_TRIANGLE_DOT    , // ［＃「--」に黒三角傍点］
-		TT_WHITE_TRIANGLE_DOT    , // ［＃「--」に白三角傍点］
-		TT_DOUBLE_ROUND_DOT      , // ［＃「--」に二重丸傍点］
-		TT_BULLS_EYE_DOT         , // ［＃「--」に蛇の目傍点］
-		TT_SALTIRE_DOT           , // ［＃「--」にばつ傍点］
-		TT_DOT                   , // ［＃「--」に傍点］
-		TT_LINE                  , // ［＃「--」に傍線］
-		TT_WAVE_LINE             , // ［＃「--」に波線］
-		TT_DEL_LINE              , // ［＃「--」に取消線］
-		TT_UNDER_LINE            , // ［＃「--」に左傍線］
-		TT_SHORT_DASHED_LINE     , // ［＃「--」に破線］
-		TT_DOT_LINE              , // ［＃「--」に点線］,［＃「--」に破線］
-		TT_DOUBLE_LINE           , // ［＃「--」に二重傍線］
-		TT_WHITE_DOT_L           , // ［＃「--」の左に白ゴマ傍点］
-		TT_ROUND_DOT_L           , // ［＃「--」の左に丸傍点］
-		TT_WHITE_ROUND_DOT_L     , // ［＃「--」の左に白丸傍点］
-		TT_BLACK_TRIANGLE_DOT_L  , // ［＃「--」の左に黒三角傍点］
-		TT_WHITE_TRIANGLE_DOT_L  , // ［＃「--」の左に白三角傍点］
-		TT_DOUBLE_ROUND_DOT_L    , // ［＃「--」の左に二重丸傍点］
-		TT_BULLS_EYE_DOT_L       , // ［＃「--」の左に蛇の目傍点］
-		TT_SALTIRE_DOT_L         , // ［＃「--」に左にばつ傍点］
-		TT_DOT_L                 , // ［＃「--」の左に傍点］
-		TT_LINE_L                , // ［＃「--」の左に傍線］
-		TT_WAVE_LINE_L           , // ［＃「--」の左に波線］
-		TT_SHORT_DASHED_LINE_L   , // ［＃「--」の左に破線］
-		TT_DOT_LINE_L            , // ［＃「--」の左に点線］,［＃「--」の左に破線］
-		TT_DOUBLE_LINE_L         , // ［＃「--」の左に二重傍線］
-		TT_RANGE_END             , // ［＃白ゴマ傍点終わり］［＃丸傍点終わり］［＃白丸傍点終わり］［＃黒三角傍点終わり］［＃白三角傍点終わり］/*                       */// ［＃二重丸傍点終わり］［＃蛇の目傍点終わり］［＃傍点終わり］［＃傍線終わり］［＃波線終わり］［＃取消線終わり］/*                       */// ［＃左傍線終わり］［＃破線終わり］［＃点線終わり］,［＃破線終わり］［＃二重傍線終わり］
-		TT_NOTE                  , // ［＃「--」の注記］
-		TT_NOTE_START            , // ［＃注記付き］
-		TT_NOTE_END              , // ［＃「--」の注記付き終わり］
-		TT_NOTE_L                , // ［＃「--」の左に「...」の注記］
-		TT_NOTE_START_L          , // ［＃左に注記付き］
-		TT_NOTE_END_L            , // ［＃左に「--」の注記付き終わり］
-		TT_SMALL_NOTE            , // ［＃（--）］               :  小書き
-		TT_SMALL_NOTE_R          , // ［＃「」は行右小書き］
-		TT_SMALL_NOTE_L          , // ［＃「」は行左小書き］
-		TT_SUP_NOTE              , // ［＃--」は上付き小文字］
-		TT_SUB_NOTE              , // ［＃--」は下付き小文字］
-		TT_ERROR                 , //  」は底本では「--」］
-		TT_UNKOWN_ERROR          , // ［＃「--」はママ］, ［＃「--」に「ママ」の注記］
-		TT_NO_READ               , //  ※［＃判読不可、--］
-		TT_INDENT                , // ［＃この行○字下げ］,［＃この行○字下げ、折り返して○字下げ］,［＃天から○字下げ］,［＃天から○字下げ、折り返して○字下げ］（これも可）
-		TT_INDENT2               , // ［＃この行天付き、折り返して○字下げ］（行頭字下げが０の場合）
-		TT_INDENT3               , // ［＃天から○字下げ］
-		TT_INDENT_START          , // ［＃ここから--字下げ］
-		TT_INDENT_START2         , // ［＃ここから改行天付き、折り返して○字下げ］～［＃ここで字下げ終わり］
-		TT_INDENT_END            , // ［＃ここで字下げ終わり］
-		TT_RINDENT               , // ［＃この行地付き］
-		TT_RINDENT_START         , // ［＃ここから地付き］,［＃ここから地から○字上げ］
-		TT_RINDENT_END           , //  ＃ここで地付き終わり］,［＃ここで字上げ終わり］
-		TT_LIMIT_CHAR_START      , // ［＃ここから○字詰め］
-		TT_LIMIT_CHAR_END        , // ［＃ここで字詰め終わり］
-		TT_PICTURE_LAYOUT        , // 段［＃写真（--）入る］［＃挿絵（--）入る］
-		TT_PICTURE_HALF_PAGE     , // 頁
-		TT_PICTURE_FULL_PAGE     , // 見開き
-		TT_LINE_BOX_START        , // ［＃ここから罫囲み］
-		TT_LINE_BOX_END          , // ［＃ここで罫囲み終わり］
-		TT_MOVING_BORDER         , // ［＃「」は罫囲み］
-		TT_ACCENT                , // 〔---〕［＃--）付き］
-		TT_OTHER_NOTE            , // ［＃「--」］
-		TT_GUID_MARK             , //  訓点
-		TT_OTHER                 , // ［＃--］
-		TT_OVERLAP_CHAR          , //  。」, か”
-		TT_KU1_CHAR              , // くの字点上
-		TT_KU2_CHAR              , // くの字点上（濁点）
-		TT_RUBY_SEP              , //  ｜
-		TT_ROTATE_NUM            , // ［＃「...」は縦中横］
-		TT_ROTATE_NUM_AUTO       , // 縦中横 文字数で判断
-		TT_HORZ                  , // ［＃「...」は横組み］
-		TT_HORZ_START            , // ［＃ここから横組み］
-		TT_HORZ_END              , // ［＃ここで横組み終わり］
-		TT_COMMENT_BEGIN         , // コメント開始
-		TT_COMMENT               , // コメント
-		TT_COMMENT_END           , // コメント終了
-		TT_BOLD                  , // 太字
-		TT_BOLD_START            , // 太字
-		TT_BOLD_END              , // 太字
-		TT_NEXT_LINE             , // 改行
-		TT_NEXT_LAYOUT           , // 改段
-		TT_NEXT_PAGE             , // 改頁
-		TT_NEXT_PAPER            , // 改丁 (奇数ページ)
-		TT_NEXT_PAPER_FIRST      , // 改見開き (偶数ページ)
-		TT_LINE_CHAR             , // ―
-		TT_TITLE                 , // タイトル
-		TT_AUTHOR                , // 著者
-		TT_SUBTITLE1             , // 大見出し
-		TT_SUBTITLE2             , // 中見出し
-		TT_SUBTITLE3             , // 小見出し
-		TT_SKIP_CHAR             , // スキップ(非表示文字)
-		TT_SKIP_CHAR_AUTO        , // スキップ(非表示文字)
-		TT_NOMBRE1               , // ノンブル1
-		TT_NOMBRE2               , // ノンブル2
-		TT_RUNNINGHEADS          , // 柱
-		TT_ENDOFCONTENTS         , // 本文終了
-		TT_LINK                  , // Link
-		TT_TEXT_SIZE             , // ［＃「...」はn段階大きな文字］［＃「...」はn段階小さな文字］
-		TT_TEXT_SIZE_L           , // ［＃「...」はn段階大きな文字］
-		TT_TEXT_SIZE_S           , // ［＃「...」はn段階小さな文字］
-		TT_CENTER                , // ［＃ページの左右中央］
-		TT_CAPTION               , // ［＃「...」はキャプション］
-		TT_ID                    , // ID ページ内リンク用
-		TT_FILE                  , // NextFile用
-		TT_TXTMIRU               , // TXTMIRU用タグ
-		TT_MaxNum                , // TextTypeの件数
+	enum class TextType {
+		TEXT                  ,
+		RUBY                  , // 《--》
+		RUBY_L                , // ［＃「--」の左に「...」のルビ］
+		RUBY_L_START          , // ［＃左にルビ付き］
+		RUBY_L_END            , // ［＃左に「...」のルビ付き終わり］
+		WHITE_DOT             , // ［＃「--」に白ゴマ傍点］
+		ROUND_DOT             , // ［＃「--」に丸傍点］
+		WHITE_ROUND_DOT       , // ［＃「--」に白丸傍点］
+		BLACK_TRIANGLE_DOT    , // ［＃「--」に黒三角傍点］
+		WHITE_TRIANGLE_DOT    , // ［＃「--」に白三角傍点］
+		DOUBLE_ROUND_DOT      , // ［＃「--」に二重丸傍点］
+		BULLS_EYE_DOT         , // ［＃「--」に蛇の目傍点］
+		SALTIRE_DOT           , // ［＃「--」にばつ傍点］
+		DOT                   , // ［＃「--」に傍点］
+		LINE                  , // ［＃「--」に傍線］
+		WAVE_LINE             , // ［＃「--」に波線］
+		DEL_LINE              , // ［＃「--」に取消線］
+		UNDER_LINE            , // ［＃「--」に左傍線］
+		SHORT_DASHED_LINE     , // ［＃「--」に破線］
+		DOT_LINE              , // ［＃「--」に点線］,［＃「--」に破線］
+		DOUBLE_LINE           , // ［＃「--」に二重傍線］
+		WHITE_DOT_L           , // ［＃「--」の左に白ゴマ傍点］
+		ROUND_DOT_L           , // ［＃「--」の左に丸傍点］
+		WHITE_ROUND_DOT_L     , // ［＃「--」の左に白丸傍点］
+		BLACK_TRIANGLE_DOT_L  , // ［＃「--」の左に黒三角傍点］
+		WHITE_TRIANGLE_DOT_L  , // ［＃「--」の左に白三角傍点］
+		DOUBLE_ROUND_DOT_L    , // ［＃「--」の左に二重丸傍点］
+		BULLS_EYE_DOT_L       , // ［＃「--」の左に蛇の目傍点］
+		SALTIRE_DOT_L         , // ［＃「--」に左にばつ傍点］
+		DOT_L                 , // ［＃「--」の左に傍点］
+		LINE_L                , // ［＃「--」の左に傍線］
+		WAVE_LINE_L           , // ［＃「--」の左に波線］
+		SHORT_DASHED_LINE_L   , // ［＃「--」の左に破線］
+		DOT_LINE_L            , // ［＃「--」の左に点線］,［＃「--」の左に破線］
+		DOUBLE_LINE_L         , // ［＃「--」の左に二重傍線］
+		RANGE_END             , // ［＃白ゴマ傍点終わり］［＃丸傍点終わり］［＃白丸傍点終わり］［＃黒三角傍点終わり］［＃白三角傍点終わり］/*                       */// ［＃二重丸傍点終わり］［＃蛇の目傍点終わり］［＃傍点終わり］［＃傍線終わり］［＃波線終わり］［＃取消線終わり］/*                       */// ［＃左傍線終わり］［＃破線終わり］［＃点線終わり］,［＃破線終わり］［＃二重傍線終わり］
+		NOTE                  , // ［＃「--」の注記］
+		NOTE_START            , // ［＃注記付き］
+		NOTE_END              , // ［＃「--」の注記付き終わり］
+		NOTE_L                , // ［＃「--」の左に「...」の注記］
+		NOTE_START_L          , // ［＃左に注記付き］
+		NOTE_END_L            , // ［＃左に「--」の注記付き終わり］
+		SMALL_NOTE            , // ［＃（--）］               :  小書き
+		SMALL_NOTE_R          , // ［＃「」は行右小書き］
+		SMALL_NOTE_L          , // ［＃「」は行左小書き］
+		SUP_NOTE              , // ［＃--」は上付き小文字］
+		SUB_NOTE              , // ［＃--」は下付き小文字］
+		ERROR_STR             , //  」は底本では「--」］
+		UNKOWN_ERROR          , // ［＃「--」はママ］, ［＃「--」に「ママ」の注記］
+		NO_READ               , //  ※［＃判読不可、--］
+		INDENT                , // ［＃この行○字下げ］,［＃この行○字下げ、折り返して○字下げ］,［＃天から○字下げ］,［＃天から○字下げ、折り返して○字下げ］（これも可）
+		INDENT2               , // ［＃この行天付き、折り返して○字下げ］（行頭字下げが０の場合）
+		INDENT3               , // ［＃天から○字下げ］
+		INDENT_START          , // ［＃ここから--字下げ］
+		INDENT_START2         , // ［＃ここから改行天付き、折り返して○字下げ］～［＃ここで字下げ終わり］
+		INDENT_END            , // ［＃ここで字下げ終わり］
+		RINDENT               , // ［＃この行地付き］
+		RINDENT_START         , // ［＃ここから地付き］,［＃ここから地から○字上げ］
+		RINDENT_END           , //  ＃ここで地付き終わり］,［＃ここで字上げ終わり］
+		LIMIT_CHAR_START      , // ［＃ここから○字詰め］
+		LIMIT_CHAR_END        , // ［＃ここで字詰め終わり］
+		PICTURE_LAYOUT        , // 段［＃写真（--）入る］［＃挿絵（--）入る］
+		PICTURE_HALF_PAGE     , // 頁
+		PICTURE_FULL_PAGE     , // 見開き
+		LINE_BOX_START        , // ［＃ここから罫囲み］
+		LINE_BOX_END          , // ［＃ここで罫囲み終わり］
+		MOVING_BORDER         , // ［＃「」は罫囲み］
+		ACCENT                , // 〔---〕［＃--）付き］
+		OTHER_NOTE            , // ［＃「--」］
+		GUID_MARK             , //  訓点
+		OTHER                 , // ［＃--］
+		OVERLAP_CHAR          , //  。」, か”
+		KU1_CHAR              , // くの字点上
+		KU2_CHAR              , // くの字点上（濁点）
+		RUBY_SEP              , //  ｜
+		ROTATE_NUM            , // ［＃「...」は縦中横］
+		ROTATE_NUM_AUTO       , // 縦中横 文字数で判断
+		HORZ                  , // ［＃「...」は横組み］
+		HORZ_START            , // ［＃ここから横組み］
+		HORZ_END              , // ［＃ここで横組み終わり］
+		COMMENT_BEGIN         , // コメント開始
+		COMMENT               , // コメント
+		COMMENT_END           , // コメント終了
+		BOLD                  , // 太字
+		BOLD_START            , // 太字
+		BOLD_END              , // 太字
+		NEXT_LINE             , // 改行
+		NEXT_LAYOUT           , // 改段
+		NEXT_PAGE             , // 改頁
+		NEXT_PAPER            , // 改丁 (奇数ページ)
+		NEXT_PAPER_FIRST      , // 改見開き (偶数ページ)
+		LINE_CHAR             , // ―
+		TITLE                 , // タイトル
+		AUTHOR                , // 著者
+		SUBTITLE1             , // 大見出し
+		SUBTITLE2             , // 中見出し
+		SUBTITLE3             , // 小見出し
+		SKIP_CHAR             , // スキップ(非表示文字)
+		SKIP_CHAR_AUTO        , // スキップ(非表示文字)
+		NOMBRE1               , // ノンブル1
+		NOMBRE2               , // ノンブル2
+		RUNNINGHEADS          , // 柱
+		ENDOFCONTENTS         , // 本文終了
+		LINK                  , // Link
+		TEXT_SIZE             , // ［＃「...」はn段階大きな文字］［＃「...」はn段階小さな文字］
+		TEXT_SIZE_L           , // ［＃「...」はn段階大きな文字］
+		TEXT_SIZE_S           , // ［＃「...」はn段階小さな文字］
+		CENTER                , // ［＃ページの左右中央］
+		CAPTION               , // ［＃「...」はキャプション］
+		ID                    , // ID ページ内リンク用
+		FILE                  , // NextFile用
+		TXTMIRU               , // TXTMIRU用タグ
+		MaxNum                , // TextTypeの件数
 	};
 	//
 	struct CharPoint {
@@ -213,15 +213,15 @@ namespace TxtMiru
 		TextListPos tpBegin;
 		TextListPos tpEnd;
 		TextType textType;
-		TextInfo() : chrType(0xffff), tpBegin{0,0}, tpEnd{0,-1}, textType(TT_TEXT){}
+		TextInfo() : chrType(0xffff), tpBegin{0,0}, tpEnd{0,-1}, textType(TextType::TEXT){}
 		TextInfo(std::tstring &&s, WORD ct, TextListPos b, TextListPos e, TextType tt) : str(s), chrType(ct), tpBegin(b), tpEnd(e), textType(tt){}
 		TextInfo(std::tstring &&s, WORD ct, int bi, int bp, int ei, int ep, TextType tt) : str(s), chrType(ct), tpBegin{bi, bp}, tpEnd{ei, ep}, textType(tt){}
 
-		TextInfo(std::tstring &&s, WORD t) : str(s), chrType(t), tpBegin(), tpEnd(), textType(TT_TEXT){}
+		TextInfo(std::tstring &&s, WORD t) : str(s), chrType(t), tpBegin(), tpEnd(), textType(TextType::TEXT){}
 		TextInfo(std::tstring &&s, WORD w, TextType t, TextListPos b) : str(s), chrType(w), textType(t), tpBegin(b), tpEnd(b){}
 
 		TextInfo(LPCTSTR s, WORD ct, int bi, int bp, int ei, int ep, TextType tt) : str(s), chrType(ct), tpBegin{bi, bp}, tpEnd{ei, ep}, textType(tt){}
-		TextInfo(LPCTSTR s, WORD t) : str(s), chrType(t), tpBegin(), tpEnd(), textType(TT_TEXT){}
+		TextInfo(LPCTSTR s, WORD t) : str(s), chrType(t), tpBegin(), tpEnd(), textType(TextType::TEXT){}
 		TextInfo(LPCTSTR s, WORD w, TextType t, TextListPos b) : str(s), chrType(w), textType(t), tpBegin(b), tpEnd(b){}
 	};
 	//

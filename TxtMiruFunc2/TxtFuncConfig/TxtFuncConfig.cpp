@@ -41,7 +41,7 @@ namespace CGrTxtFunc
 	{
 		TCHAR file_path[512];
 		TCHAR buf[1024];
-		pParam->GetText(CGrTxtFuncIParam::BookMarkFolder, buf, sizeof(buf)/sizeof(TCHAR));
+		pParam->GetText(CGrTxtFuncIParam::TextType::BookMarkFolder, buf, sizeof(buf)/sizeof(TCHAR));
 		str = buf;
 		_tcscpy_s(file_path, CGrTxtFunc::GetDataPath());
 		switch(str.size()){
@@ -119,7 +119,7 @@ extern "C" TXTFUNCCONFIG_API bool cdecl TxtFuncGetBrowserURL(LPTSTR *ppURL, CGrT
 	_tsetlocale(LC_ALL,szLanguageName);
 	*ppURL = nullptr;
 	TCHAR buf[4098];
-	pParam->GetText(CGrTxtFuncIParam::BrowserAppName, buf, sizeof(buf)/sizeof(TCHAR));
+	pParam->GetText(CGrTxtFuncIParam::TextType::BrowserAppName, buf, sizeof(buf)/sizeof(TCHAR));
 	CGrCSVText csv(buf);
 	auto *pRow = csv.GetRow(0);
 	if(pRow){

@@ -64,8 +64,8 @@ static void saveUpdate(HWND hwnd, CGrTxtLayout &layout, LPCTSTR type)
 	}
 
 	auto &&param = CGrTxtFunc::Param();
-	param.SetText(CGrTxtFuncIParam::LayoutFile, filename.c_str());
-	param.SetText(CGrTxtFuncIParam::LayoutType, layout.LayoutType());
+	param.SetText(CGrTxtFuncIParam::TextType::LayoutFile, filename.c_str());
+	param.SetText(CGrTxtFuncIParam::TextType::LayoutType, layout.LayoutType());
 	param.UpdateLayout(GetParent(hwnd));
 	::SendMessage(GetParent(hwnd), WM_COMMAND, (WPARAM)TxtDocMessage::UPDATE_LAYOUT, (LPARAM)0);
 }
@@ -155,11 +155,11 @@ static void getLineSize(TxtMiru::LineSize &ls, HWND hwnd, UINT id_width, UINT id
 static CGrTxtLayout::NombreFormatType getNombreFormatType(HWND hwnd, UINT id_outside, UINT id_center)
 {
 	if(IsDlgButtonChecked(hwnd, id_outside)){
-		return CGrTxtLayout::NFT_outside;
+		return CGrTxtLayout::NombreFormatType::outside;
 	} else if(IsDlgButtonChecked(hwnd, id_center)){
-		return CGrTxtLayout::NFT_center;
+		return CGrTxtLayout::NombreFormatType::center;
 	}
-	return CGrTxtLayout::NFT_inside;
+	return CGrTxtLayout::NombreFormatType::inside;
 }
 struct ErrorCheck {
 	int ctl_id = 0;
@@ -283,24 +283,24 @@ struct LayoutInfoBase {
 		layout.SetMaxLine(lines*2);
 		layout.SetMaxCharacters(characters);
 		layout.SetPaper(paperSize);
-		layout.SetLineSize(CGrTxtLayout::LST_Text        , lsText        );
-		layout.SetLineSize(CGrTxtLayout::LST_Ruby        , lsRuby        );
-		layout.SetLineSize(CGrTxtLayout::LST_Nombre      , lsNombre      );
-		layout.SetLineSize(CGrTxtLayout::LST_Note        , lsNote        );
-		layout.SetLineSize(CGrTxtLayout::LST_RunningHeads, lsRunningHeads);
+		layout.SetLineSize(CGrTxtLayout::LineSizeType::Text        , lsText        );
+		layout.SetLineSize(CGrTxtLayout::LineSizeType::Ruby        , lsRuby        );
+		layout.SetLineSize(CGrTxtLayout::LineSizeType::Nombre      , lsNombre      );
+		layout.SetLineSize(CGrTxtLayout::LineSizeType::Note        , lsNote        );
+		layout.SetLineSize(CGrTxtLayout::LineSizeType::RunningHeads, lsRunningHeads);
 	}
 	__declspec(noinline) void setInitialData(HWND hwnd, CGrTxtLayout &layout)
 	{
 		SetDlgItemInt(hwnd, IDC_EDIT_PAPER_WIDTH , paperSize.cx, TRUE);
 		SetDlgItemInt(hwnd, IDC_EDIT_PAPER_HEIGHT, paperSize.cy, TRUE);
 		//
-		lsText         = layout.GetLineSize(CGrTxtLayout::LST_Text        );
-		lsRuby         = layout.GetLineSize(CGrTxtLayout::LST_Ruby        );
-		lsNombre       = layout.GetLineSize(CGrTxtLayout::LST_Nombre      );
-		lsNote         = layout.GetLineSize(CGrTxtLayout::LST_Note        );
-		lsRunningHeads = layout.GetLineSize(CGrTxtLayout::LST_RunningHeads);
+		lsText         = layout.GetLineSize(CGrTxtLayout::LineSizeType::Text        );
+		lsRuby         = layout.GetLineSize(CGrTxtLayout::LineSizeType::Ruby        );
+		lsNombre       = layout.GetLineSize(CGrTxtLayout::LineSizeType::Nombre      );
+		lsNote         = layout.GetLineSize(CGrTxtLayout::LineSizeType::Note        );
+		lsRunningHeads = layout.GetLineSize(CGrTxtLayout::LineSizeType::RunningHeads);
 		//
-		const TxtMiru::TxtLayoutList &tllNombre = layout.GetConstLayoutList(CGrTxtLayout::LLT_Nombre);
+		const TxtMiru::TxtLayoutList &tllNombre = layout.GetConstLayoutList(CGrTxtLayout::LayoutListType::Nombre);
 		if(tllNombre.size() == 2){
 			paperNombrePos[0].x = tllNombre[0].left;
 			paperNombrePos[0].y = tllNombre[0].top ;
@@ -308,7 +308,7 @@ struct LayoutInfoBase {
 			paperNombrePos[1].y = tllNombre[1].top ;
 		}
 		//
-		const TxtMiru::TxtLayoutList &tllRH = layout.GetConstLayoutList(CGrTxtLayout::LLT_RunningHeads);
+		const TxtMiru::TxtLayoutList &tllRH = layout.GetConstLayoutList(CGrTxtLayout::LayoutListType::RunningHeads);
 		if(tllRH.size() == 1){
 			if(tllRH[0].left < paperSize.cx / 2){
 				paperRunningHeadsPos.x = tllRH[0].left;
@@ -320,9 +320,9 @@ struct LayoutInfoBase {
 		//
 		nombreFormatType = layout.GetNombreFormatType();
 		UINT check_id = IDC_RADIO_NOMBRE_OUT;
-		if(nombreFormatType == CGrTxtLayout::NFT_center){
+		if(nombreFormatType == CGrTxtLayout::NombreFormatType::center){
 			check_id = IDC_RADIO_NOMBRE_CENTER;
-		} else if(nombreFormatType == CGrTxtLayout::NFT_inside){
+		} else if(nombreFormatType == CGrTxtLayout::NombreFormatType::inside){
 			check_id = IDC_RADIO_NOMBRE_IN;
 		}
 		CheckRadioButton(hwnd, IDC_RADIO_NOMBRE_OUT, IDC_RADIO_NOMBRE_IN, check_id);
@@ -804,12 +804,12 @@ std::tuple<int, int> CGrCustomLayoutSettingDlg::errorCheck()
 void CGrCustomLayoutSettingDlg::setInitialData()
 {
 	// 105×148 文庫
-	const auto &tllText = m_layout.GetConstLayoutList(CGrTxtLayout::LLT_Text);
+	const auto &tllText = m_layout.GetConstLayoutList(CGrTxtLayout::LayoutListType::Text);
 	int tllText_size = tllText.size();
 	if(tllText_size < 2 || (tllText_size % 2) != 0){
 		m_layout.SetInitialize();
 		tllText_size = tllText.size();
-		if(tllText_size <= 0){ // ありえない
+		if(tllText_size <= 0){
 			return;
 		}
 	}
@@ -949,7 +949,7 @@ void CGrCustomLayoutSettingDlg::setTxtLayout()
 		layout.top        = m_li.paperSpace.top;
 		for(int i=0; i<m_li.paperCenterYNum; ++i){
 			layout.bottom = layout.top + height;
-			m_layout.AddLayout(CGrTxtLayout::LLT_Text, layout);
+			m_layout.AddLayout(CGrTxtLayout::LayoutListType::Text, layout);
 			layout.top += step;
 		}
 	}
@@ -959,7 +959,7 @@ void CGrCustomLayoutSettingDlg::setTxtLayout()
 		layout.top        = m_li.paperSpace.top;
 		for(int i=0; i<m_li.paperCenterYNum; ++i){
 			layout.bottom = layout.top + height;
-			m_layout.AddLayout(CGrTxtLayout::LLT_Text, layout);
+			m_layout.AddLayout(CGrTxtLayout::LayoutListType::Text, layout);
 			layout.top += step;
 		}
 	}
@@ -969,7 +969,7 @@ void CGrCustomLayoutSettingDlg::setTxtLayout()
 		layout.top    = m_li.paperNombrePos[i].y;
 		layout.right  = layout.left + m_li.lsNombre.width * 3;
 		layout.bottom = layout.top  + m_li.lsNombre.width;
-		m_layout.AddLayout(CGrTxtLayout::LLT_Nombre, layout);
+		m_layout.AddLayout(CGrTxtLayout::LayoutListType::Nombre, layout);
 	}
 	layout.left   = m_li.paperRunningHeadsPos.x;
 	layout.top    = m_li.paperRunningHeadsPos.y;
@@ -980,14 +980,14 @@ void CGrCustomLayoutSettingDlg::setTxtLayout()
 		layout.right = layout.left;
 		layout.left  = tmp;
 	}
-	m_layout.AddLayout(CGrTxtLayout::LLT_RunningHeads, layout);
+	m_layout.AddLayout(CGrTxtLayout::LayoutListType::RunningHeads, layout);
 	layout.left       = 0;
 	layout.top        = m_li.paperSpace.top;
 	layout.right      = m_li.paperSpace.right;
 	layout.bottom     = m_li.paperSize.cy - m_li.paperSpace.bottom;
 	layout.characters = (layout.bottom - layout.top) / max(m_li.lsNote.width, 1);
 	layout.lines      = (layout.right - layout.left) / max(m_li.lsNote.width+m_li.lsNote.space, 1);
-	m_layout.AddLayout(CGrTxtLayout::LLT_Note, layout);
+	m_layout.AddLayout(CGrTxtLayout::LayoutListType::Note, layout);
 
 	saveUpdate(m_hWnd, m_layout, lpName);
 }
@@ -1066,7 +1066,7 @@ void CGrCustomLayoutSettingDlg::OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT 
 					SetDlgItemInt(m_hWnd, IDC_EDIT_PAGE_OUTSIDE  ,  500, TRUE); // 小口
 					SetDlgItemInt(m_hWnd, IDC_EDIT_PAGE_TOP      , 1000, TRUE); // 天
 					SetDlgItemInt(m_hWnd, IDC_EDIT_PAGE_BOTTOM   , 1000, TRUE); // 地
-					SetDlgItemInt(m_hWnd, IDC_EDIT_PAGE_CENTER   ,    0, TRUE); // 段間
+					SetDlgItemInt(m_hWnd, IDC_EDIT_PAGE_DIV_SIZE ,    0, TRUE); // 段間
 					SetDlgItemInt(m_hWnd, IDC_EDIT_PAGE_DIV_NUM  ,    1, TRUE); // 段数
 				} else if(size.cx == 21000 && size.cy == 14800){
 					SetDlgItemInt(m_hWnd, IDC_EDIT_LINES         ,   17, TRUE); // 行数
@@ -1075,7 +1075,7 @@ void CGrCustomLayoutSettingDlg::OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT 
 					SetDlgItemInt(m_hWnd, IDC_EDIT_PAGE_OUTSIDE  ,  500, TRUE); // 小口
 					SetDlgItemInt(m_hWnd, IDC_EDIT_PAGE_TOP      , 1000, TRUE); // 天
 					SetDlgItemInt(m_hWnd, IDC_EDIT_PAGE_BOTTOM   , 1000, TRUE); // 地
-					SetDlgItemInt(m_hWnd, IDC_EDIT_PAGE_CENTER   ,    0, TRUE); // 段間
+					SetDlgItemInt(m_hWnd, IDC_EDIT_PAGE_DIV_SIZE ,    0, TRUE); // 段間
 					SetDlgItemInt(m_hWnd, IDC_EDIT_PAGE_DIV_NUM  ,    1, TRUE); // 段数
 				}
 				{

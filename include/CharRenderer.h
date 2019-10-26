@@ -15,7 +15,8 @@ public:
 	virtual ~CGrCharRenderer(){};
 
 	virtual bool Draw(CGrBitmap &canvas, int x, int y, LPCTSTR str, int len) = 0;
-	virtual void PatternFill(CGrBitmap &canvas, int x, int y, int width, int height, LPCTSTR str, int len) = 0;
+	virtual void PatternFillVert(CGrBitmap& canvas, int x, int y, int width, int height, LPCTSTR str, int len) = 0;
+	virtual void PatternFillHorz(CGrBitmap& canvas, int x, int y, int width, int height, LPCTSTR str, int len) = 0;
 
 	virtual bool SetFont(CGrFont &font) = 0;
 	virtual CGrFont &GetFont() = 0;
@@ -38,7 +39,8 @@ public:
 	virtual ~CGrCharKNNRenderer();
 
 	virtual bool Draw(CGrBitmap &canvas, int x, int y, LPCTSTR str, int len) = 0;
-	virtual void PatternFill(CGrBitmap &canvas, int x, int y, int width, int height, LPCTSTR str, int len);
+	virtual void PatternFillVert(CGrBitmap& canvas, int x, int y, int width, int height, LPCTSTR str, int len);
+	virtual void PatternFillHorz(CGrBitmap& canvas, int x, int y, int width, int height, LPCTSTR str, int len);
 
 	virtual bool SetFont(CGrFont &font);
 	virtual CGrFont &GetFont();
@@ -87,7 +89,8 @@ public:
 	virtual ~CGrChar4NNRenderer();
 
 	virtual bool Draw(CGrBitmap &canvas, int x, int y, LPCTSTR str, int len);
-	virtual void PatternFill(CGrBitmap &canvas, int x, int y, int width, int height, LPCTSTR str, int len);
+	virtual void PatternFillVert(CGrBitmap& canvas, int x, int y, int width, int height, LPCTSTR str, int len);
+	virtual void PatternFillHorz(CGrBitmap& canvas, int x, int y, int width, int height, LPCTSTR str, int len);
 
 	virtual LPCTSTR Name() const { return CharRendererName_4NNR; };
 protected:
@@ -104,7 +107,8 @@ public:
 	virtual ~CGrChar8NNRenderer();
 
 	virtual bool Draw(CGrBitmap &canvas, int x, int y, LPCTSTR str, int len);
-	virtual void PatternFill(CGrBitmap &canvas, int x, int y, int width, int height, LPCTSTR str, int len);
+	virtual void PatternFillVert(CGrBitmap& canvas, int x, int y, int width, int height, LPCTSTR str, int len);
+	virtual void PatternFillHorz(CGrBitmap& canvas, int x, int y, int width, int height, LPCTSTR str, int len);
 
 	virtual LPCTSTR Name() const { return CharRendererName_8NNR; };
 protected:
@@ -121,7 +125,8 @@ public:
 	virtual ~CGrCharLCDRenderer();
 
 	virtual bool Draw(CGrBitmap &canvas, int x, int y, LPCTSTR str, int len);
-	virtual void PatternFill(CGrBitmap &canvas, int x, int y, int width, int height, LPCTSTR str, int len);
+	virtual void PatternFillVert(CGrBitmap& canvas, int x, int y, int width, int height, LPCTSTR str, int len);
+	virtual void PatternFillHorz(CGrBitmap& canvas, int x, int y, int width, int height, LPCTSTR str, int len);
 
 	virtual void SetTextColor(COLORREF color);
 	virtual LPCTSTR Name() const { return CharRendererName_LCDR; };
@@ -142,7 +147,8 @@ public:
 	virtual ~CGrCharExtRenderer();
 
 	virtual bool Draw(CGrBitmap &canvas, int x, int y, LPCTSTR str, int len);
-	virtual void PatternFill(CGrBitmap &canvas, int x, int y, int width, int height, LPCTSTR str, int len);
+	virtual void PatternFillVert(CGrBitmap& canvas, int x, int y, int width, int height, LPCTSTR str, int len);
+	virtual void PatternFillHorz(CGrBitmap& canvas, int x, int y, int width, int height, LPCTSTR str, int len);
 
 	virtual bool SetFont(CGrFont &font);
 	virtual CGrFont &GetFont();

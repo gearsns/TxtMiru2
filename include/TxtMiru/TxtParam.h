@@ -61,7 +61,7 @@ public:
 		virtual void operator()(CharOffsetMap::value_type &v){};
 	};
 	struct FileTypeInfo {
-		FileType ft = FileType::FT_Html;
+		FileType ft = FileType::Html;
 		std::tstring ext;
 	};
 	using FileTypeMap = std::simple_array<FileTypeInfo>;
@@ -124,10 +124,10 @@ public:
 	//
 	LPCTSTR GetCookie(LPCTSTR lpURL) const;
 private:
-	Value             m_valueTypeMap[VT_MaxNum];
-	CharInfo          m_charInfoMap [CT_MaxNum];
-	TextInfo          m_textInfoMap [TT_MaxNum];
-	Points            m_pointsMap   [PT_MaxNum];
+	Value             m_valueTypeMap[static_cast<int>(ValueType::MaxNum)];
+	CharInfo          m_charInfoMap [static_cast<int>(CharType::MaxNum)];
+	TextInfo          m_textInfoMap [static_cast<int>(TextType::MaxNum)];
+	Points            m_pointsMap   [static_cast<int>(PointsType::MaxNum)];
 	CharOffsetMap     m_charOffsetMap; // ï\é¶à íuí≤êÆÇçsÇ§ï∂éö áÄ Ç∆Ç© offset.lisÇÊÇËéÊìæ
 	CharOffsetTypeMap m_charOffsetTypeMap;
 	FileTypeMap       m_fileTypeMap;

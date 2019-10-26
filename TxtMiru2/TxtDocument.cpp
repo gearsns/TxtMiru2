@@ -184,36 +184,36 @@ static void setCurrentDirectoryFromFilename(LPCTSTR lpfilename)
 	}
 }
 
-static CGrTxtDocument::TXTMIRU_FT getFileType(LPCTSTR lpext, CGrTxtDocument::TXTMIRU_FT nomatched_ft=CGrTxtDocument::TXTMIRU_FT_NONE)
+static CGrTxtDocument::TXTMIRU_FT getFileType(LPCTSTR lpext, CGrTxtDocument::TXTMIRU_FT nomatched_ft=CGrTxtDocument::TXTMIRU_FT::NONE)
 {
 	const auto &param = CGrTxtMiru::theApp().Param();
 	switch(param.GetFileType(lpext)){
-	case CGrTxtParam::FT_Html  :
-		return CGrTxtDocument::TXTMIRU_FT_TEXT;
-	case CGrTxtParam::FT_Text  :
-		return CGrTxtDocument::TXTMIRU_FT_TEXT;
-	case CGrTxtParam::FT_Link  :
-		return CGrTxtDocument::TXTMIRU_FT_LINK;
-	case CGrTxtParam::FT_Siori :
-		return CGrTxtDocument::TXTMIRU_FT_SIORI;
-	case CGrTxtParam::FT_Arc7z :
-	case CGrTxtParam::FT_ArcCab:
-	case CGrTxtParam::FT_ArcLzh:
-	case CGrTxtParam::FT_ArcRar:
-	case CGrTxtParam::FT_ArcZip:
-		return CGrTxtDocument::TXTMIRU_FT_ARCHIVE;
+	case CGrTxtParam::FileType::Html  :
+		return CGrTxtDocument::TXTMIRU_FT::TEXT;
+	case CGrTxtParam::FileType::Text  :
+		return CGrTxtDocument::TXTMIRU_FT::TEXT;
+	case CGrTxtParam::FileType::Link  :
+		return CGrTxtDocument::TXTMIRU_FT::LINK;
+	case CGrTxtParam::FileType::Siori :
+		return CGrTxtDocument::TXTMIRU_FT::SIORI;
+	case CGrTxtParam::FileType::Arc7z :
+	case CGrTxtParam::FileType::ArcCab:
+	case CGrTxtParam::FileType::ArcLzh:
+	case CGrTxtParam::FileType::ArcRar:
+	case CGrTxtParam::FileType::ArcZip:
+		return CGrTxtDocument::TXTMIRU_FT::ARCHIVE;
 	}
 	return nomatched_ft;
 }
 CGrTxtDocument::TXTMIRU_FT CGrTxtDocument::GetFileType(LPCTSTR lpFileName)
 {
 	if(getArcfileSplitPos(lpFileName) != std::tstring::npos){
-		return TXTMIRU_FT_ARCHIVE;
+		return TXTMIRU_FT::ARCHIVE;
 	}
 	if(CGrShell::IsURI(lpFileName)){
-		return TXTMIRU_FT_TEXT;
+		return TXTMIRU_FT::TEXT;
 	}
-	return getFileType(CGrShell::GetFileExtConst(lpFileName), TXTMIRU_FT_TEXT);
+	return getFileType(CGrShell::GetFileExtConst(lpFileName), TXTMIRU_FT::TEXT);
 }
 
 bool CGrTxtDocument::openFile(LPCTSTR lpFileName)
@@ -318,7 +318,7 @@ bool CGrTxtDocument::openFile(LPCTSTR lpFileName)
 		}
 	}
 	const auto &param = CGrTxtMiru::theApp().Param();
-	if(param.GetBoolean(CGrTxtParam::BookMarkAutoSave)){
+	if(param.GetBoolean(CGrTxtParam::PointsType::BookMarkAutoSave)){
 		Save();
 	}
 	/**/
@@ -357,7 +357,7 @@ struct HitMap : public CGrTxtBuffer::CGrCharFunc {
 			}
 		}
 	}
-	virtual bool IsValid(TxtMiru::TextType tt){ return (tt == TxtMiru::TT_TEXT || tt == TxtMiru::TT_OVERLAP_CHAR); }
+	virtual bool IsValid(TxtMiru::TextType tt){ return (tt == TxtMiru::TextType::TEXT || tt == TxtMiru::TextType::OVERLAP_CHAR); }
 	virtual bool SetChar(const TxtMiru::TextPoint &cur, LPCTSTR lpSrc, LPCTSTR lpEnd){
 		if(char_count > MAX_HITMAP_CHARCOUNT){
 			return false;
@@ -385,7 +385,7 @@ void CGrTxtDocument::UpdateLayout()
 {
 	const auto &param = CGrTxtMiru::theApp().Param();
 	std::tstring filename;
-	param.GetText(CGrTxtParam::LayoutFile, filename);
+	param.GetText(CGrTxtParam::TextType::LayoutFile, filename);
 	if(filename.empty()){
 		m_layout.SetInitialize();
 	} else {
@@ -488,7 +488,7 @@ void CGrTxtDocument::CalcTotalPage()
 		m_maxPage = 1;
 	} else {
 		m_maxPage = LineToPage(m_txtBuffer.GetConstLineList().back().iEndCol) | 0x01;
-		const auto &textLayout = m_layout.GetConstLayoutList(CGrTxtLayout::LLT_Text);
+		const auto &textLayout = m_layout.GetConstLayoutList(CGrTxtLayout::LayoutListType::Text);
 		int total_layout_h = (textLayout.size() / 2);
 		for(const auto &item : m_txtBuffer.GetConstPictPosMap()){
 			int page = (item.second.iStartLayout-1) / total_layout_h | 0x01;
@@ -515,17 +515,25 @@ int CGrTxtDocument::GetTotalPage() const
 
 bool CGrTxtDocument::StartPageToTextPoint(TxtMiru::TextPoint &tp, int start_page) const
 {
-	const auto &textLayout = m_layout.GetConstLayoutList(CGrTxtLayout::LLT_Text);
+	const auto &textLayout = m_layout.GetConstLayoutList(CGrTxtLayout::LayoutListType::Text);
 	const int iLayoutFrom = start_page * textLayout.size() / 2 + 1;
 	const int iLayoutTo   = iLayoutFrom + textLayout.size() - 1;
-	for(const auto &item : m_txtBuffer.GetConstPictPosMap()){
-		const auto &pp = item.second;
+	for(const auto & [i_tp, pp] : m_txtBuffer.GetConstPictPosMap()){
 		if(iLayoutFrom <= pp.iStartLayout && pp.iStartLayout <= iLayoutTo){
-			tp = item.first;
+			tp = i_tp;
 			return true;
 		}
 	}
 	int start_line = m_layout.GetMaxLine() * (start_page/2);
+	{ // start_line‚ªÅIs‚ð’´‚¦‚È‚¢‚æ‚¤‚É‚·‚é
+		auto ll = m_txtBuffer.GetConstLineList();
+		if(!ll.empty()){
+			auto last_ll = ll.back();
+			if(start_line >= last_ll.iEndCol){
+				start_line = last_ll.iEndCol - 1;
+			}
+		}
+	}
 	bool bRet = false;
 	bool bRet1st = false;
 	auto tp1st = tp;
@@ -552,7 +560,7 @@ int CGrTxtDocument::TextPointToPage(const TxtMiru::TextPoint &pos) const
 	const auto &ppm = m_txtBuffer.GetConstPictPosMap();
 	auto it=ppm.find(pos);
 	if(ppm.end() != it){
-		const auto &textLayout = m_layout.GetConstLayoutList(CGrTxtLayout::LLT_Text);
+		const auto &textLayout = m_layout.GetConstLayoutList(CGrTxtLayout::LayoutListType::Text);
 		return (it->second.iStartLayout-1) / (textLayout.size() / 2);
 	}
 	const auto &lineList = m_txtBuffer.GetConstLineList();
@@ -600,7 +608,7 @@ struct NextPosFunc : public CGrTxtBuffer::CGrCharFunc {
 	int num;
 	TxtMiru::TextPoint &last_point;
 	NextPosFunc(TxtMiru::TextPoint &tp, int n) : last_point(tp), num(n){}
-	virtual bool IsValid(TxtMiru::TextType tt){ return (tt == TxtMiru::TT_TEXT); }
+	virtual bool IsValid(TxtMiru::TextType tt){ return (tt == TxtMiru::TextType::TEXT); }
 	virtual bool SetChar(const TxtMiru::TextPoint &cur, LPCTSTR lpSrc, LPCTSTR lpEnd){
 		last_point = cur;
 		--num;
@@ -710,7 +718,7 @@ static void makeFileInfoList(std::vector<FileInfo> &out_fi_list, const std::vect
 	out_fi_list.shrink_to_fit();
 	for(const auto &item : in_flist){
 		auto lpFilename = item.c_str();
-		if(CGrTxtDocument::TXTMIRU_FT_TEXT == getFileType(CGrShell::GetFileExtConst(lpFilename))){
+		if(CGrTxtDocument::TXTMIRU_FT::TEXT == getFileType(CGrShell::GetFileExtConst(lpFilename))){
 			for(; *lpFilename; ++lpFilename){
 				if(*lpFilename != '.' && *lpFilename != '/' && *lpFilename != '\\'){
 					break;
@@ -752,7 +760,7 @@ bool CGrTxtDocument::Open(LPCTSTR lpFileName)
 			break;
 		}
 		switch(GetFileType(lpFileName)){
-		case TXTMIRU_FT_LINK:
+		case TXTMIRU_FT::LINK:
 			{
 				std::tstring filename;
 				if(CGrShell::GetPathFromLink(lpFileName, filename)){
@@ -760,7 +768,7 @@ bool CGrTxtDocument::Open(LPCTSTR lpFileName)
 				}
 			}
 			break;
-		case TXTMIRU_FT_ARCHIVE:
+		case TXTMIRU_FT::ARCHIVE:
 			{
 				bool bExtracted = false;
 				std::tstring in_filename(lpFileName);
@@ -797,23 +805,23 @@ bool CGrTxtDocument::Open(LPCTSTR lpFileName)
 					m_arcFileName = in_filename;
 					int arcmaxfilesize = 0;
 					const auto &param = CGrTxtMiru::theApp().Param();
-					param.GetPoints(CGrTxtParam::ArcMaxFileSize, &arcmaxfilesize, 1);
+					param.GetPoints(CGrTxtParam::PointsType::ArcMaxFileSize, &arcmaxfilesize, 1);
 					//
-					auto at = CGrArchive::ARTYPE_NONE;
+					auto at = CGrArchive::ArchiveType::NONE;
 					switch(param.GetFileType(CGrShell::GetFileExtConst(m_arcFileName.c_str()))){
-					case CGrTxtParam::FT_Arc7z : at = CGrArchive::ARTYPE_7Z ; break;
-					case CGrTxtParam::FT_ArcCab: at = CGrArchive::ARTYPE_CAB; break;
-					case CGrTxtParam::FT_ArcLzh: at = CGrArchive::ARTYPE_LZH; break;
-					case CGrTxtParam::FT_ArcRar: at = CGrArchive::ARTYPE_RAR; break;
-					case CGrTxtParam::FT_ArcZip: at = CGrArchive::ARTYPE_ZIP; break;
+					case CGrTxtParam::FileType::Arc7z : at = CGrArchive::ArchiveType::SevenZ; break;
+					case CGrTxtParam::FileType::ArcCab: at = CGrArchive::ArchiveType::CAB; break;
+					case CGrTxtParam::FileType::ArcLzh: at = CGrArchive::ArchiveType::LZH; break;
+					case CGrTxtParam::FileType::ArcRar: at = CGrArchive::ArchiveType::RAR; break;
+					case CGrTxtParam::FileType::ArcZip: at = CGrArchive::ArchiveType::ZIP; break;
 					}
 					switch(ar.ExtractFull(at, m_arcFileName.c_str(), curDir.c_str(), arcmaxfilesize)){
-					case CGrArchive::ERCODE_SUCCESS         : bExtracted = true; break;
-					case CGrArchive::ERCODE_ERROR           : err_no = IDS_ERROR_OPEN_ARCFILE ; break;
-					case CGrArchive::ERCODE_NOSUPPORT       : err_no = IDS_ERROR_ARC_NOSUPPORT; break;
-					case CGrArchive::ERCODE_FILENOTFOUND    : err_no = IDS_ERROR_FILENOTFOUND ; break;
-					case CGrArchive::ERCODE_ARCHIVERNOTFOUND: err_no = IDS_ERROR_ARC_NOTFOUND ; break;
-					case CGrArchive::ERCODE_ARCHIVERRUNNING : err_no = IDS_ERROR_ARC_RUNNING  ; break;
+					case CGrArchive::ErrorCode::SUCCESS         : bExtracted = true; break;
+					case CGrArchive::ErrorCode::Error           : err_no = IDS_ERROR_OPEN_ARCFILE ; break;
+					case CGrArchive::ErrorCode::NOSUPPORT       : err_no = IDS_ERROR_ARC_NOSUPPORT; break;
+					case CGrArchive::ErrorCode::FILENOTFOUND    : err_no = IDS_ERROR_FILENOTFOUND ; break;
+					case CGrArchive::ErrorCode::ARCHIVERNOTFOUND: err_no = IDS_ERROR_ARC_NOTFOUND ; break;
+					case CGrArchive::ErrorCode::ARCHIVERRUNNING : err_no = IDS_ERROR_ARC_RUNNING  ; break;
 					default                                 : err_no = IDS_ERROR_ARC          ; break;
 					}
 					if(err_no != 0){
@@ -880,8 +888,8 @@ bool CGrTxtDocument::Open(LPCTSTR lpFileName)
 				return ret;
 			}
 			break;
-		case TXTMIRU_FT_SIORI  : break;
-		case TXTMIRU_FT_TEXT   : break;
+		case TXTMIRU_FT::SIORI  : break;
+		case TXTMIRU_FT::TEXT   : break;
 		}
 	} while(0);
 	//
@@ -1117,14 +1125,14 @@ public:
 	virtual LPCTSTR String(){ return mp_text_info->str.c_str(); }
 	virtual size_t StringLength(){ return mp_text_info->str.size(); }
 	virtual WORD CharType(){ return mp_text_info->chrType; }
-	virtual WORD TextType(){ return mp_text_info->textType; }
+	virtual WORD TextType(){ return static_cast<WORD>(mp_text_info->textType); }
 	virtual TxtMiru::TextListPos BeginTextListPos(){ return mp_text_info->tpBegin; }
 	virtual TxtMiru::TextListPos EndTextListPos(){ return mp_text_info->tpEnd; }
 	virtual int Page(){ return m_pDoc->TextPointToPage(TxtMiru::TextPoint{mp_cur->iLine, mp_text_info->tpBegin.iIndex, mp_text_info->tpBegin.iPos}); }
 	virtual LPCTSTR RangeString()
 	{
 		const auto &textBuffer = m_pDoc->GetTxtBuffer();
-		textBuffer.ToString(m_buf,
+		textBuffer.ToString(m_buf, 
 							TxtMiru::TextPoint{mp_cur->iLine, mp_text_info->tpBegin.iIndex, mp_text_info->tpBegin.iPos},
 							TxtMiru::TextPoint{mp_cur->iLine, mp_text_info->tpEnd  .iIndex, mp_text_info->tpEnd  .iPos},
 							-1);

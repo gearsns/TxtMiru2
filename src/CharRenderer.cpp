@@ -1,6 +1,7 @@
 #include "CharRenderer.h"
 #include <math.h>
 #include <vector>
+#include "Text.h"
 #include "Shell.h"
 #include "stlutil.h"
 #include "Win32Wrap.h"
@@ -129,16 +130,15 @@ public:
 		if(num > 0){
 			::DeleteEnhMetaFile(hemf);
 			return false;
-		} else {
-			RECT rect={0,0,fontsize,fontsize};
-			// 一時的に色反転
-			RGBQUAD col[2] = {{0x00,0x00,0x00,0x00},{0xff,0xff,0xff,0x00}};
-			RGBQUAD revCol[2] = {{0xff,0xff,0xff,0x00},{0x00,0x00,0x00,0x00}};
-			::SetDIBColorTable(hdc, 0, 2, revCol);
-			::PlayEnhMetaFile(hdc , hemf , &rect);
-			::DeleteEnhMetaFile(hemf);
-			::SetDIBColorTable(hdc, 0, 2, col);
 		}
+		RECT rect={0,0,fontsize,fontsize};
+		// 一時的に色反転
+		RGBQUAD col[2] = {{0x00,0x00,0x00,0x00},{0xff,0xff,0xff,0x00}};
+		RGBQUAD revCol[2] = {{0xff,0xff,0xff,0x00},{0x00,0x00,0x00,0x00}};
+		::SetDIBColorTable(hdc, 0, 2, revCol);
+		::PlayEnhMetaFile(hdc , hemf , &rect);
+		::DeleteEnhMetaFile(hemf);
+		::SetDIBColorTable(hdc, 0, 2, col);
 		return true;
 	}
 };
@@ -215,7 +215,7 @@ bool CGrCharKNNRenderer::SetParam(LPCTSTR name, LPCTSTR val)
 				SetFont(font);
 				return true;
 			} else if(pptm->type == PARAMTYPE_FONTCENTERING){
-				m_bCentering = (bool)(_ttol(val) == 1);
+				m_bCentering = (_ttol(val) == 1);
 				return true;
 			}
 		}
@@ -325,7 +325,8 @@ bool CGrCharKNNRenderer::drawText(LPCTSTR str, int len, CGrMonoBitmap *lpWorkBit
 	return bret;
 }
 
-void CGrCharKNNRenderer::PatternFill(CGrBitmap &canvas, int x, int y, int width, int height, LPCTSTR str, int len){}
+void CGrCharKNNRenderer::PatternFillVert(CGrBitmap& canvas, int x, int y, int width, int height, LPCTSTR str, int len) {}
+void CGrCharKNNRenderer::PatternFillHorz(CGrBitmap& canvas, int x, int y, int width, int height, LPCTSTR str, int len) {}
 void CGrCharKNNRenderer::clearCache()
 {
 	for(auto &&item : m_FontCache){
@@ -428,23 +429,27 @@ bool CGrChar4NNRenderer::Draw(CGrBitmap &canvas, int x, int y, LPCTSTR str, int 
 	int iTextWidth  = m_iWidth ;
 	int iTextHeight = m_iHeight;
 	//
-	int iNextLineSrc = iTmpWidth/2; // (iTmpWidth / 8) Bytes * 4 Lines  <- (iTmpWidth / 8) Bytes <- iTmpWidth bits
+	int iNextLineSrc = iTmpWidth / 2; // (iTmpWidth / 8) Bytes * 4 Lines  <- (iTmpWidth / 8) Bytes <- iTmpWidth bits
 	//
-	int nextSrcNum  = iTmpWidth/8 ; // (iTmpWidth / 8) Bytes <- iTmpWidth bits
-	int nextSrcNum1 = nextSrcNum*1;
-	int nextSrcNum2 = nextSrcNum*2;
-	int nextSrcNum3 = nextSrcNum*3;
+	int nextSrcNum = iTmpWidth / 8; // (iTmpWidth / 8) Bytes <- iTmpWidth bits
+	int nextSrcNum1 = nextSrcNum * 1;
+	int nextSrcNum2 = nextSrcNum * 2;
+	int nextSrcNum3 = nextSrcNum * 3;
 	//
 	int iCanvasWidth  = canvas.Width ();
 	int iCanvasHeight = canvas.Height();
 	if(x > iCanvasWidth || y > iCanvasHeight || x + iTextWidth < 0 || y + iTmpWidth < 0){ return false; }
 	//
 	int iNextLineDst  = iCanvasWidth;
-	int iLastDstNum   = min(iTextWidth - 1, iCanvasWidth - x);
+	int iLastDstNum   = min(iTextWidth, iCanvasWidth - x);
 	if(iLastDstNum <= 0){
 		return false; // 描画範囲外
 	}
-	int iBaseHeight = min(m_BaseFont.Height(), iCanvasHeight - y);
+	auto iBaseFontHeight = m_BaseFont.Height();
+	if (iBaseFontHeight + y < 0) {
+		return false;
+	}
+	int iBaseHeight = min(iBaseFontHeight, iCanvasHeight - y);
 	if(iBaseHeight <= 0){
 		return false;
 	}
@@ -460,17 +465,17 @@ bool CGrChar4NNRenderer::Draw(CGrBitmap &canvas, int x, int y, LPCTSTR str, int 
 	auto lpCanvasBits = canvas.GetBits();
 	//
 	auto lpTmpBits = lpWorkBitmap->GetBits();
-	auto lpLastSrc = lpTmpBits + iTmpWidth * iBaseHeight / 2;
+	auto lpLastSrc = lpTmpBits + iNextLineSrc * iBaseHeight;
 	auto lpNextSrc = lpTmpBits;
 	if(y < 0){
-		y = -y;
-		lpNextSrc += y * iNextLineSrc;
+		lpNextSrc -= (y % iTmpHeight) * iNextLineSrc;
 		y = 0;
 	}
+	auto textColor = RGBQUAD2DWORD(m_TextColor);
 	if(x < 0){
-		x = -x;
-		lpNextSrc += (x/2);
-		iLastDstNum -= x;
+		iLastDstNum += x;
+		x = -(x % iTextWidth);
+		lpNextSrc += x / 2;
 		if(x & 0x01){
 			// 左端数有り
 			auto lpDst = reinterpret_cast<LPDWORD>(lpCanvasBits) + y * iCanvasWidth;
@@ -480,7 +485,7 @@ bool CGrChar4NNRenderer::Draw(CGrBitmap &canvas, int x, int y, LPCTSTR str, int 
 					RendererTable::byteArrayAft[*(lpSrc            )] + RendererTable::byteArrayAft[*(lpSrc+nextSrcNum1)] +
 					RendererTable::byteArrayAft[*(lpSrc+nextSrcNum2)] + RendererTable::byteArrayAft[*(lpSrc+nextSrcNum3)] ];
 				if(alpha == 0){
-					*lpDst = RGBQUAD2DWORD(m_TextColor);
+					*lpDst = textColor;
 				} else if(alpha != 255){
 					*lpDst = (
 						(( (*lpDst) & ODD ) * alpha + m_TextColorMapODD [alpha]) & EVEN
@@ -496,16 +501,17 @@ bool CGrChar4NNRenderer::Draw(CGrBitmap &canvas, int x, int y, LPCTSTR str, int 
 			x = 0;
 		}
 	}
-	if(iCanvasWidth <= (iLastDstNum | 0x01) && iLastDstNum & 0x01){
+	if(iLastDstNum & 0x01){
 		// 右端数有り
-		auto lpDst = reinterpret_cast<LPDWORD>(lpCanvasBits) + iLastDstNum + y * iCanvasWidth;
-		auto lpSrc = lpNextSrc + iLastDstNum / 2;
+		auto iLastSrc = (iLastDstNum % iTextWidth) / 2;
+		auto lpDst = reinterpret_cast<LPDWORD>(lpCanvasBits) + x + iLastDstNum - 1 + y * iCanvasWidth;
+		auto lpSrc = lpNextSrc + iLastSrc;
 		for(; lpSrc < lpLastSrc; lpSrc += iNextLineSrc, lpDst += iNextLineDst){
 			auto alpha = m_ColorMap[
 				RendererTable::byteArrayPre[*(lpSrc            )] + RendererTable::byteArrayPre[*(lpSrc+nextSrcNum1)] +
 				RendererTable::byteArrayPre[*(lpSrc+nextSrcNum2)] + RendererTable::byteArrayPre[*(lpSrc+nextSrcNum3)] ];
 			if(alpha == 0){
-				*lpDst = RGBQUAD2DWORD(m_TextColor);
+				*lpDst = textColor;
 			} else if(alpha != 255){
 				*lpDst = (
 					(( (*lpDst) & ODD ) * alpha + m_TextColorMapODD [alpha]) & EVEN
@@ -520,17 +526,16 @@ bool CGrChar4NNRenderer::Draw(CGrBitmap &canvas, int x, int y, LPCTSTR str, int 
 	for(;lpNextSrc < lpLastSrc; lpNextSrc += iNextLineSrc, lpNextDst += iNextLineDst){
 		auto lpSrc  = lpNextSrc;
 		auto lpDst  = lpNextDst;
-		auto lpEnd  = lpDst+iLastDstNum;
-		for(;lpEnd >= lpDst; ++lpDst, ++lpSrc){
-			auto lpSrc1 = lpSrc+nextSrcNum1;
-			auto lpSrc2 = lpSrc+nextSrcNum2;
-			auto lpSrc3 = lpSrc+nextSrcNum3;
-			BYTE alpha;
-			alpha = m_ColorMap[
+		auto lpEnd = lpDst + iLastDstNum;
+		for (; lpDst < lpEnd; ++lpDst, ++lpSrc) {
+			auto lpSrc1 = lpSrc + nextSrcNum1;
+			auto lpSrc2 = lpSrc + nextSrcNum2;
+			auto lpSrc3 = lpSrc + nextSrcNum3;
+			auto alpha = m_ColorMap[
 				RendererTable::byteArrayPre[*(lpSrc )] + RendererTable::byteArrayPre[*(lpSrc1)] +
 				RendererTable::byteArrayPre[*(lpSrc2)] + RendererTable::byteArrayPre[*(lpSrc3)] ];
 			if(alpha == 0){
-				*lpDst = RGBQUAD2DWORD(m_TextColor);
+				*lpDst = textColor;
 			} else if(alpha != 255){
 				*lpDst = (
 					(( (*lpDst) & ODD ) * alpha + m_TextColorMapODD [alpha]) & EVEN
@@ -543,7 +548,7 @@ bool CGrChar4NNRenderer::Draw(CGrBitmap &canvas, int x, int y, LPCTSTR str, int 
 				RendererTable::byteArrayAft[*(lpSrc )] + RendererTable::byteArrayAft[*(lpSrc1)] +
 				RendererTable::byteArrayAft[*(lpSrc2)] + RendererTable::byteArrayAft[*(lpSrc3)] ];
 			if(alpha == 0){
-				*lpDst = RGBQUAD2DWORD(m_TextColor);
+				*lpDst = textColor;
 			} else if(alpha != 255){
 				*lpDst = (
 					(( (*lpDst) & ODD ) * alpha + m_TextColorMapODD [alpha]) & EVEN
@@ -556,162 +561,345 @@ bool CGrChar4NNRenderer::Draw(CGrBitmap &canvas, int x, int y, LPCTSTR str, int 
 	return true;
 }
 
-void CGrChar4NNRenderer::PatternFill(CGrBitmap &canvas, int x, int y, int width, int height, LPCTSTR str, int len)
+void CGrChar4NNRenderer::PatternFillVert(CGrBitmap& canvas, int x, int y, int width, int height, LPCTSTR str, int len)
 {
 	// 裏画面用ビットマップ サイズ取得
-	int iBgWidth  = (m_iWidth *2  + 31) & (-32); // (m_iWidth *2  + 31) / 32 * 32;
-	int iBgHeight = (m_iHeight    + 31) & (-32); // (m_iHeight    + 31) / 32 * 32;
+	int iBgWidth = (m_iWidth * 2 + 31) & (-32); // (m_iWidth *2  + 31) / 32 * 32;
+	int iBgHeight = (m_iHeight + 31) & (-32); // (m_iHeight    + 31) / 32 * 32;
 	// 作業用のビットマップサイズを取得
-	int iTmpWidth   = (iBgWidth  * 4 + 31) & (-32); // (iBgWidth  * 4 + 31) / 32 * 32;
-	int iTmpHeight  = (iBgHeight * 4 + 31) & (-32); // (iBgHeight * 4 + 31) / 32 * 32;
-	int iTextWidth  = m_iWidth ;
+	int iTmpWidth = (iBgWidth * 4 + 31) & (-32); // (iBgWidth  * 4 + 31) / 32 * 32;
+	int iTmpHeight = (iBgHeight * 4 + 31) & (-32); // (iBgHeight * 4 + 31) / 32 * 32;
+	int iTextWidth = m_iWidth;
 	int iTextHeight = m_iHeight;
 	//
-	int iNextLineSrc = iTmpWidth/2;  // (iTmpWidth / 8) Bytes * 8 Lines  <- (iTmpWidth / 8) Bytes <- iTmpWidth bits
+	int iNextLineSrc = iTmpWidth / 2;  // (iTmpWidth / 8) Bytes * 8 Lines  <- (iTmpWidth / 8) Bytes <- iTmpWidth bits
 	//
-	int nextSrcNum  = iTmpWidth/8 ; // (iTmpWidth / 8) Bytes <- iTmpWidth bits
-	int nextSrcNum1 = nextSrcNum*1;
-	int nextSrcNum2 = nextSrcNum*2;
-	int nextSrcNum3 = nextSrcNum*3;
+	int nextSrcNum = iTmpWidth / 8; // (iTmpWidth / 8) Bytes <- iTmpWidth bits
+	int nextSrcNum1 = nextSrcNum * 1;
+	int nextSrcNum2 = nextSrcNum * 2;
+	int nextSrcNum3 = nextSrcNum * 3;
 	//
-	int iCanvasWidth  = canvas.Width ();
+	int iCanvasWidth = canvas.Width();
 	int iCanvasHeight = canvas.Height();
-	if(y + height > iCanvasHeight){
+	if (y + height > iCanvasHeight) {
 		height = iCanvasHeight - y;
 	}
-	if(x + width > iCanvasWidth){
+	if (x + width > iCanvasWidth) {
 		width = iCanvasWidth - x;
 	}
-	if(height <= 0 || width <= 0){ return; }
-	if(x > iCanvasWidth || y > iCanvasHeight || x + iTextWidth < 0 || y + iTmpWidth < 0){ return; }
+	if (height <= 0 || width <= 0) { return; }
+	if (x > iCanvasWidth || y > iCanvasHeight || x + iTextWidth < 0 || y + iTmpHeight < 0) { return; }
 	//
-	int iNextLineDst  = iCanvasWidth;
-	int iLastDstNum   = min(iTextWidth - 1, iCanvasWidth - x);
-	if(iLastDstNum <= 0){
+	int iNextLineDst = iCanvasWidth;
+	int iLastDstNum = min(iTextWidth, iCanvasWidth - x);
+	if (iLastDstNum <= 0) {
 		return; // 描画範囲外
 	}
 	int iBaseHeight = min(m_BaseFont.Height(), iCanvasHeight - y);
-	if(iBaseHeight <= 0){
+	if (iBaseHeight <= 0) {
 		return;
 	}
-	CGrMonoBitmap *lpWorkBitmap;
+	CGrMonoBitmap* lpWorkBitmap;
 	// キャッシュチェック
 	bool bCache = getCache(str, len, &lpWorkBitmap);
 	// 作業用のビットマップ作成
 	createWorkDC();
 	// 作業用画面に描画
-	if(!lpWorkBitmap->Create(iTmpWidth, iTmpHeight)){ return; }
-	if(!bCache){ drawText(str, len, lpWorkBitmap); }
+	if (!lpWorkBitmap->Create(iTmpWidth, iTmpHeight)) { return; }
+	if (!bCache) { drawText(str, len, lpWorkBitmap); }
 	//
 	auto lpCanvasBits = canvas.GetBits();
 	//
 	auto lpTmpBits = lpWorkBitmap->GetBits();
-	auto lpLastSrc = lpTmpBits + iTmpWidth * iBaseHeight / 2;
+	auto lpLastSrc = lpTmpBits + iNextLineSrc * iBaseHeight;
 	auto lpNextSrc = lpTmpBits;
-	if(y < 0){
-		y = -y;
-		lpNextSrc += y * iNextLineSrc;
-		height -= y;
+	if (y < 0) {
+		lpNextSrc -= (y % iBaseHeight) * iNextLineSrc;
+		height += y;
 		y = 0;
 	}
-	if(x < 0){
-		x = -x;
-		lpNextSrc += x/2;
-		lpTmpBits += x/2;
-		iLastDstNum -= x;
-		if(x & 0x01){
+	auto textColor = RGBQUAD2DWORD(m_TextColor);
+	auto lpNextTopSrc = lpTmpBits + iNextLineSrc; // 一ビットかぶせる
+	if (x < 0) {
+		iLastDstNum += x;
+		x = -(x % iTextWidth);
+		lpNextSrc += x / 2;
+		lpNextTopSrc += x / 2;
+		if (x & 0x01) {
 			// 左端数有り
-			auto lpTmpLastSrc = lpLastSrc;
-			auto lpDst = reinterpret_cast<LPDWORD>(lpCanvasBits) + x + y * iCanvasWidth;
+			auto lpDst = reinterpret_cast<LPDWORD>(lpCanvasBits) + y * iCanvasWidth;
 			auto lpLastDst = lpDst + height * iCanvasWidth;
 			auto lpSrc = lpNextSrc;
 			do {
-				for(; lpSrc < lpTmpLastSrc && lpDst < lpLastDst; lpSrc += iNextLineSrc, lpDst += iNextLineDst){
+				for (; lpSrc < lpLastSrc && lpDst < lpLastDst; lpSrc += iNextLineSrc, lpDst += iNextLineDst) {
 					auto alpha = m_ColorMap[
-						RendererTable::byteArrayAft[*(lpSrc            )] + RendererTable::byteArrayAft[*(lpSrc+nextSrcNum1)] +
-						RendererTable::byteArrayAft[*(lpSrc+nextSrcNum2)] + RendererTable::byteArrayAft[*(lpSrc+nextSrcNum3)] ];
-					if(alpha == 0){
-						*lpDst = RGBQUAD2DWORD(m_TextColor);
-					} else if(alpha != 255){
+						RendererTable::byteArrayAft[*(lpSrc)] + RendererTable::byteArrayAft[*(lpSrc + nextSrcNum1)] +
+						RendererTable::byteArrayAft[*(lpSrc + nextSrcNum2)] + RendererTable::byteArrayAft[*(lpSrc + nextSrcNum3)]];
+					if (alpha == 0) {
+						*lpDst = textColor;
+					}
+					else if (alpha != 255) {
 						*lpDst = (
-							(( (*lpDst) & ODD ) * alpha + m_TextColorMapODD [alpha]) & EVEN
+							(((*lpDst) & ODD) * alpha + m_TextColorMapODD[alpha]) & EVEN
 							|
-							(( (*lpDst) & EVEN) * alpha + m_TextColorMapEVEN[alpha]) & ODD
+							(((*lpDst) & EVEN) * alpha + m_TextColorMapEVEN[alpha]) & ODD
 							) >> 8;
 					}
 				}
-				lpSrc = lpNextSrc - 1; // 一ビットかぶせる
-			} while(lpDst < lpLastDst);
-			x = 1;
+				lpSrc = lpNextTopSrc;
+			} while (lpDst < lpLastDst);
 			++lpNextSrc;
+			++lpNextTopSrc;
 			--iLastDstNum;
-		} else {
+			x = 1;
+		}
+		else {
 			x = 0;
 		}
 	}
-	if(iCanvasWidth <= (iLastDstNum | 0x01) && iLastDstNum & 0x01){
+	if (iLastDstNum & 0x01) {
 		// 右端数有り
-		auto lpTmpLastSrc = lpLastSrc;
-		auto lpDst = reinterpret_cast<LPDWORD>(lpCanvasBits) + iLastDstNum + y * iCanvasWidth;
+		auto iLastSrc = (iLastDstNum % iTextWidth) / 2;
+		auto lpDst = reinterpret_cast<LPDWORD>(lpCanvasBits) + x + iLastDstNum - 1 + y * iCanvasWidth;
 		auto lpLastDst = lpDst + height * iCanvasWidth;
-		auto lpSrc = lpNextSrc + iLastDstNum / 2;
+		auto lpSrc = lpNextSrc + iLastSrc;
 		do {
-			for(; lpSrc < lpTmpLastSrc && lpDst < lpLastDst; lpSrc += iNextLineSrc, lpDst += iNextLineDst){
+			for (; lpSrc < lpLastSrc && lpDst < lpLastDst; lpSrc += iNextLineSrc, lpDst += iNextLineDst) {
 				auto alpha = m_ColorMap[
-					RendererTable::byteArrayPre[*(lpSrc            )] + RendererTable::byteArrayPre[*(lpSrc+nextSrcNum1)] +
-					RendererTable::byteArrayPre[*(lpSrc+nextSrcNum2)] + RendererTable::byteArrayPre[*(lpSrc+nextSrcNum3)] ];
-				if(alpha == 0){
-					*lpDst = RGBQUAD2DWORD(m_TextColor);
-				} else if(alpha != 255){
+					RendererTable::byteArrayPre[*(lpSrc)] + RendererTable::byteArrayPre[*(lpSrc + nextSrcNum1)] +
+					RendererTable::byteArrayPre[*(lpSrc + nextSrcNum2)] + RendererTable::byteArrayPre[*(lpSrc + nextSrcNum3)]];
+				if (alpha == 0) {
+					*lpDst = textColor;
+				}
+				else if (alpha != 255) {
 					*lpDst = (
-						(( (*lpDst) & ODD ) * alpha + m_TextColorMapODD [alpha]) & EVEN
+						(((*lpDst) & ODD) * alpha + m_TextColorMapODD[alpha]) & EVEN
 						|
-						(( (*lpDst) & EVEN) * alpha + m_TextColorMapEVEN[alpha]) & ODD
+						(((*lpDst) & EVEN) * alpha + m_TextColorMapEVEN[alpha]) & ODD
 						) >> 8;
 				}
 			}
-			lpSrc = lpNextSrc - 1;
-		} while(lpDst < lpLastDst);
+			lpSrc = lpNextTopSrc + iLastSrc;
+		} while (lpDst < lpLastDst);
 		--iLastDstNum;
 	}
-	auto lpNextTopSrc = lpNextSrc+iNextLineSrc;
 	auto lpNextDst = reinterpret_cast<LPDWORD>(lpCanvasBits) + x + y * iCanvasWidth;
 	auto lpLastDst = lpNextDst + height * iCanvasWidth;
 	do {
-		for(; lpNextSrc < lpLastSrc && lpNextDst < lpLastDst; lpNextSrc += iNextLineSrc, lpNextDst += iNextLineDst){
+		for (; lpNextSrc < lpLastSrc && lpNextDst < lpLastDst; lpNextSrc += iNextLineSrc, lpNextDst += iNextLineDst) {
 			auto lpSrc = lpNextSrc;
 			auto lpDst = lpNextDst;
-			auto lpEnd = lpDst+iLastDstNum;
-			for(; lpEnd >= lpDst; ++lpDst, ++lpSrc){
+			auto lpEnd = lpDst + iLastDstNum;
+			for (; lpDst < lpEnd; ++lpDst, ++lpSrc) {
+				auto lpSrc1 = lpSrc + nextSrcNum1;
+				auto lpSrc2 = lpSrc + nextSrcNum2;
+				auto lpSrc3 = lpSrc + nextSrcNum3;
 				auto alpha = m_ColorMap[
-					RendererTable::byteArrayPre[*(lpSrc            )] + RendererTable::byteArrayPre[*(lpSrc+nextSrcNum1)] +
-					RendererTable::byteArrayPre[*(lpSrc+nextSrcNum2)] + RendererTable::byteArrayPre[*(lpSrc+nextSrcNum3)] ];
-				if(alpha == 0){
-					*lpDst = RGBQUAD2DWORD(m_TextColor);
-				} else if(alpha != 255){
+					RendererTable::byteArrayPre[*(lpSrc)] + RendererTable::byteArrayPre[*(lpSrc1)] +
+					RendererTable::byteArrayPre[*(lpSrc2)] + RendererTable::byteArrayPre[*(lpSrc3)]];
+				if (alpha == 0) {
+					*lpDst = textColor;
+				}
+				else if (alpha != 255) {
 					*lpDst = (
-						(( (*lpDst) & ODD ) * alpha + m_TextColorMapODD [alpha]) & EVEN
+						(((*lpDst) & ODD) * alpha + m_TextColorMapODD[alpha]) & EVEN
 						|
-						(( (*lpDst) & EVEN) * alpha + m_TextColorMapEVEN[alpha]) & ODD
+						(((*lpDst) & EVEN) * alpha + m_TextColorMapEVEN[alpha]) & ODD
 						) >> 8;
 				}
 				++lpDst;
 				alpha = m_ColorMap[
-					RendererTable::byteArrayAft[*(lpSrc            )] + RendererTable::byteArrayAft[*(lpSrc+nextSrcNum1)] +
-					RendererTable::byteArrayAft[*(lpSrc+nextSrcNum2)] + RendererTable::byteArrayAft[*(lpSrc+nextSrcNum3)] ];
-				if(alpha == 0){
-					*lpDst = RGBQUAD2DWORD(m_TextColor);
-				} else if(alpha != 255){
+					RendererTable::byteArrayAft[*(lpSrc)] + RendererTable::byteArrayAft[*(lpSrc1)] +
+					RendererTable::byteArrayAft[*(lpSrc2)] + RendererTable::byteArrayAft[*(lpSrc3)]];
+				if (alpha == 0) {
+					*lpDst = textColor;
+				}
+				else if (alpha != 255) {
 					*lpDst = (
-						(( (*lpDst) & ODD ) * alpha + m_TextColorMapODD [alpha]) & EVEN
+						(((*lpDst) & ODD) * alpha + m_TextColorMapODD[alpha]) & EVEN
 						|
-						(( (*lpDst) & EVEN) * alpha + m_TextColorMapEVEN[alpha]) & ODD
+						(((*lpDst) & EVEN) * alpha + m_TextColorMapEVEN[alpha]) & ODD
 						) >> 8;
 				}
 			}
 		}
 		lpNextSrc = lpNextTopSrc;
-	} while(lpNextDst < lpLastDst);
+	} while (lpNextDst < lpLastDst);
+}
+
+void CGrChar4NNRenderer::PatternFillHorz(CGrBitmap& canvas, int x, int y, int width, int height, LPCTSTR str, int len)
+{
+	// 裏画面用ビットマップ サイズ取得
+	int iBgWidth = (m_iWidth * 2 + 31) & (-32); // (m_iWidth *2  + 31) / 32 * 32;
+	int iBgHeight = (m_iHeight + 31) & (-32); // (m_iHeight    + 31) / 32 * 32;
+	// 作業用のビットマップサイズを取得
+	int iTmpWidth = (iBgWidth * 4 + 31) & (-32); // (iBgWidth  * 4 + 31) / 32 * 32;
+	int iTmpHeight = (iBgHeight * 4 + 31) & (-32); // (iBgHeight * 4 + 31) / 32 * 32;
+	int iTextWidth = m_iWidth;
+	int iTextHeight = m_iHeight;
+	//
+	int iNextLineSrc = iTmpWidth / 2;  // (iTmpWidth / 8) Bytes * 8 Lines  <- (iTmpWidth / 8) Bytes <- iTmpWidth bits
+	//
+	int nextSrcNum = iTmpWidth / 8; // (iTmpWidth / 8) Bytes <- iTmpWidth bits
+	int nextSrcNum1 = nextSrcNum * 1;
+	int nextSrcNum2 = nextSrcNum * 2;
+	int nextSrcNum3 = nextSrcNum * 3;
+	//
+	int iCanvasWidth = canvas.Width();
+	int iCanvasHeight = canvas.Height();
+	if (y + height > iCanvasHeight) {
+		height = iCanvasHeight - y;
+	}
+	if (x + width > iCanvasWidth) {
+		width = iCanvasWidth - x;
+	}
+	if (height <= 0 || width <= 0) { return; }
+	if (x > iCanvasWidth || y > iCanvasHeight || x + width < 0 || y + iTmpHeight < 0) { return; }
+	//
+	int iNextLineDst = iCanvasWidth;
+	int iLastDstNum = min(width , iCanvasWidth - x);
+	if (iLastDstNum <= 0) {
+		return; // 描画範囲外
+	}
+	auto iBaseFontHeight = m_BaseFont.Height();
+	if (iBaseFontHeight + y < 0) {
+		return;
+	}
+	int iBaseHeight = min(iBaseFontHeight, iCanvasHeight - y);
+	if (iBaseHeight <= 0) {
+		return;
+	}
+	CGrMonoBitmap* lpWorkBitmap;
+	// キャッシュチェック
+	bool bCache = getCache(str, len, &lpWorkBitmap);
+	// 作業用のビットマップ作成
+	createWorkDC();
+	// 作業用画面に描画
+	if (!lpWorkBitmap->Create(iTmpWidth, iTmpHeight)) { return; }
+	if (!bCache) { drawText(str, len, lpWorkBitmap); }
+	//
+	auto lpCanvasBits = canvas.GetBits();
+	//
+	auto lpTmpBits = lpWorkBitmap->GetBits();
+	auto lpLastSrc = lpTmpBits + iNextLineSrc * iBaseHeight;
+	auto lpNextSrc = lpTmpBits;
+	//
+	if (y < 0) {
+		lpNextSrc -= (y % iBaseHeight) * iNextLineSrc;
+		height += y;
+		y = 0;
+	}
+	iTextWidth -= 2; // 一ビットかぶせる
+	auto textColor = RGBQUAD2DWORD(m_TextColor);
+	auto lpNextTopSrc = lpNextSrc;
+	auto iStartWidthDst = iTextWidth;
+	if (x < 0) {
+		iLastDstNum += x;
+		x = -(x % iTextWidth);
+		lpNextSrc += x / 2;
+		iStartWidthDst = x;
+		if (x & 0x01) {
+			// 左端数有り
+			auto lpDst = reinterpret_cast<LPDWORD>(lpCanvasBits) + y * iCanvasWidth;
+			auto lpLastDst = lpDst + height * iCanvasWidth;
+			auto lpSrc = lpNextSrc;
+			for (; lpSrc < lpLastSrc && lpDst < lpLastDst; lpSrc += iNextLineSrc, lpDst += iNextLineDst) {
+				auto alpha = m_ColorMap[
+					RendererTable::byteArrayAft[*(lpSrc)] + RendererTable::byteArrayAft[*(lpSrc + nextSrcNum1)] +
+						RendererTable::byteArrayAft[*(lpSrc + nextSrcNum2)] + RendererTable::byteArrayAft[*(lpSrc + nextSrcNum3)]];
+				if (alpha == 0) {
+					*lpDst = textColor;
+				}
+				else if (alpha != 255) {
+					*lpDst = (
+						(((*lpDst) & ODD) * alpha + m_TextColorMapODD[alpha]) & EVEN
+						|
+						(((*lpDst) & EVEN) * alpha + m_TextColorMapEVEN[alpha]) & ODD
+						) >> 8;
+				}
+			}
+			++lpNextSrc;
+			--iLastDstNum;
+			x = 1;
+			++iStartWidthDst;
+		}
+		else {
+			x = 0;
+		}
+	}
+	if (x + width % iTextWidth) {
+		// 右端数有り
+		auto iLastSrc = ((iStartWidthDst + iLastDstNum) % iTextWidth) / 2;
+		auto lpDst = reinterpret_cast<LPDWORD>(lpCanvasBits) + x + iLastDstNum - 1 + y * iCanvasWidth;
+		auto lpLastDst = lpDst + height * iCanvasWidth;
+		auto lpSrc = lpNextTopSrc + iLastSrc;
+		for (; lpSrc < lpLastSrc && lpDst < lpLastDst; lpSrc += iNextLineSrc, lpDst += iNextLineDst) {
+			auto alpha = m_ColorMap[
+				RendererTable::byteArrayPre[*(lpSrc)] + RendererTable::byteArrayPre[*(lpSrc + nextSrcNum1)] +
+					RendererTable::byteArrayPre[*(lpSrc + nextSrcNum2)] + RendererTable::byteArrayPre[*(lpSrc + nextSrcNum3)]];
+			if (alpha == 0) {
+				*lpDst = textColor;
+			}
+			else if (alpha != 255) {
+				*lpDst = (
+					(((*lpDst) & ODD) * alpha + m_TextColorMapODD[alpha]) & EVEN
+					|
+					(((*lpDst) & EVEN) * alpha + m_TextColorMapEVEN[alpha]) & ODD
+					) >> 8;
+			}
+		}
+		--iLastDstNum;
+	}
+	auto lpNextDst = reinterpret_cast<LPDWORD>(lpCanvasBits) + x + y * iCanvasWidth;
+	auto lpLastDst = lpNextDst + height * iCanvasWidth;
+	auto lpNextTopDst = lpNextDst;
+	auto lpLastTopDst = lpNextTopDst + iLastDstNum;
+	auto lpLineLastDst = lpLastTopDst;
+	auto iWidthDst = iTextWidth - iStartWidthDst;
+	do {
+		auto lpLineLastDst = lpLastTopDst;
+		for (; lpNextSrc < lpLastSrc && lpNextDst < lpLastDst; lpNextSrc += iNextLineSrc, lpNextDst += iNextLineDst, lpLineLastDst += iNextLineDst) {
+			auto lpSrc = lpNextSrc;
+			auto lpDst = lpNextDst;
+			auto lpEnd = lpDst + iWidthDst;
+			for (; lpDst < lpEnd && lpDst < lpLineLastDst; ++lpDst, ++lpSrc) {
+				auto lpSrc1 = lpSrc + nextSrcNum1;
+				auto lpSrc2 = lpSrc + nextSrcNum2;
+				auto lpSrc3 = lpSrc + nextSrcNum3;
+				auto alpha = m_ColorMap[
+					RendererTable::byteArrayPre[*(lpSrc)] + RendererTable::byteArrayPre[*(lpSrc1)] +
+						RendererTable::byteArrayPre[*(lpSrc2)] + RendererTable::byteArrayPre[*(lpSrc3)]];
+				if (alpha == 0) {
+					*lpDst = textColor;
+				}
+				else if (alpha != 255) {
+					*lpDst = (
+						(((*lpDst) & ODD) * alpha + m_TextColorMapODD[alpha]) & EVEN
+						|
+						(((*lpDst) & EVEN) * alpha + m_TextColorMapEVEN[alpha]) & ODD
+						) >> 8;
+				}
+				++lpDst;
+				alpha = m_ColorMap[
+					RendererTable::byteArrayAft[*(lpSrc)] + RendererTable::byteArrayAft[*(lpSrc1)] +
+						RendererTable::byteArrayAft[*(lpSrc2)] + RendererTable::byteArrayAft[*(lpSrc3)]];
+				if (alpha == 0) {
+					*lpDst = textColor;
+				}
+				else if (alpha != 255) {
+					*lpDst = (
+						(((*lpDst) & ODD) * alpha + m_TextColorMapODD[alpha]) & EVEN
+						|
+						(((*lpDst) & EVEN) * alpha + m_TextColorMapEVEN[alpha]) & ODD
+						) >> 8;
+				}
+			}
+		}
+		lpNextSrc = lpNextTopSrc;
+		lpNextTopDst += iWidthDst;
+		lpNextDst = lpNextTopDst;
+		iWidthDst = iTextWidth;
+	} while (lpNextDst < lpLastTopDst);
 }
 
 void CGrChar4NNRenderer::makeColorMap()
@@ -747,21 +935,21 @@ bool CGrChar8NNRenderer::Draw(CGrBitmap &canvas, int x, int y, LPCTSTR str, int 
 	//
 	int iNextLineSrc = iTmpWidth;  // (iTmpWidth / 8) Bytes * 8 Lines  <- (iTmpWidth / 8) Bytes <- iTmpWidth bits
 	//
-	int nextSrcNum  = iTmpWidth/8 ; // (iTmpWidth / 8) Bytes <- iTmpWidth bits
-	int nextSrcNum1 = nextSrcNum*1;
-	int nextSrcNum2 = nextSrcNum*2;
-	int nextSrcNum3 = nextSrcNum*3;
-	int nextSrcNum4 = nextSrcNum*4;
-	int nextSrcNum5 = nextSrcNum*5;
-	int nextSrcNum6 = nextSrcNum*6;
-	int nextSrcNum7 = nextSrcNum*7;
+	int nextSrcNum = iTmpWidth / 8; // (iTmpWidth / 8) Bytes <- iTmpWidth bits
+	int nextSrcNum1 = nextSrcNum * 1;
+	int nextSrcNum2 = nextSrcNum * 2;
+	int nextSrcNum3 = nextSrcNum * 3;
+	int nextSrcNum4 = nextSrcNum * 4;
+	int nextSrcNum5 = nextSrcNum * 5;
+	int nextSrcNum6 = nextSrcNum * 6;
+	int nextSrcNum7 = nextSrcNum * 7;
 	//
 	int iCanvasWidth  = canvas.Width ();
 	int iCanvasHeight = canvas.Height();
 	if(x > iCanvasWidth || y > iCanvasHeight || x + iTextWidth < 0 || y + iTmpWidth < 0){ return false; }
 	//
 	int iNextLineDst  = iCanvasWidth;
-	int iLastDstNum   = min(iTextWidth - 1, iCanvasWidth - x);
+	int iLastDstNum   = min(iTextWidth, iCanvasWidth - x);
 	if(iLastDstNum <= 0){
 		return false; // 描画範囲外
 	}
@@ -781,32 +969,31 @@ bool CGrChar8NNRenderer::Draw(CGrBitmap &canvas, int x, int y, LPCTSTR str, int 
 	auto lpCanvasBits = canvas.GetBits();
 	//
 	auto lpTmpBits = lpWorkBitmap->GetBits();
-	auto lpLastSrc = lpTmpBits + iTmpWidth * iBaseHeight;
+	auto lpLastSrc = lpTmpBits + iNextLineSrc * iBaseHeight;
 	auto lpNextSrc = lpTmpBits;
-	if(x < 0){
-		x = -x;
-		lpNextSrc += x;
-		iLastDstNum -= x;
-		x = 0;
-	}
-	if(y < 0){
-		y = -y;
-		lpNextSrc += y * iNextLineSrc;
+	if (y < 0) {
+		lpNextSrc -= (y % iTmpHeight) * iNextLineSrc;
 		y = 0;
 	}
+	if(x < 0){
+		lpNextSrc -= x;
+		iLastDstNum += x;
+		x = 0;
+	}
+	auto textColor = RGBQUAD2DWORD(m_TextColor);
 	for(auto lpNextDst = reinterpret_cast<LPDWORD>(lpCanvasBits) + x + y * iCanvasWidth;
 		lpNextSrc < lpLastSrc; lpNextSrc += iNextLineSrc, lpNextDst += iNextLineDst){
 		auto lpSrc = lpNextSrc;
 		auto lpDst = lpNextDst;
 		auto lpEnd = lpDst+iLastDstNum;
-		for(; lpEnd >= lpDst; ++lpSrc, ++lpDst){
+		for(; lpDst < lpEnd; ++lpSrc, ++lpDst){
 			auto alpha = m_ColorMap[
 				RendererTable::byteArray[*(lpSrc            )] + RendererTable::byteArray[*(lpSrc+nextSrcNum1)] +
 				RendererTable::byteArray[*(lpSrc+nextSrcNum2)] + RendererTable::byteArray[*(lpSrc+nextSrcNum3)] +
 				RendererTable::byteArray[*(lpSrc+nextSrcNum4)] + RendererTable::byteArray[*(lpSrc+nextSrcNum5)] +
 				RendererTable::byteArray[*(lpSrc+nextSrcNum6)] + RendererTable::byteArray[*(lpSrc+nextSrcNum7)] ];
 			if(alpha == 0){
-				*lpDst = RGBQUAD2DWORD(m_TextColor);
+				*lpDst = textColor;
 			} else if(alpha != 255){
 				*lpDst = (
 					(( (*lpDst) & ODD ) * alpha + m_TextColorMapODD [alpha]) & EVEN
@@ -819,7 +1006,7 @@ bool CGrChar8NNRenderer::Draw(CGrBitmap &canvas, int x, int y, LPCTSTR str, int 
 	return true;
 }
 
-void CGrChar8NNRenderer::PatternFill(CGrBitmap &canvas, int x, int y, int width, int height, LPCTSTR str, int len)
+void CGrChar8NNRenderer::PatternFillVert(CGrBitmap &canvas, int x, int y, int width, int height, LPCTSTR str, int len)
 {
 	// 裏画面用ビットマップ サイズ取得
 	int iBgWidth  = (m_iWidth *2  + 31) & (-32); // (m_iWidth *2  + 31) / 32 * 32;
@@ -832,14 +1019,14 @@ void CGrChar8NNRenderer::PatternFill(CGrBitmap &canvas, int x, int y, int width,
 	//
 	int iNextLineSrc = iTmpWidth;  // (iTmpWidth / 8) Bytes * 8 Lines  <- (iTmpWidth / 8) Bytes <- iTmpWidth bits
 	//
-	int nextSrcNum  = iTmpWidth/8 ; // (iTmpWidth / 8) Bytes <- iTmpWidth bits
-	int nextSrcNum1 = nextSrcNum*1;
-	int nextSrcNum2 = nextSrcNum*2;
-	int nextSrcNum3 = nextSrcNum*3;
-	int nextSrcNum4 = nextSrcNum*4;
-	int nextSrcNum5 = nextSrcNum*5;
-	int nextSrcNum6 = nextSrcNum*6;
-	int nextSrcNum7 = nextSrcNum*7;
+	int nextSrcNum = iTmpWidth / 8; // (iTmpWidth / 8) Bytes <- iTmpWidth bits
+	int nextSrcNum1 = nextSrcNum * 1;
+	int nextSrcNum2 = nextSrcNum * 2;
+	int nextSrcNum3 = nextSrcNum * 3;
+	int nextSrcNum4 = nextSrcNum * 4;
+	int nextSrcNum5 = nextSrcNum * 5;
+	int nextSrcNum6 = nextSrcNum * 6;
+	int nextSrcNum7 = nextSrcNum * 7;
 	//
 	int iCanvasWidth  = canvas.Width ();
 	int iCanvasHeight = canvas.Height();
@@ -853,7 +1040,7 @@ void CGrChar8NNRenderer::PatternFill(CGrBitmap &canvas, int x, int y, int width,
 	if(x > iCanvasWidth || y > iCanvasHeight || x + iTextWidth < 0 || y + iTmpWidth < 0){ return; }
 	//
 	int iNextLineDst  = iCanvasWidth;
-	int iLastDstNum   = min(iTextWidth - 1, iCanvasWidth - x);
+	int iLastDstNum   = min(iTextWidth, iCanvasWidth - x);
 	if(iLastDstNum <= 0){
 		return; // 描画範囲外
 	}
@@ -873,23 +1060,22 @@ void CGrChar8NNRenderer::PatternFill(CGrBitmap &canvas, int x, int y, int width,
 	auto lpCanvasBits = canvas.GetBits();
 	//
 	auto lpTmpBits = lpWorkBitmap->GetBits();
-	auto lpLastSrc = lpTmpBits + iTmpWidth * iBaseHeight;
+	auto lpLastSrc = lpTmpBits + iNextLineSrc * (iBaseHeight-1); // (iNextLineSrc = nextSrcNum * 8)
 	auto lpNextSrc = lpTmpBits;
-	if(x < 0){
-		x = -x;
-		lpNextSrc += x;
-		iLastDstNum -= x;
-		lpTmpBits += x;
-		width -= x;
-		x = 0;
-	}
-	if(y < 0){
-		y = -y;
-		lpNextSrc += y * iNextLineSrc;
-		height -= y;
+	if (y < 0) {
+		lpNextSrc -= (y % iBaseHeight) * iNextLineSrc;
+		height += y;
 		y = 0;
 	}
-	auto lpNextTopSrc = lpNextSrc+iNextLineSrc;
+	auto lpNextTopSrc = lpTmpBits + iNextLineSrc;
+	if(x < 0){
+		iLastDstNum += x;
+		x = -(x % iTextWidth);
+		lpNextSrc += x;
+		lpNextTopSrc += x;
+		x = 0;
+	}
+	auto textColor = RGBQUAD2DWORD(m_TextColor);
 	auto lpNextDst = reinterpret_cast<LPDWORD>(lpCanvasBits) + x + y * iCanvasWidth;
 	auto lpLastDst = lpNextDst + height * iCanvasWidth;
 	do {
@@ -897,14 +1083,14 @@ void CGrChar8NNRenderer::PatternFill(CGrBitmap &canvas, int x, int y, int width,
 			auto  lpSrc = lpNextSrc;
 			auto lpDst = lpNextDst;
 			auto lpEnd = lpDst+iLastDstNum;
-			for(; lpEnd >= lpDst; ++lpSrc, ++lpDst){
+			for(; lpDst < lpEnd; ++lpSrc, ++lpDst){
 				auto alpha = m_ColorMap[
 					RendererTable::byteArray[*(lpSrc            )] + RendererTable::byteArray[*(lpSrc+nextSrcNum1)] +
 					RendererTable::byteArray[*(lpSrc+nextSrcNum2)] + RendererTable::byteArray[*(lpSrc+nextSrcNum3)] +
 					RendererTable::byteArray[*(lpSrc+nextSrcNum4)] + RendererTable::byteArray[*(lpSrc+nextSrcNum5)] +
 					RendererTable::byteArray[*(lpSrc+nextSrcNum6)] + RendererTable::byteArray[*(lpSrc+nextSrcNum7)] ];
 				if(alpha == 0){
-					*lpDst = RGBQUAD2DWORD(m_TextColor);
+					*lpDst = textColor;
 				} else if(alpha != 255){
 					*lpDst = (
 						(( (*lpDst) & ODD ) * alpha + m_TextColorMapODD [alpha]) & EVEN
@@ -916,6 +1102,114 @@ void CGrChar8NNRenderer::PatternFill(CGrBitmap &canvas, int x, int y, int width,
 		}
 		lpNextSrc = lpNextTopSrc;
 	} while(lpNextDst < lpLastDst);
+}
+void CGrChar8NNRenderer::PatternFillHorz(CGrBitmap& canvas, int x, int y, int width, int height, LPCTSTR str, int len)
+{
+	// 裏画面用ビットマップ サイズ取得
+	int iBgWidth = (m_iWidth * 2 + 31) & (-32); // (m_iWidth *2  + 31) / 32 * 32;
+	int iBgHeight = (m_iHeight + 31) & (-32); // (m_iHeight    + 31) / 32 * 32;
+	// 作業用のビットマップサイズを取得
+	int iTmpWidth = (iBgWidth * 8 + 31) & (-32); // (iBgWidth  * 8 + 31) / 32 * 32;
+	int iTmpHeight = (iBgHeight * 8 + 31) & (-32); // (iBgHeight * 8 + 31) / 32 * 32;
+	int iTextWidth = m_iWidth;
+	int iTextHeight = m_iHeight;
+	//
+	int iNextLineSrc = iTmpWidth;  // (iTmpWidth / 8) Bytes * 8 Lines  <- (iTmpWidth / 8) Bytes <- iTmpWidth bits
+	//
+	int nextSrcNum = iTmpWidth / 8; // (iTmpWidth / 8) Bytes <- iTmpWidth bits
+	int nextSrcNum1 = nextSrcNum * 1;
+	int nextSrcNum2 = nextSrcNum * 2;
+	int nextSrcNum3 = nextSrcNum * 3;
+	int nextSrcNum4 = nextSrcNum * 4;
+	int nextSrcNum5 = nextSrcNum * 5;
+	int nextSrcNum6 = nextSrcNum * 6;
+	int nextSrcNum7 = nextSrcNum * 7;
+	//
+	int iCanvasWidth = canvas.Width();
+	int iCanvasHeight = canvas.Height();
+	if (y + height > iCanvasHeight) {
+		height = iCanvasHeight - y;
+	}
+	if (x + width > iCanvasWidth) {
+		width = iCanvasWidth - x;
+	}
+	if (height <= 0 || width <= 0) { return; }
+	if (x > iCanvasWidth || y > iCanvasHeight || x + width < 0 || y + iTmpWidth < 0) { return; }
+	//
+	int iNextLineDst = iCanvasWidth;
+	int iLastDstNum = min(width, iCanvasWidth - x);
+	if (iLastDstNum <= 0) {
+		return; // 描画範囲外
+	}
+	int iBaseHeight = min(m_BaseFont.Height(), iCanvasHeight - y);
+	if (iBaseHeight <= 0) {
+		return;
+	}
+	CGrMonoBitmap* lpWorkBitmap;
+	// キャッシュチェック
+	bool bCache = getCache(str, len, &lpWorkBitmap);
+	// 作業用のビットマップ作成
+	createWorkDC();
+	// 作業用画面に描画
+	if (!lpWorkBitmap->Create(iTmpWidth, iTmpHeight)) { return; }
+	if (!bCache) { drawText(str, len, lpWorkBitmap); }
+	//
+	auto lpCanvasBits = canvas.GetBits();
+	//
+	auto lpTmpBits = lpWorkBitmap->GetBits();
+	auto lpLastSrc = lpTmpBits + iNextLineSrc * iBaseHeight;
+	auto lpNextSrc = lpTmpBits;
+	if (y < 0) {
+		lpNextSrc -= (y % iTmpHeight) * iNextLineSrc;
+		height += y;
+		y = 0;
+	}
+	--iTextWidth; // 一ビットかぶせる
+	auto textColor = RGBQUAD2DWORD(m_TextColor);
+	auto lpNextTopSrc = lpNextSrc;
+	auto iStartWidthDst = iTextWidth;
+	if (x < 0) {
+		iLastDstNum += x;
+		x = -(x % iTextWidth);
+		lpNextSrc += x;
+		iStartWidthDst = x;
+		x = 0;
+	}
+	auto lpNextDst = reinterpret_cast<LPDWORD>(lpCanvasBits) + x + y * iCanvasWidth;
+	auto lpLastDst = lpNextDst + height * iCanvasWidth;
+	auto lpNextTopDst = lpNextDst;
+	auto lpLastTopDst = lpNextTopDst + iLastDstNum;
+	auto lpLineLastDst = lpLastTopDst;
+	auto iWidthDst = iTextWidth - iStartWidthDst;
+	do {
+		auto lpLineLastDst = lpLastTopDst;
+		for (; lpNextSrc < lpLastSrc && lpNextDst < lpLastDst; lpNextSrc += iNextLineSrc, lpNextDst += iNextLineDst, lpLineLastDst += iNextLineDst) {
+			auto lpSrc = lpNextSrc;
+			auto lpDst = lpNextDst;
+			auto lpEnd = lpDst + iWidthDst;
+			for (; lpDst < lpEnd && lpDst < lpLineLastDst; ++lpSrc, ++lpDst) {
+				auto alpha = m_ColorMap[
+					RendererTable::byteArray[*(lpSrc)] + RendererTable::byteArray[*(lpSrc + nextSrcNum1)] +
+					RendererTable::byteArray[*(lpSrc + nextSrcNum2)] + RendererTable::byteArray[*(lpSrc + nextSrcNum3)] +
+					RendererTable::byteArray[*(lpSrc + nextSrcNum4)] + RendererTable::byteArray[*(lpSrc + nextSrcNum5)] +
+					RendererTable::byteArray[*(lpSrc + nextSrcNum6)] + RendererTable::byteArray[*(lpSrc + nextSrcNum7)]];
+				if (alpha == 0) {
+					*lpDst = textColor;
+				}
+				else if (alpha != 255) {
+					*lpDst = (
+						(((*lpDst) & ODD) * alpha + m_TextColorMapODD[alpha]) & EVEN
+						|
+						(((*lpDst) & EVEN) * alpha + m_TextColorMapEVEN[alpha]) & ODD
+						) >> 8;
+				}
+			}
+		}
+		lpNextSrc = lpNextTopSrc;
+		lpNextTopDst += iWidthDst;
+		lpNextDst = lpNextTopDst;
+		iWidthDst = iTextWidth;
+	} while (lpNextDst < lpLastTopDst);
 }
 
 void CGrChar8NNRenderer::makeColorMap()
@@ -997,7 +1291,7 @@ bool CGrCharLCDRenderer::Draw(CGrBitmap &canvas, int x, int y, LPCTSTR str, int 
 	int iTextWidth  = m_iWidth ;
 	int iTextHeight = m_iHeight;
 	//
-	int iNextLineSrc = iTmpWidth/2; // (iTmpWidth / 8) Bytes * 4 Lines  <- (iTmpWidth / 8) Bytes <- iTmpWidth bits
+	int iNextLineSrc = iTmpWidth / 2; // (iTmpWidth / 8) Bytes * 4 Lines  <- (iTmpWidth / 8) Bytes <- iTmpWidth bits
 	//
 	int nextSrcNum  = iTmpWidth/8 ; // (iTmpWidth / 8) Bytes <- iTmpWidth bits
 	int nextSrcNum1 = nextSrcNum*1;
@@ -1010,11 +1304,15 @@ bool CGrCharLCDRenderer::Draw(CGrBitmap &canvas, int x, int y, LPCTSTR str, int 
 	if(x > iCanvasWidth || y > iCanvasHeight || x + iTextWidth < 0 || y + iTmpWidth < 0){ return false; }
 	//
 	int iNextLineDst  = iCanvasWidth;
-	int iLastDstNum   = min(iTextWidth - 1, iCanvasWidth - x);
+	int iLastDstNum   = min(iTextWidth, iCanvasWidth - x);
 	if(iLastDstNum <= 0){
 		return false; // 描画範囲外
 	}
-	int iBaseHeight = min(m_BaseFont.Height(), iCanvasHeight - y);
+	auto iBaseFontHeight = m_BaseFont.Height();
+	if (iBaseFontHeight + y < 0) {
+		return false;
+	}
+	int iBaseHeight = min(iBaseFontHeight, iCanvasHeight - y);
 	if(iBaseHeight <= 0){
 		return false;
 	}
@@ -1030,17 +1328,16 @@ bool CGrCharLCDRenderer::Draw(CGrBitmap &canvas, int x, int y, LPCTSTR str, int 
 	auto lpCanvasBits = canvas.GetBits();
 	//
 	auto lpTmpBits = lpWorkBitmap->GetBits();
-	auto lpLastSrc = lpTmpBits + iTmpWidth * iBaseHeight / 2;
+	auto lpLastSrc = lpTmpBits + iNextLineSrc * iBaseHeight;
 	auto lpNextSrc = lpTmpBits;
 	if(y < 0){
-		y = -y;
-		lpNextSrc += y * iNextLineSrc;
+		lpNextSrc -= (y % iTmpHeight) * iNextLineSrc;
 		y = 0;
 	}
 	if(x < 0){
-		x = -x;
-		lpNextSrc += (x/2);
-		iLastDstNum -= x;
+		iLastDstNum += x;
+		x = -(x % iTextWidth);
+		lpNextSrc += x / 2;
 		if(x & 0x01){
 			// 左端数有り
 			auto lpDst = reinterpret_cast<LPDWORD>(lpCanvasBits) + y * iCanvasWidth;
@@ -1058,10 +1355,11 @@ bool CGrCharLCDRenderer::Draw(CGrBitmap &canvas, int x, int y, LPCTSTR str, int 
 			x = 0;
 		}
 	}
-	if(iCanvasWidth <= (iLastDstNum | 0x01) && iLastDstNum & 0x01){
+	if(iLastDstNum & 0x01){
 		// 右端数有り
-		auto lpDst = reinterpret_cast<LPDWORD>(lpCanvasBits) + iLastDstNum + y * iCanvasWidth;
-		auto lpSrc = lpNextSrc + iLastDstNum / 2;
+		auto iLastSrc = (iLastDstNum % iTextWidth) / 2;
+		auto lpDst = reinterpret_cast<LPDWORD>(lpCanvasBits) + x + iLastDstNum - 1 + y * iCanvasWidth;
+		auto lpSrc = lpNextSrc + iLastSrc;
 		for(; lpSrc < lpLastSrc; lpSrc += iNextLineSrc, lpDst += iNextLineDst){
 			LCD_INIT_EVEN;
 			LCD_SET_COLOR(LCD_EVEN_R, Red  );
@@ -1075,7 +1373,7 @@ bool CGrCharLCDRenderer::Draw(CGrBitmap &canvas, int x, int y, LPCTSTR str, int 
 		auto lpSrc  = lpNextSrc;
 		auto lpDst  = lpNextDst;
 		auto lpEnd  = lpDst+iLastDstNum;
-		for(;lpEnd >= lpDst; ++lpDst, ++lpSrc){
+		for(; lpDst < lpEnd; ++lpDst, ++lpSrc){
 			LCD_INIT_ODD;
 			LCD_SET_COLOR(LCD_EVEN_R, Red  );
 			LCD_SET_COLOR(LCD_EVEN_G, Green);
@@ -1089,7 +1387,7 @@ bool CGrCharLCDRenderer::Draw(CGrBitmap &canvas, int x, int y, LPCTSTR str, int 
 	return true;
 }
 
-void CGrCharLCDRenderer::PatternFill(CGrBitmap &canvas, int x, int y, int width, int height, LPCTSTR str, int len)
+void CGrCharLCDRenderer::PatternFillVert(CGrBitmap &canvas, int x, int y, int width, int height, LPCTSTR str, int len)
 {
 	// 裏画面用ビットマップ サイズ取得
 	int iBgWidth  = (m_iWidth *2  + 31) & (-32); // (m_iWidth *2  + 31) / 32 * 32;
@@ -1120,7 +1418,7 @@ void CGrCharLCDRenderer::PatternFill(CGrBitmap &canvas, int x, int y, int width,
 	if(x > iCanvasWidth || y > iCanvasHeight || x + iTextWidth < 0 || y + iTmpWidth < 0){ return; }
 	//
 	int iNextLineDst  = iCanvasWidth;
-	int iLastDstNum   = min(iTextWidth - 1, iCanvasWidth - x);
+	int iLastDstNum   = min(iTextWidth, iCanvasWidth - x);
 	if(iLastDstNum <= 0){
 		return; // 描画範囲外
 	}
@@ -1140,59 +1438,58 @@ void CGrCharLCDRenderer::PatternFill(CGrBitmap &canvas, int x, int y, int width,
 	auto lpCanvasBits = canvas.GetBits();
 	//
 	auto lpTmpBits = lpWorkBitmap->GetBits();
-	auto lpLastSrc = lpTmpBits + iTmpWidth * iBaseHeight / 2;
+	auto lpLastSrc = lpTmpBits + iNextLineSrc * (iBaseHeight-1);
 	auto lpNextSrc = lpTmpBits;
 	if(y < 0){
-		y = -y;
-		lpNextSrc += y * iNextLineSrc;
-		height -= y;
+		lpNextSrc -= (y % iBaseHeight) * iNextLineSrc;
+		height += y;
 		y = 0;
 	}
+	auto lpNextTopSrc = lpTmpBits + iNextLineSrc; // 一ビットかぶせる
 	if(x < 0){
-		x = -x;
-		lpNextSrc += x/2;
-		lpTmpBits += x/2;
-		iLastDstNum -= x;
+		iLastDstNum += x;
+		x = -(x % iTextWidth);
+		lpNextSrc += x / 2;
+		lpNextTopSrc += x / 2;
 		if(x & 0x01){
 			// 左端数有り
-			auto lpTmpLastSrc = lpLastSrc;
-			auto lpDst = reinterpret_cast<LPDWORD>(lpCanvasBits) + x + y * iCanvasWidth;
+			auto lpDst = reinterpret_cast<LPDWORD>(lpCanvasBits) + y * iCanvasWidth;
 			auto lpLastDst = lpDst + height * iCanvasWidth;
 			auto lpSrc = lpNextSrc;
 			do {
-				for(; lpSrc < lpTmpLastSrc && lpDst < lpLastDst; lpSrc += iNextLineSrc, lpDst += iNextLineDst){
+				for(; lpSrc < lpLastSrc && lpDst < lpLastDst; lpSrc += iNextLineSrc, lpDst += iNextLineDst){
 					LCD_INIT_ODD;
 					LCD_SET_COLOR(LCD_ODD_R, Red  );
 					LCD_SET_COLOR(LCD_ODD_G, Green);
 					LCD_SET_COLOR(LCD_ODD_B, Blue );
 				}
-				lpSrc = lpNextSrc - 1; // 一ビットかぶせる
+				lpSrc = lpNextTopSrc;
 			} while(lpDst < lpLastDst);
-			x = 1;
 			++lpNextSrc;
+			++lpNextTopSrc;
 			--iLastDstNum;
+			x = 1;
 		} else {
 			x = 0;
 		}
 	}
-	if(iCanvasWidth <= (iLastDstNum | 0x01) && iLastDstNum & 0x01){
+	if(iLastDstNum & 0x01){
 		// 右端数有り
-		auto lpTmpLastSrc = lpLastSrc;
-		auto lpDst = reinterpret_cast<LPDWORD>(lpCanvasBits) + iLastDstNum + y * iCanvasWidth;
+		auto iLastSrc = (iLastDstNum % iTextWidth) / 2;
+		auto lpDst = reinterpret_cast<LPDWORD>(lpCanvasBits) + x + iLastDstNum - 1 + y * iCanvasWidth;
 		auto lpLastDst = lpDst + height * iCanvasWidth;
-		auto lpSrc = lpNextSrc + iLastDstNum / 2;
+		auto lpSrc = lpNextSrc + iLastSrc;
 		do {
-			for(; lpSrc < lpTmpLastSrc && lpDst < lpLastDst; lpSrc += iNextLineSrc, lpDst += iNextLineDst){
+			for(; lpSrc < lpLastSrc && lpDst < lpLastDst; lpSrc += iNextLineSrc, lpDst += iNextLineDst){
 				LCD_INIT_EVEN;
 				LCD_SET_COLOR(LCD_EVEN_R, Red  );
 				LCD_SET_COLOR(LCD_EVEN_G, Green);
 				LCD_SET_COLOR(LCD_EVEN_B, Blue );
 			}
-			lpSrc = lpNextSrc - 1;
+			lpSrc = lpNextTopSrc + iLastSrc;
 		} while(lpDst < lpLastDst);
 		--iLastDstNum;
 	}
-	auto lpNextTopSrc = lpNextSrc+iNextLineSrc;
 	auto lpNextDst = reinterpret_cast<LPDWORD>(lpCanvasBits) + x + y * iCanvasWidth;
 	auto lpLastDst = lpNextDst + height * iCanvasWidth;
 	do {
@@ -1200,7 +1497,7 @@ void CGrCharLCDRenderer::PatternFill(CGrBitmap &canvas, int x, int y, int width,
 			auto lpSrc = lpNextSrc;
 			auto lpDst = lpNextDst;
 			auto lpEnd = lpDst+iLastDstNum;
-			for(; lpEnd >= lpDst; ++lpDst, ++lpSrc){
+			for(; lpDst < lpEnd; ++lpDst, ++lpSrc){
 				LCD_INIT_ODD;
 				LCD_SET_COLOR(LCD_EVEN_R, Red  );
 				LCD_SET_COLOR(LCD_EVEN_G, Green);
@@ -1213,6 +1510,139 @@ void CGrCharLCDRenderer::PatternFill(CGrBitmap &canvas, int x, int y, int width,
 		}
 		lpNextSrc = lpNextTopSrc;
 	} while(lpNextDst < lpLastDst);
+}
+void CGrCharLCDRenderer::PatternFillHorz(CGrBitmap& canvas, int x, int y, int width, int height, LPCTSTR str, int len)
+{
+	// 裏画面用ビットマップ サイズ取得
+	int iBgWidth = (m_iWidth * 2 + 31) & (-32); // (m_iWidth *2  + 31) / 32 * 32;
+	int iBgHeight = (m_iHeight + 31) & (-32); // (m_iHeight    + 31) / 32 * 32;
+	// 作業用のビットマップサイズを取得
+	int iTmpWidth = (iBgWidth * 4 + 31) & (-32); // (iBgWidth  * 4 + 31) / 32 * 32;
+	int iTmpHeight = (iBgHeight * 4 + 31) & (-32); // (iBgHeight * 4 + 31) / 32 * 32;
+	int iTextWidth = m_iWidth;
+	int iTextHeight = m_iHeight;
+	//
+	int iNextLineSrc = iTmpWidth / 2;  // (iTmpWidth / 8) Bytes * 8 Lines  <- (iTmpWidth / 8) Bytes <- iTmpWidth bits
+	//
+	int nextSrcNum = iTmpWidth / 8; // (iTmpWidth / 8) Bytes <- iTmpWidth bits
+	int nextSrcNum1 = nextSrcNum * 1;
+	int nextSrcNum2 = nextSrcNum * 2;
+	int nextSrcNum3 = nextSrcNum * 3;
+	int nextSrcNum4 = nextSrcNum * 4;
+	//
+	int iCanvasWidth = canvas.Width();
+	int iCanvasHeight = canvas.Height();
+	if (y + height > iCanvasHeight) {
+		height = iCanvasHeight - y;
+	}
+	if (x + width > iCanvasWidth) {
+		width = iCanvasWidth - x;
+	}
+	if (height <= 0 || width <= 0) { return; }
+	if (x > iCanvasWidth || y > iCanvasHeight || x + width < 0 || y + iTmpHeight < 0) { return; }
+	//
+	int iNextLineDst = iCanvasWidth;
+	int iLastDstNum = min(width, iCanvasWidth - x);
+	if (iLastDstNum <= 0) {
+		return; // 描画範囲外
+	}
+	auto iBaseFontHeight = m_BaseFont.Height();
+	if (iBaseFontHeight + y < 0) {
+		return;
+	}
+	int iBaseHeight = min(iBaseFontHeight, iCanvasHeight - y);
+	if (iBaseHeight <= 0) {
+		return;
+	}
+	CGrMonoBitmap* lpWorkBitmap;
+	// キャッシュチェック
+	bool bCache = getCache(str, len, &lpWorkBitmap);
+	// 作業用のビットマップ作成
+	createWorkDC();
+	// 作業用画面に描画
+	if (!lpWorkBitmap->Create(iTmpWidth, iTmpHeight)) { return; }
+	if (!bCache) { drawText(str, len, lpWorkBitmap); }
+	//
+	auto lpCanvasBits = canvas.GetBits();
+	//
+	auto lpTmpBits = lpWorkBitmap->GetBits();
+	auto lpLastSrc = lpTmpBits + iNextLineSrc * iBaseHeight;
+	auto lpNextSrc = lpTmpBits;
+	if (y < 0) {
+		lpNextSrc -= (y % iBaseHeight) * iNextLineSrc;
+		height += y;
+		y = 0;
+	}
+	iTextWidth -= 2; // 一ビットかぶせる
+	auto lpNextTopSrc = lpNextSrc;
+	auto iStartWidthDst = iTextWidth;
+	if (x < 0) {
+		iLastDstNum += x;
+		x = -(x % iTextWidth);
+		lpNextSrc += x / 2;
+		iStartWidthDst = x;
+		if (x & 0x01) {
+			// 左端数有り
+			auto lpDst = reinterpret_cast<LPDWORD>(lpCanvasBits) + y * iCanvasWidth;
+			auto lpLastDst = lpDst + height * iCanvasWidth;
+			auto lpSrc = lpNextSrc;
+			for (; lpSrc < lpLastSrc && lpDst < lpLastDst; lpSrc += iNextLineSrc, lpDst += iNextLineDst) {
+				LCD_INIT_ODD;
+				LCD_SET_COLOR(LCD_ODD_R, Red);
+				LCD_SET_COLOR(LCD_ODD_G, Green);
+				LCD_SET_COLOR(LCD_ODD_B, Blue);
+			}
+			++lpNextSrc;
+			--iLastDstNum;
+			x = 1;
+			++iStartWidthDst;
+		}
+		else {
+			x = 0;
+		}
+	}
+	if (x + width % iTextWidth) {
+		// 右端数有り
+		auto iLastSrc = ((iStartWidthDst + iLastDstNum) % iTextWidth) / 2;
+		auto lpDst = reinterpret_cast<LPDWORD>(lpCanvasBits) + x + iLastDstNum - 1 + y * iCanvasWidth;
+		auto lpLastDst = lpDst + height * iCanvasWidth;
+		auto lpSrc = lpNextTopSrc + iLastSrc;
+		for (; lpSrc < lpLastSrc && lpDst < lpLastDst; lpSrc += iNextLineSrc, lpDst += iNextLineDst) {
+			LCD_INIT_EVEN;
+			LCD_SET_COLOR(LCD_EVEN_R, Red);
+			LCD_SET_COLOR(LCD_EVEN_G, Green);
+			LCD_SET_COLOR(LCD_EVEN_B, Blue);
+		}
+		--iLastDstNum;
+	}
+	auto lpNextDst = reinterpret_cast<LPDWORD>(lpCanvasBits) + x + y * iCanvasWidth;
+	auto lpLastDst = lpNextDst + height * iCanvasWidth;
+	auto lpNextTopDst = lpNextDst;
+	auto lpLastTopDst = lpNextTopDst + iLastDstNum;
+	auto lpLineLastDst = lpLastTopDst;
+	auto iWidthDst = iTextWidth - iStartWidthDst;
+	do {
+		auto lpLineLastDst = lpLastTopDst;
+		for (; lpNextSrc < lpLastSrc && lpNextDst < lpLastDst; lpNextSrc += iNextLineSrc, lpNextDst += iNextLineDst, lpLineLastDst += iNextLineDst) {
+			auto lpSrc = lpNextSrc;
+			auto lpDst = lpNextDst;
+			auto lpEnd = lpDst + iWidthDst;
+			for (; lpDst < lpEnd && lpDst < lpLineLastDst; ++lpDst, ++lpSrc) {
+				LCD_INIT_ODD;
+				LCD_SET_COLOR(LCD_EVEN_R, Red);
+				LCD_SET_COLOR(LCD_EVEN_G, Green);
+				LCD_SET_COLOR(LCD_EVEN_B, Blue);
+				++lpDst;
+				LCD_SET_COLOR(LCD_ODD_R, Red);
+				LCD_SET_COLOR(LCD_ODD_G, Green);
+				LCD_SET_COLOR(LCD_ODD_B, Blue);
+			}
+		}
+		lpNextSrc = lpNextTopSrc;
+		lpNextTopDst += iWidthDst;
+		lpNextDst = lpNextTopDst;
+		iWidthDst = iTextWidth;
+	} while (lpNextDst < lpLastTopDst);
 }
 
 void CGrCharLCDRenderer::makeColorMap()
@@ -1251,6 +1681,7 @@ void CGrCharLCDRenderer::SetTextColor(COLORREF color)
 }
 
 //////////////////////////////////////////
+
 CGrCharExtRenderer::CGrCharExtRenderer(){
 	//CGrCharRenderer
 	m_fileName = _T("TxtFuncCharFTRenderer.dll");
@@ -1286,10 +1717,16 @@ bool CGrCharExtRenderer::Draw(CGrBitmap &canvas, int x, int y, LPCTSTR str, int 
 	return false;
 }
 
-void CGrCharExtRenderer::PatternFill(CGrBitmap &canvas, int x, int y, int width, int height, LPCTSTR str, int len)
+void CGrCharExtRenderer::PatternFillVert(CGrBitmap& canvas, int x, int y, int width, int height, LPCTSTR str, int len)
 {
-	if(m_pCharRenderer){
-		return m_pCharRenderer->PatternFill(canvas, x, y, width, height, str, len);
+	if (m_pCharRenderer) {
+		return m_pCharRenderer->PatternFillVert(canvas, x, y, width, height, str, len);
+	}
+}
+void CGrCharExtRenderer::PatternFillHorz(CGrBitmap& canvas, int x, int y, int width, int height, LPCTSTR str, int len)
+{
+	if (m_pCharRenderer) {
+		return m_pCharRenderer->PatternFillHorz(canvas, x, y, width, height, str, len);
 	}
 }
 bool CGrCharExtRenderer::SetFont(CGrFont &font)
@@ -1321,3 +1758,4 @@ COLORREF CGrCharExtRenderer::GetTextColor()
 	}
 	return RGB(0,0,0);
 }
+

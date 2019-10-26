@@ -67,27 +67,6 @@ LRESULT CGrVersionDlg::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	return CGrWinCtrl::WndProc(hWnd, uMsg, wParam, lParam);
 }
 
-bool utf82w(LPCSTR c, std::tstring &w)
-{
-	if(c[0]==0xEF && c[1]==0xBB && c[2]==0xBF){ //BOM check
-		c+=3;
-	}
-	bool result = false;
-
-	int wlen = ::MultiByteToWideChar(CP_UTF8, 0, c, -1, NULL, 0);
-	if(wlen == 0){
-		return false;
-	}
-	auto* buff = new WCHAR[wlen + 1];
-	if(::MultiByteToWideChar(CP_UTF8, 0, c, -1, buff, wlen)){
-		result = true;
-		buff[wlen] = L'\0';
-		w = buff;
-	}
-	delete[] buff;
-	return result;
-}
-
 unsigned __stdcall CGrVersionDlg::GetVersionProc(void *lpParam)
 {
 	auto* pDlg = reinterpret_cast<CGrVersionDlg*>(lpParam);
@@ -107,14 +86,14 @@ unsigned __stdcall CGrVersionDlg::GetVersionProc(void *lpParam)
 		LPCTSTR url = _T("https://drive.google.com/uc?id=1Hi6pI2tu0l_c9J6vnL2cEz68XRB7x4zY");
 
 		INTERNET_PROXY_INFO proxy = {0};
-		if(param.GetBoolean(CGrTxtFuncIParam::UseIESetting)){
+		if(param.GetBoolean(CGrTxtFuncIParam::PointsType::UseIESetting)){
 			proxy.dwAccessType = INTERNET_OPEN_TYPE_PRECONFIG;
-		} else if(param.GetBoolean(CGrTxtFuncIParam::UseProxy)){
+		} else if(param.GetBoolean(CGrTxtFuncIParam::PointsType::UseProxy)){
 			//プロクシの変更
 			TCHAR strProxyServer   [2048];
 			TCHAR strNoProxyAddress[2048];
-			param.GetText(CGrTxtFuncIParam::ProxyServer   , strProxyServer   , sizeof(strProxyServer   )/sizeof(TCHAR));
-			param.GetText(CGrTxtFuncIParam::NoProxyAddress, strNoProxyAddress, sizeof(strNoProxyAddress)/sizeof(TCHAR));
+			param.GetText(CGrTxtFuncIParam::TextType::ProxyServer   , strProxyServer   , sizeof(strProxyServer   )/sizeof(TCHAR));
+			param.GetText(CGrTxtFuncIParam::TextType::NoProxyAddress, strNoProxyAddress, sizeof(strNoProxyAddress)/sizeof(TCHAR));
 			int lenStrProxyServer    = lstrlen(strProxyServer   ) * 3;
 			int lenStrNoProxyAddress = lstrlen(strNoProxyAddress) * 3;
 			charProxyServer    = new char[lenStrProxyServer    + 1];
@@ -160,7 +139,7 @@ unsigned __stdcall CGrVersionDlg::GetVersionProc(void *lpParam)
 		} while(dwSize > 0);
 	} while(0);
 	if(hFile){
-		InternetCloseHandle(hFile);
+		 InternetCloseHandle(hFile);
 	}
 	if(charProxyServer   ){ delete [] charProxyServer   ; }
 	if(charNoProxyAddress){ delete [] charNoProxyAddress; }

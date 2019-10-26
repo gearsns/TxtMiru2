@@ -43,13 +43,13 @@
 // マウスサイドボタン対応
 #ifndef HANDLE_WM_XBUTTONUP
 #define HANDLE_WM_XBUTTONUP(hwnd, wParam, lParam, fn) \
-	((fn)((hwnd), (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (UINT)(wParam)), 0L)
+    ((fn)((hwnd), (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (UINT)(wParam)), 0L)
 #define FORWARD_WM_XBUTTONUP(hwnd, x, y, keyFlags, fn) \
-	(void)(fn)((hwnd), WM_XBUTTONUP, (WPARAM)(UINT)(keyFlags), MAKELPARAM((x), (y)))
+    (void)(fn)((hwnd), WM_XBUTTONUP, (WPARAM)(UINT)(keyFlags), MAKELPARAM((x), (y)))
 #define HANDLE_WM_XBUTTONDOWN(hwnd, wParam, lParam, fn) \
-	((fn)((hwnd), FALSE, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (UINT)(wParam)), 0L)
+    ((fn)((hwnd), FALSE, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (UINT)(wParam)), 0L)
 #define FORWARD_WM_XBUTTONDOWN(hwnd, fDoubleClick, x, y, keyFlags, fn) \
-	(void)(fn)((hwnd), (fDoubleClick) ? WM_XBUTTONDBLCLK : WM_XBUTTONDOWN, (WPARAM)(UINT)(keyFlags), MAKELPARAM((x), (y)))
+    (void)(fn)((hwnd), (fDoubleClick) ? WM_XBUTTONDBLCLK : WM_XBUTTONDOWN, (WPARAM)(UINT)(keyFlags), MAKELPARAM((x), (y)))
 #endif
 
 #include "Shell.h"

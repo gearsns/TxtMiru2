@@ -2,6 +2,7 @@
 
 #include <windows.h>
 #include "stlutil.h"
+#include "Text.h"
 
 namespace std
 {
@@ -29,20 +30,7 @@ namespace std
 		if(c[0]==0xEF && c[1]==0xBB && c[2]==0xBF){ //BOM check
 			c+=3;
 		}
-		bool result = false;
-
-		int wlen = ::MultiByteToWideChar(CP_UTF8, 0, c, -1, nullptr, 0);
-		if(wlen == 0){
-			return false;
-		}
-		auto* buff = new WCHAR[wlen + 1];
-		if(::MultiByteToWideChar(CP_UTF8, 0, c, -1, buff, wlen)){
-			result = true;
-			buff[wlen] = L'\0';
-			w = buff;
-		}
-		delete[] buff;
-		return result;
+		return CGrText::MultiByteToTString(CP_UTF8, c, -1, w);
 	}
 	bool w2utf8(LPCTSTR w, std::string &c, UINT iCodePage/* = CP_UTF8*/)
 	{

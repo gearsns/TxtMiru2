@@ -106,7 +106,7 @@
     <ClCompile Include="..\..\src\text.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="TxtMiru.cpp" />
-    <ClCompile Include="TxtParam.cpp" />
+    <ClCompile Include="..\..\src\TxtMiru\TxtParam.cpp" />
     <ClCompile Include="BookMarkHtml.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -122,7 +122,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="TxtMiru.h" />
     <ClInclude Include="TxtMiruDef.h" />
-    <ClInclude Include="TxtParam.h" />
+    <ClInclude Include="..\..\include\TxtMiru\TxtParam.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

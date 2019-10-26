@@ -94,14 +94,14 @@ inline static bool isTateChuYoko(const TxtMiru::TextInfoList &text_list, int iIn
 			{
 				// 一つ前が半角の空白文字ならもうひとつ前の文字を参照する
 				const auto &tt = text_list[iIndex-1];
-				if(iIndex > 1 && tt.textType == TxtMiru::TT_TEXT && tt.str.c_str()[0] == L' '){
+				if(iIndex > 1 && tt.textType == TxtMiru::TextType::TEXT && tt.str.c_str()[0] == L' '){
 					--iIndex;
 				}
 			}
 			{
 				// 前の文字が半角文字なら縦中横にしない
 				const auto &tt = text_list[iIndex-1];
-				if(HalfChar(tt.chrType) && tt.textType == TxtMiru::TT_TEXT){
+				if(HalfChar(tt.chrType) && tt.textType == TxtMiru::TextType::TEXT){
 					{ // 最低でもアルファベットを含むことを条件にする
 						for(const auto ch : tt.str){
 							if((ch >= L'A' && ch <= 'Z')
@@ -172,7 +172,7 @@ static bool isLineStartNGCharacters(const CGrTxtParam &param, LPCTSTR lpNextSrc)
 	while(*lpNextSrc){
 		sc = lpNextSrc;
 		lpNextSrc = CGrText::CharNext(lpNextSrc);
-		if(param.FindIF(CGrTxtParam::LineStartNGCharacters, static_cast<CGrTxtParam::CGrStringCompare &&>(sc)) >= 0){
+		if(param.FindIF(CGrTxtParam::ValueType::LineStartNGCharacters, static_cast<CGrTxtParam::CGrStringCompare &&>(sc)) >= 0){
 			++matchNum;
 			if(matchNum > 3){ // 3 文字以上は、ぶら下げない
 				return false;
@@ -184,7 +184,7 @@ static bool isLineStartNGCharacters(const CGrTxtParam &param, LPCTSTR lpNextSrc)
 	return (matchNum != 0);
 }
 
-static bool isLineStartNGCharacters(const CGrTxtParam &param, TxtMiru::TextInfo *it, int len, LPCTSTR lpSrc, TxtMiru::TextType textType=TxtMiru::TT_TEXT)
+static bool isLineStartNGCharacters(const CGrTxtParam &param, TxtMiru::TextInfo *it, int len, LPCTSTR lpSrc, TxtMiru::TextType textType=TxtMiru::TextType::TEXT)
 {
 	std::tstring str1st;
 	int matchNum = 0;
@@ -212,7 +212,7 @@ static bool isLineStartNGCharacters(const CGrTxtParam &param, TxtMiru::TextInfo 
 			while(*lpNextSrc){
 				sc = lpNextSrc;
 				lpNextSrc = CGrText::CharNext(lpNextSrc);
-				if(param.FindIF(CGrTxtParam::LineStartNGCharacters, static_cast<CGrTxtParam::CGrStringCompare&&>(sc)) >= 0){
+				if(param.FindIF(CGrTxtParam::ValueType::LineStartNGCharacters, static_cast<CGrTxtParam::CGrStringCompare&&>(sc)) >= 0){
 					bBreak = false;
 				} else {
 					bBreak = true;
@@ -240,7 +240,7 @@ static bool isLineStartNGCharacters(const CGrTxtParam &param, TxtMiru::TextInfo 
 					bBreak = true;
 					break;
 				}
-				if(param.FindIF(CGrTxtParam::LineStartNGCharacters, static_cast<CGrTxtParam::CGrStringCompare&&>(sc)) >= 0){
+				if(param.FindIF(CGrTxtParam::ValueType::LineStartNGCharacters, static_cast<CGrTxtParam::CGrStringCompare&&>(sc)) >= 0){
 					++matchNum;
 					bBreak = false;
 					// 3 文字以上は、ぶら下げないが
@@ -298,13 +298,13 @@ class CGrPointMapper
 			const auto &param = CGrTxtMiru::theApp().Param();
 			txtLayout.left = txtLayout.top = txtLayout.right = txtLayout.bottom = -1;
 			const auto &layout = doc.GetConstLayout();
-			lsText = layout.GetLineSize(CGrTxtLayout::LST_Text);
-			lsRuby = layout.GetLineSize(CGrTxtLayout::LST_Ruby);
-			lsNote = layout.GetLineSize(CGrTxtLayout::LST_Note);
+			lsText = layout.GetLineSize(CGrTxtLayout::LineSizeType::Text);
+			lsRuby = layout.GetLineSize(CGrTxtLayout::LineSizeType::Ruby);
+			lsNote = layout.GetLineSize(CGrTxtLayout::LineSizeType::Note);
 			izLineWidth = lsText.width + lsText.space + lsRuby.width + lsRuby.space;
-			param.GetText(CGrTxtParam::NoteFormat, noteFmt);
+			param.GetText(CGrTxtParam::TextType::NoteFormat, noteFmt);
 			iCurTextWidth = lsText.width;
-			bRubyPosition = param.GetBoolean(CGrTxtParam::RubyPosition);
+			bRubyPosition = param.GetBoolean(CGrTxtParam::PointsType::RubyPosition);
 		}
 		void SetTxtLayout(const TxtMiru::TxtLayout tl){
 			txtLayout = tl;
@@ -398,11 +398,11 @@ class CGrPointMapper
 					ref_tp = CGrTxtMapper::NextTextPoint(ref_tp, text_list);
 					++tpCur.iPos;
 					continue;
-				} else if(ref_tp.iIndex < size && ref_tp.iIndex >= 0 && ref_tp.iPos != 0 && text_list[ref_tp.iIndex].textType == TxtMiru::TT_OTHER){ // 注記の外枠への表示部分は対象外(iPos ≧ 1 以降に注記が入る)
+				} else if(ref_tp.iIndex < size && ref_tp.iIndex >= 0 && ref_tp.iPos != 0 && text_list[ref_tp.iIndex].textType == TxtMiru::TextType::OTHER){ // 注記の外枠への表示部分は対象外(iPos ≧ 1 以降に注記が入る)
 					++ref_tp.iIndex;
 					ref_tp.iPos = 0;
 					continue;
-				} else if(text_list[ref_tp.iIndex].textType == TxtMiru::TT_RUBY){ // ルビには、線とは引かない
+				} else if(text_list[ref_tp.iIndex].textType == TxtMiru::TextType::RUBY){ // ルビには、線とは引かない
 					++ref_tp.iIndex;
 					ref_tp.iPos = 0;
 					continue;
@@ -481,18 +481,18 @@ class CGrPointMapper
 		void SetTextType(const TxtMiru::TextInfo &ti){
 			ttCur = ti.textType;
 			switch(ti.textType){
-			case TxtMiru::TT_SMALL_NOTE    : // through
-			case TxtMiru::TT_SMALL_NOTE_R  : // through
-			case TxtMiru::TT_SUP_NOTE      : setHalfChar(ti.chrType, true ); break;
-			case TxtMiru::TT_SMALL_NOTE_L  : // through
-			case TxtMiru::TT_SUB_NOTE      : // through
-			case TxtMiru::TT_GUID_MARK     : setHalfChar(ti.chrType, false); break;
-			case TxtMiru::TT_SKIP_CHAR     :
+			case TxtMiru::TextType::SMALL_NOTE    : // through
+			case TxtMiru::TextType::SMALL_NOTE_R  : // through
+			case TxtMiru::TextType::SUP_NOTE      : setHalfChar(ti.chrType, true ); break;
+			case TxtMiru::TextType::SMALL_NOTE_L  : // through
+			case TxtMiru::TextType::SUB_NOTE      : // through
+			case TxtMiru::TextType::GUID_MARK     : setHalfChar(ti.chrType, false); break;
+			case TxtMiru::TextType::SKIP_CHAR     :
 				cp.h = cp.w = cp.ch_w = cp.ch_h = 0;
 				resetKeepPos();
 				break;
-			case TxtMiru::TT_KU1_CHAR      : // through
-			case TxtMiru::TT_KU2_CHAR      :
+			case TxtMiru::TextType::KU1_CHAR      : // through
+			case TxtMiru::TextType::KU2_CHAR      :
 				cp.ch_h = lsText.width * 2;
 				cp.h    = cp.ch_h + izTextSpace;
 				cp.ch_w = cp.w = iCurTextWidth;
@@ -588,7 +588,7 @@ class CGrPointMapper
 			_stprintf_s(buf, noteFmt.c_str(), iNoteNum);
 
 			note_cp.w = lsRuby.width;
-			if(ti.textType != TxtMiru::TT_OTHER){
+			if(ti.textType != TxtMiru::TextType::OTHER){
 				note_cp.x += lsText.width + lsRuby.space;
 			}
 			setNote(cp_map, buf, note_cp, lsRuby.width / 2, lsRuby.width);
@@ -674,7 +674,7 @@ class CGrPointMapper
 				{ -1, -1, -1, -1 },
 				{ -1, -1, -1, -1 },
 			};
-			if(ti.textType == TxtMiru::TT_RUBY_L || ti.textType == TxtMiru::TT_NOTE_L){
+			if(ti.textType == TxtMiru::TextType::RUBY_L || ti.textType == TxtMiru::TextType::NOTE_L){
 				getRubyRangeL(range, begin_ch.lcol, ch_map); // 範囲の取得
 			} else {
 				getRubyRangeR(range, begin_ch.lcol, ch_map); // 範囲の取得
@@ -709,12 +709,10 @@ class CGrPointMapper
 							int maxIndex = text_list.size();
 							std::map<int,int> text_padding_map;
 							{
-								for(const auto &it : cp_map){
-									const auto &tp = it.first;
+								for(const auto & [tp, it_cp] : cp_map){
 									if(tp < tp_begin || tp_end < tp || tp.iIndex < 0 || tp.iIndex >= maxIndex){
 										continue;
 									}
-									const auto &it_cp = it.second;
 									const auto &item = text_list[tp.iIndex];
 									if(CGrTxtParser::isText(item.textType)){
 										text_padding_map[it_cp.zy] = 0;
@@ -727,9 +725,8 @@ class CGrPointMapper
 							{
 								int padding_pre = padding_top;
 								for(auto &&it : text_padding_map){
-									int zy = it.first;
-									int &padding = it.second;
-									padding = padding_pre;
+									int &it_padding = it.second;
+									it_padding = padding_pre;
 									padding_pre += padding_ch;
 								}
 							}
@@ -829,13 +826,13 @@ class CGrPointMapper
 					++tpCur.iPos;
 					ruby_cp.y += ruby_cp.h;
 					if(bottom > 0 && ruby_cp.y > bottom){
-						// ルビ行頭禁則 ぶら下げ?
-						if(!isLineStartNGCharacters(param, lpNextSrc)){
+						// ルビ行頭禁則 ぶら下げ? // 画面外にルビが配置される場合がある.......(一旦コメント)
+						//if(!isLineStartNGCharacters(param, lpNextSrc)){
 							bottom = 0;
 							ruby_cp.y = range[1].top;
 							ruby_cp.x = range[1].right;
 							++ruby_cp.lcol;
-						}
+						//}
 					}
 				}
 				return;
@@ -880,7 +877,7 @@ class CGrPointMapper
 				++iCharacters;
 			}
 		}
-		bool isSkipChar(){ return (ttCur == TxtMiru::TT_SKIP_CHAR_AUTO && iCharacters == 0); }
+		bool isSkipChar(){ return (ttCur == TxtMiru::TextType::SKIP_CHAR_AUTO && iCharacters == 0); }
 		// 範囲の取得(2行以上にまたがる場合は 考慮しない)
 		void getRubyRangeL(RECT range[2], int lcol, const std::vector<TxtMiru::CharPoint> &ch_map)
 		{
@@ -921,12 +918,12 @@ class CGrPointMapper
 		{
 			auto it=cp_map.rbegin(), e=cp_map.rend();
 			int maxIndex = text_list.size();
-			if(textType == TxtMiru::TT_RUBY_L || textType == TxtMiru::TT_NOTE_L){
+			if(textType == TxtMiru::TextType::RUBY_L || textType == TxtMiru::TextType::NOTE_L){
 				for(;it != e; ++it){
 					auto iIndex = it->first.iIndex;
 					if(tpCur.iLine == it->first.iLine && iIndex >= 0 && iIndex < maxIndex && it->second.lcol == cp.lcol &&
-					   (text_list[iIndex].textType == TxtMiru::TT_RUBY_L || text_list[iIndex].textType == TxtMiru::TT_NOTE_L
-						|| (text_list[iIndex].textType == TxtMiru::TT_ERROR && !text_list[iIndex].str.empty()))){
+					   (text_list[iIndex].textType == TxtMiru::TextType::RUBY_L || text_list[iIndex].textType == TxtMiru::TextType::NOTE_L
+						|| (text_list[iIndex].textType == TxtMiru::TextType::ERROR_STR && !text_list[iIndex].str.empty()))){
 						return it->second.y + it->second.h;
 					}
 				}
@@ -934,8 +931,8 @@ class CGrPointMapper
 				for(;it != e; ++it){
 					auto iIndex = it->first.iIndex;
 					if(tpCur.iLine == it->first.iLine && iIndex >= 0 && iIndex < maxIndex && it->second.lcol == cp.lcol &&
-					   (text_list[iIndex].textType == TxtMiru::TT_RUBY || text_list[iIndex].textType == TxtMiru::TT_UNKOWN_ERROR
-						|| (text_list[iIndex].textType == TxtMiru::TT_ERROR && !text_list[iIndex].str.empty()))){
+					   (text_list[iIndex].textType == TxtMiru::TextType::RUBY || text_list[iIndex].textType == TxtMiru::TextType::UNKOWN_ERROR
+						|| (text_list[iIndex].textType == TxtMiru::TextType::ERROR_STR && !text_list[iIndex].str.empty()))){
 						return it->second.y + it->second.h;
 					}
 				}
@@ -1085,7 +1082,7 @@ class CGrPointMapper
 		TxtMiru::CharPoint   old_sup_cp;
 		TxtMiru::CharPoint   old_sub_cp;
 		//
-		TxtMiru::TextType    ttCur = TxtMiru::TextType::TT_MaxNum;
+		TxtMiru::TextType    ttCur = TxtMiru::TextType::MaxNum;
 		TxtMiru::TextPoint   tpCur;
 		TxtMiru::TextTurnPos ttpCur;
 		TxtMiru::CharPoint   cp;
@@ -1114,8 +1111,8 @@ class CGrPointMapper
 public:
 	CGrPointMapper(const CGrTxtDocument &doc, TxtMiru::CharPointMap &cp_map)
 	: m_doc(doc), m_txtBuffer(doc.GetTxtBuffer()), m_textOffsetMap(doc.GetConstTextOffsetMap()),
-	  m_textLayout(doc.GetConstLayout().GetConstLayoutList(CGrTxtLayout::LLT_Text)),
-	  m_noteLayout(doc.GetConstLayout().GetConstLayoutList(CGrTxtLayout::LLT_Note)),
+	  m_textLayout(doc.GetConstLayout().GetConstLayoutList(CGrTxtLayout::LayoutListType::Text)),
+	  m_noteLayout(doc.GetConstLayout().GetConstLayoutList(CGrTxtLayout::LayoutListType::Note)),
 	  m_param(CGrTxtMiru::theApp().Param()), m_cpMap(cp_map),
 	  m_maxLine(doc.GetConstLayout().GetMaxLine()),
 	  m_cur(doc)
@@ -1278,7 +1275,7 @@ private:
 			setLineBoxContinueCPLeft(tp, left);
 		} else if(m_iCurTxtLayout < lbp.iTxtLayout){
 			// lbp.iTxtLayoutの左端までを範囲に変更
-			if (lbp.iTxtLayout < m_iLayoutMaxNum) {/*2.0.44.0*/
+			if (lbp.iTxtLayout < m_iLayoutMaxNum) {
 				const auto& layout = m_textLayout[lbp.iTxtLayout];
 				setLineBoxContinueCPLeft(tp, layout.left);
 			}
@@ -1371,13 +1368,13 @@ private:
 		auto lpNextSrc = m_cur.Get1stChar(text.c_str());
 		m_cur.SetTextType(ti);
 		switch(ti.textType){
-		case TxtMiru::TT_CENTER    :
+		case TxtMiru::TextType::CENTER    :
 			m_iCenterILine = m_cur.tpCur.iLine;
 			break;
-		case TxtMiru::TT_TEXT_SIZE :
+		case TxtMiru::TextType::TEXT_SIZE :
 			m_cur.SetCharSize(static_cast<signed short>(ti.chrType));
 			break;
-		case TxtMiru::TT_LINE_BOX_START  :
+		case TxtMiru::TextType::LINE_BOX_START  :
 			{
 				// 罫囲み 番号(n番目)
 				int line_no = ti.chrType;
@@ -1415,7 +1412,7 @@ private:
 							if(m_cpMap.find(ref_tp) == m_cpMap.end()){
 								ref_tp = CGrTxtMapper::NextTextPoint(ref_tp, text_list);
 								continue;
-							} else if(ref_tp.iIndex < size && ref_tp.iIndex >= 0 && text_list[ref_tp.iIndex].textType == TxtMiru::TT_OTHER){ // 注記は対象外
+							} else if(ref_tp.iIndex < size && ref_tp.iIndex >= 0 && text_list[ref_tp.iIndex].textType == TxtMiru::TextType::OTHER){ // 注記は対象外
 								++ref_tp.iIndex;
 								ref_tp.iPos = 0;
 								continue;
@@ -1423,7 +1420,10 @@ private:
 							const TxtMiru::CharPoint &ref_cp = m_cpMap[ref_tp];
 							m_cpMap[tp].zx = ref_cp.zx;
 							m_cpMap[tp].w  = ref_cp.w ;
-							break;
+							if (ref_cp.lcol >= m_iStartLine) {
+								break;
+							}
+							++ref_tp.iIndex;
 						}
 					}
 				} else {
@@ -1432,7 +1432,7 @@ private:
 				}
 			}
 			break;
-		case TxtMiru::TT_LINE_BOX_END    :
+		case TxtMiru::TextType::LINE_BOX_END    :
 			{
 				// 罫囲み 番号(n番目)
 				int line_no = ti.chrType;
@@ -1456,14 +1456,14 @@ private:
 				}
 			}
 			break;
-		case TxtMiru::TT_RINDENT         : // through
-		case TxtMiru::TT_RINDENT_START   : // through
-		case TxtMiru::TT_RINDENT_END     : m_cur.SetBottomIndent(ti.tpBegin.iIndex, ti.tpEnd.iPos); break; // 行末からのインデント開始
-		case TxtMiru::TT_INDENT          : // through
-		case TxtMiru::TT_INDENT_START    : // through
-		case TxtMiru::TT_INDENT_END      : m_cur.SetTopIndent(ti.tpBegin.iIndex, ti.tpEnd.iIndex, true); break;  // 行頭からのインデント開始
-		case TxtMiru::TT_ROTATE_NUM      : // through
-		case TxtMiru::TT_ROTATE_NUM_AUTO:
+		case TxtMiru::TextType::RINDENT         : // through
+		case TxtMiru::TextType::RINDENT_START   : // through
+		case TxtMiru::TextType::RINDENT_END     : m_cur.SetBottomIndent(ti.tpBegin.iIndex, ti.tpEnd.iPos); break; // 行末からのインデント開始
+		case TxtMiru::TextType::INDENT          : // through
+		case TxtMiru::TextType::INDENT_START    : // through
+		case TxtMiru::TextType::INDENT_END      : m_cur.SetTopIndent(ti.tpBegin.iIndex, ti.tpEnd.iIndex, true); break;  // 行頭からのインデント開始
+		case TxtMiru::TextType::ROTATE_NUM      : // through
+		case TxtMiru::TextType::ROTATE_NUM_AUTO:
 			if(m_cur.IsTurnup()){
 				nextLine();
 				m_cur.Turnup();
@@ -1496,16 +1496,16 @@ private:
 			}
 			m_cur.EndHorz();
 			break;
-		case TxtMiru::TT_SMALL_NOTE      : // through
-		case TxtMiru::TT_SMALL_NOTE_R    : // through
-		case TxtMiru::TT_SMALL_NOTE_L    : // through
-		case TxtMiru::TT_SUP_NOTE        : // through
-		case TxtMiru::TT_SUB_NOTE        : // through
-		case TxtMiru::TT_GUID_MARK       : // through
-		case TxtMiru::TT_SKIP_CHAR       : // through
-		case TxtMiru::TT_SKIP_CHAR_AUTO  : // through
-		case TxtMiru::TT_TEXT            : // through
-		case TxtMiru::TT_LINE_CHAR       :
+		case TxtMiru::TextType::SMALL_NOTE      : // through
+		case TxtMiru::TextType::SMALL_NOTE_R    : // through
+		case TxtMiru::TextType::SMALL_NOTE_L    : // through
+		case TxtMiru::TextType::SUP_NOTE        : // through
+		case TxtMiru::TextType::SUB_NOTE        : // through
+		case TxtMiru::TextType::GUID_MARK       : // through
+		case TxtMiru::TextType::SKIP_CHAR       : // through
+		case TxtMiru::TextType::SKIP_CHAR_AUTO  : // through
+		case TxtMiru::TextType::TEXT            : // through
+		case TxtMiru::TextType::LINE_CHAR       :
 			for(;*lpNextSrc; lpNextSrc=CGrText::CharNext(lpNextSrc)){
 				if(m_cur.IsTurnup()){
 					nextLine();
@@ -1526,8 +1526,8 @@ private:
 				}
 			}
 			break;
-		case TxtMiru::TT_KU1_CHAR       : // through
-		case TxtMiru::TT_KU2_CHAR       :
+		case TxtMiru::TextType::KU1_CHAR       : // through
+		case TxtMiru::TextType::KU2_CHAR       :
 			for(;*lpNextSrc; lpNextSrc=CGrText::CharNext(lpNextSrc)){
 				if(m_cur.IsTurnup()){
 					nextLine();
@@ -1538,12 +1538,12 @@ private:
 			// TT_KU1_CHAR, TT_KU2_CHAR は、4バイトとして処理
 			m_cur.NextPosNoSpace();
 			break;
-		case TxtMiru::TT_OTHER          :
+		case TxtMiru::TextType::OTHER          :
 			m_cur.SetCharPointMap(m_cpMap);
 			m_cur.NextPos();
 			m_cur.Note(m_noteLayout[0], text_list, m_cpMap, ti);
 			break;
-		case TxtMiru::TT_OVERLAP_CHAR   :
+		case TxtMiru::TextType::OVERLAP_CHAR   :
 			m_cur.BeginOverlap(m_cpMap, ti.tpBegin);
 			for(;*lpNextSrc; lpNextSrc=CGrText::CharNext(lpNextSrc)){
 				if(m_cur.IsTurnup()){
@@ -1555,55 +1555,55 @@ private:
 			}
 			m_cur.EndOverlap();
 			break;
-		case TxtMiru::TT_LINK              :
+		case TxtMiru::TextType::LINK              :
 			if(ti.tpEnd.iIndex == -1 && ti.tpEnd.iPos == -1){
 				;
 			} else {
 				m_cur.DrawLine(text_list, m_cpMap, ti, 1/*-1*/);
 			}
 			break;
-		case TxtMiru::TT_NO_READ             : // through
-		case TxtMiru::TT_OTHER_NOTE          : // through
-		case TxtMiru::TT_ERROR               : // through
-		case TxtMiru::TT_NOTE                : m_cur.Note(m_noteLayout[0], text_list, m_cpMap, ti); break;
-		case TxtMiru::TT_MOVING_BORDER       : // through
-		case TxtMiru::TT_DOT                 : // through
-		case TxtMiru::TT_SALTIRE_DOT         : // through
-		case TxtMiru::TT_WHITE_DOT           : // through
-		case TxtMiru::TT_ROUND_DOT           : // through
-		case TxtMiru::TT_WHITE_ROUND_DOT     : // through
-		case TxtMiru::TT_BLACK_TRIANGLE_DOT  : // through
-		case TxtMiru::TT_WHITE_TRIANGLE_DOT  : // through
-		case TxtMiru::TT_DOUBLE_ROUND_DOT    : // through
-		case TxtMiru::TT_BULLS_EYE_DOT       : // through
-		case TxtMiru::TT_LINE                : // through
-		case TxtMiru::TT_WAVE_LINE           : // through
-		case TxtMiru::TT_SHORT_DASHED_LINE   : // through
-		case TxtMiru::TT_DOT_LINE            : // through
-		case TxtMiru::TT_DOUBLE_LINE         : m_cur.DrawLine(text_list, m_cpMap, ti, 1 ); break;
-		case TxtMiru::TT_DEL_LINE            : m_cur.DrawLine(text_list, m_cpMap, ti, 0 ); break;
-		case TxtMiru::TT_WHITE_DOT_L         : // through
-		case TxtMiru::TT_ROUND_DOT_L         : // through
-		case TxtMiru::TT_WHITE_ROUND_DOT_L   : // through
-		case TxtMiru::TT_BLACK_TRIANGLE_DOT_L: // through
-		case TxtMiru::TT_WHITE_TRIANGLE_DOT_L: // through
-		case TxtMiru::TT_DOUBLE_ROUND_DOT_L  : // through
-		case TxtMiru::TT_BULLS_EYE_DOT_L     : // through
-		case TxtMiru::TT_SALTIRE_DOT_L       : // through
-		case TxtMiru::TT_DOT_L               : // through
-		case TxtMiru::TT_LINE_L              : // through
-		case TxtMiru::TT_WAVE_LINE_L         : // through
-		case TxtMiru::TT_SHORT_DASHED_LINE_L : // through
-		case TxtMiru::TT_DOT_LINE_L          : // through
-		case TxtMiru::TT_DOUBLE_LINE_L       : // through
-		case TxtMiru::TT_UNDER_LINE          : m_cur.DrawLine(text_list, m_cpMap, ti, -1); break;
-		case TxtMiru::TT_RUBY                : // through
-		case TxtMiru::TT_RUBY_L              : // through
-		case TxtMiru::TT_NOTE_L              : // through
-		case TxtMiru::TT_UNKOWN_ERROR        : m_cur.DrawRuby(text_list, m_cpMap, ti, m_textOffsetMap); break;
-		case TxtMiru::TT_PICTURE_LAYOUT      : // through
-		case TxtMiru::TT_PICTURE_HALF_PAGE   : // through
-		case TxtMiru::TT_PICTURE_FULL_PAGE   :
+		case TxtMiru::TextType::NO_READ             : // through
+		case TxtMiru::TextType::OTHER_NOTE          : // through
+		case TxtMiru::TextType::ERROR_STR           : // through
+		case TxtMiru::TextType::NOTE                : m_cur.Note(m_noteLayout[0], text_list, m_cpMap, ti); break;
+		case TxtMiru::TextType::MOVING_BORDER       : // through
+		case TxtMiru::TextType::DOT                 : // through
+		case TxtMiru::TextType::SALTIRE_DOT         : // through
+		case TxtMiru::TextType::WHITE_DOT           : // through
+		case TxtMiru::TextType::ROUND_DOT           : // through
+		case TxtMiru::TextType::WHITE_ROUND_DOT     : // through
+		case TxtMiru::TextType::BLACK_TRIANGLE_DOT  : // through
+		case TxtMiru::TextType::WHITE_TRIANGLE_DOT  : // through
+		case TxtMiru::TextType::DOUBLE_ROUND_DOT    : // through
+		case TxtMiru::TextType::BULLS_EYE_DOT       : // through
+		case TxtMiru::TextType::LINE                : // through
+		case TxtMiru::TextType::WAVE_LINE           : // through
+		case TxtMiru::TextType::SHORT_DASHED_LINE   : // through
+		case TxtMiru::TextType::DOT_LINE            : // through
+		case TxtMiru::TextType::DOUBLE_LINE         : m_cur.DrawLine(text_list, m_cpMap, ti, 1 ); break;
+		case TxtMiru::TextType::DEL_LINE            : m_cur.DrawLine(text_list, m_cpMap, ti, 0 ); break;
+		case TxtMiru::TextType::WHITE_DOT_L         : // through
+		case TxtMiru::TextType::ROUND_DOT_L         : // through
+		case TxtMiru::TextType::WHITE_ROUND_DOT_L   : // through
+		case TxtMiru::TextType::BLACK_TRIANGLE_DOT_L: // through
+		case TxtMiru::TextType::WHITE_TRIANGLE_DOT_L: // through
+		case TxtMiru::TextType::DOUBLE_ROUND_DOT_L  : // through
+		case TxtMiru::TextType::BULLS_EYE_DOT_L     : // through
+		case TxtMiru::TextType::SALTIRE_DOT_L       : // through
+		case TxtMiru::TextType::DOT_L               : // through
+		case TxtMiru::TextType::LINE_L              : // through
+		case TxtMiru::TextType::WAVE_LINE_L         : // through
+		case TxtMiru::TextType::SHORT_DASHED_LINE_L : // through
+		case TxtMiru::TextType::DOT_LINE_L          : // through
+		case TxtMiru::TextType::DOUBLE_LINE_L       : // through
+		case TxtMiru::TextType::UNDER_LINE          : m_cur.DrawLine(text_list, m_cpMap, ti, -1); break;
+		case TxtMiru::TextType::RUBY                : // through
+		case TxtMiru::TextType::RUBY_L              : // through
+		case TxtMiru::TextType::NOTE_L              : // through
+		case TxtMiru::TextType::UNKOWN_ERROR        : m_cur.DrawRuby(text_list, m_cpMap, ti, m_textOffsetMap); break;
+		case TxtMiru::TextType::PICTURE_LAYOUT      : // through
+		case TxtMiru::TextType::PICTURE_HALF_PAGE   : // through
+		case TxtMiru::TextType::PICTURE_FULL_PAGE   :
 			setCaption(ti);
 			break;
 		}
@@ -1623,7 +1623,7 @@ private:
 		}
 		int line = 1;
 		const auto &layout = m_doc.GetConstLayout();
-		const auto &lsRunningHeads = layout.GetLineSize(CGrTxtLayout::LST_RunningHeads);
+		const auto &lsRunningHeads = layout.GetLineSize(CGrTxtLayout::LineSizeType::RunningHeads);
 		TxtMiru::TextPoint tp;
 		tp.iLine  = m_cur.tpCur.iLine;
 		tp.iIndex = ti.tpBegin.iIndex;
@@ -1702,36 +1702,36 @@ void CGrTxtMapper::setNombre(const CGrTxtDocument &doc, const TxtMiru::TextInfo 
 	auto lpNextSrc = ti.str.c_str();
 	int nombre = 0;
 	const auto &layout = doc.GetConstLayout();
-	enum PositionFormat { PF_LEFT, PF_CENTER, PF_RIGHT } pf = PF_LEFT;
+	enum class PositionFormat { LEFT, CENTER, RIGHT } pf = PositionFormat::LEFT;
 	switch(ti.textType){
-	case TxtMiru::TT_NOMBRE1:
+	case TxtMiru::TextType::NOMBRE1:
 		// デフォルト値を使用 nombre = 0;
 		switch(layout.GetNombreFormatType()){
-		case CGrTxtLayout::NFT_center : pf = PF_CENTER; break;
-		case CGrTxtLayout::NFT_inside : pf = PF_RIGHT ; break;
+		case CGrTxtLayout::NombreFormatType::center : pf = PositionFormat::CENTER; break;
+		case CGrTxtLayout::NombreFormatType::inside : pf = PositionFormat::RIGHT ; break;
 			// デフォルト値を使用
 		default: break;
 		}
 		break;
-	case TxtMiru::TT_NOMBRE2:
+	case TxtMiru::TextType::NOMBRE2:
 		nombre = 1;
 		switch(layout.GetNombreFormatType()){
-		case CGrTxtLayout::NFT_center : pf = PF_CENTER; break;
+		case CGrTxtLayout::NombreFormatType::center : pf = PositionFormat::CENTER; break;
 			// デフォルト値を使用
-		case CGrTxtLayout::NFT_outside: pf = PF_RIGHT ; break;
+		case CGrTxtLayout::NombreFormatType::outside: pf = PositionFormat::RIGHT ; break;
 		default: break;
 		}
 		break;
 	default: return;
 	}
-	const auto &layoutNombre=layout.GetConstLayoutList(CGrTxtLayout::LLT_Nombre);
+	const auto &layoutNombre=layout.GetConstLayoutList(CGrTxtLayout::LayoutListType::Nombre);
 	if(nombre >= static_cast<signed int>(layoutNombre.size())){
 		return;
 	}
 	if(layoutNombre[nombre].lines <= 0){ // 非表示の場合は、高さ0に
 		return;
 	}
-	const auto &lsNombre = layout.GetLineSize(CGrTxtLayout::LST_Nombre);
+	const auto &lsNombre = layout.GetLineSize(CGrTxtLayout::LineSizeType::Nombre);
 	TxtMiru::TextPoint tp;
 	tp.iIndex = iIndex;
 	TxtMiru::CharPoint cp;
@@ -1753,10 +1753,10 @@ void CGrTxtMapper::setNombre(const CGrTxtDocument &doc, const TxtMiru::TextInfo 
 	}
 	int x = 0;
 	switch(pf){
-	case PF_CENTER:
+	case PositionFormat::CENTER:
 		x = (layoutNombre[nombre].right - cp.x - cp.w) / 2;
 		break;
-	case PF_RIGHT :
+	case PositionFormat::RIGHT :
 		x = layoutNombre[nombre].right - cp.x - cp.w;
 		break;
 	}
@@ -1771,16 +1771,16 @@ void CGrTxtMapper::setNombre(const CGrTxtDocument &doc, const TxtMiru::TextInfo 
 }
 void CGrTxtMapper::setRunningHeads(const CGrTxtDocument &doc, const TxtMiru::TextInfo &ti, int iIndex)
 {
-	if(ti.textType != TxtMiru::TT_RUNNINGHEADS){
+	if(ti.textType != TxtMiru::TextType::RUNNINGHEADS){
 		return;
 	}
 	auto lpNextSrc = ti.str.c_str();
 	const auto &layout = doc.GetConstLayout();
-	const auto &layoutRunningHeads=layout.GetConstLayoutList(CGrTxtLayout::LLT_RunningHeads);
+	const auto &layoutRunningHeads=layout.GetConstLayoutList(CGrTxtLayout::LayoutListType::RunningHeads);
 	if(0 >= static_cast<signed int>(layoutRunningHeads.size())){
 		return;
 	}
-	const auto &lsRunningHeads = layout.GetLineSize(CGrTxtLayout::LST_RunningHeads);
+	const auto &lsRunningHeads = layout.GetLineSize(CGrTxtLayout::LineSizeType::RunningHeads);
 	int half_rh_width = lsRunningHeads.width / 2 + lsRunningHeads.space;
 	int rh_width      = lsRunningHeads.width     + lsRunningHeads.space;
 	TxtMiru::TextPoint tp;
@@ -1906,14 +1906,14 @@ public:
 	: m_doc(doc), m_textOffsetMap(doc.GetTextOffsetMap()), m_textLayout(txtLayout), m_param(CGrTxtMiru::theApp().Param())
 	{
 		m_textOffsetMap.clear();
-		m_param.GetPoints(CGrTxtParam::TateChuNum, (int*)&m_iTateChuNum, 1);
+		m_param.GetPoints(CGrTxtParam::PointsType::TateChuNum, (int*)&m_iTateChuNum, 1);
 		m_iLayoutMaxNum = m_textLayout.size();
 		if(m_iPageLayoutNum < m_iLayoutMaxNum / 2){
 			m_iPageLayoutNum = m_iLayoutMaxNum / 2;
 		}
 		// 追い込みができるだけのスペースがあるかどうかをチェック
 		const auto &layout = doc.GetConstLayout();
-		auto lsText = layout.GetLineSize(CGrTxtLayout::LST_Text);
+		auto lsText = layout.GetLineSize(CGrTxtLayout::LineSizeType::Text);
 		const auto &tl = getCurrentTxtLayout();
 		int i_line_width = (tl.bottom - tl.top); /* 行幅 */
 		int i_need_line_width = lsText.width * (tl.characters + 1/*追い込み用*/); /* 必要な行幅 */
@@ -1922,7 +1922,7 @@ public:
 		}
 		m_iCurTextL1byteSize = text_l_1byte_size;
 		m_iCurTextL2byteSize = text_l_2byte_size;
-		m_bImageNextLayout   = m_param.GetBoolean(CGrTxtParam::ImageNextLayout);
+		m_bImageNextLayout   = m_param.GetBoolean(CGrTxtParam::PointsType::ImageNextLayout);
 	}
 	void Create()
 	{
@@ -2068,16 +2068,16 @@ private:
 			while(pi.iIndex > 0){
 				--pi.iIndex;
 				switch(text_list[pi.iIndex].textType){
-				case TxtMiru::TT_OTHER          : // through
-				case TxtMiru::TT_TEXT           : // through
-				case TxtMiru::TT_LINE_CHAR      :
+				case TxtMiru::TextType::OTHER          : // through
+				case TxtMiru::TextType::TEXT           : // through
+				case TxtMiru::TextType::LINE_CHAR      :
 					getPrevPosInfo(pi, text_list);
 					return;
 					break;
-				case TxtMiru::TT_ROTATE_NUM     : // through // 縦中横
-				case TxtMiru::TT_ROTATE_NUM_AUTO: // through
-				case TxtMiru::TT_KU1_CHAR       : // through
-				case TxtMiru::TT_KU2_CHAR       :
+				case TxtMiru::TextType::ROTATE_NUM     : // through // 縦中横
+				case TxtMiru::TextType::ROTATE_NUM_AUTO: // through
+				case TxtMiru::TextType::KU1_CHAR       : // through
+				case TxtMiru::TextType::KU2_CHAR       :
 					getPrevPosInfo(pi, text_list);
 					pi.iPos = 0;
 					pi.iNum = CGrText::CharLen(pi.lpSrc);
@@ -2150,7 +2150,7 @@ private:
 			CGrArrange(const CGrTxtParam &p, TxtMiru::TextOffsetMap &t, TxtMiru::TextTurnPos &pre)
 			: param(p), textOffsetMap(t), pre_ttp(pre){}
 			virtual bool IsValid(TxtMiru::TextType tt){
-				return tt == TxtMiru::TT_SKIP_CHAR_AUTO;
+				return tt == TxtMiru::TextType::SKIP_CHAR_AUTO;
 			}
 			virtual bool SetChar(const TxtMiru::TextPoint &cur, LPCTSTR lpSrc, LPCTSTR lpEnd){
 				if(textOffsetMap.find(cur) == textOffsetMap.end()){
@@ -2213,7 +2213,7 @@ private:
 			bHangingLine = false;
 			auto &&ti = (*it);
 			if(isComment(ti)){
-				ti.textType = TxtMiru::TT_COMMENT;
+				ti.textType = TxtMiru::TextType::COMMENT;
 				continue;
 			}
 			if(!isNeedNewLine(ti)){
@@ -2225,36 +2225,36 @@ private:
 			auto lpBeginSrc = text.c_str();
 			auto lpNextSrc  = lpBeginSrc;
 			switch(ti.textType){
-			case TxtMiru::TT_LINE_BOX_START:
+			case TxtMiru::TextType::LINE_BOX_START:
 				iLineBoxStart = m_iCurLine;
 				break;
-			case TxtMiru::TT_LINE_BOX_END:
+			case TxtMiru::TextType::LINE_BOX_END:
 				if(iLineBoxStart != m_iCurLine && m_iCurTextLayoutLines == m_iCurTextLayoutMaxLines){
 					// 行頭に罫線の閉じは入れない
 					m_bSkipNextLine = true;
 				}
 				break;
-			case TxtMiru::TT_CENTER    :
+			case TxtMiru::TextType::CENTER    :
 				if(m_iCurTextLayoutLines > 0){
 					nextLayout();
 				}
 				break;
-			case TxtMiru::TT_TEXT_SIZE :
+			case TxtMiru::TextType::TEXT_SIZE :
 				setCharSize((signed short)ti.chrType);
 				break;
-			case TxtMiru::TT_HORZ_START:
+			case TxtMiru::TextType::HORZ_START:
 				m_bHorz = true;
 				if(m_iTILIndex == 0 && tl_len == 1){
 					m_bSkipNextLine = true;
 				}
 				break;
-			case TxtMiru::TT_HORZ_END:
+			case TxtMiru::TextType::HORZ_END:
 				m_bHorz = false;
 				if(m_iTILIndex == 0 && tl_len == 1){
 					m_bSkipNextLine = true;
 				}
 				break;
-			case TxtMiru::TT_OTHER     :
+			case TxtMiru::TextType::OTHER     :
 				forceSkipLine(bSkipNextLine);
 				m_iCurChar = maxCurChar();
 				++m_iLineCharNum;
@@ -2280,7 +2280,7 @@ private:
 							if(isLineStartSkipCharacter(lpPrevSrc)){
 								// ２行目以降の行頭の無視する文字の時 ※折り返した後の先頭行が、先頭行時、非表示文字の時は 属性を非表示にして その分の高さを引いておく
 								// ※折り返しての「空白」は、無視する
-								text_list[iPrevIndex].textType = TxtMiru::TT_SKIP_CHAR_AUTO;
+								text_list[iPrevIndex].textType = TxtMiru::TextType::SKIP_CHAR_AUTO;
 								m_iCurChar -= HalfCharCur(text_list[iPrevIndex].chrType);
 								--m_iLineCharNum;
 								setTurnupNextLine(tlpTurnList, m_iTILIndex, iPos, nextHeight);
@@ -2303,7 +2303,8 @@ private:
 						--m_iLineCharNum;
 						if(isLineStartSkipCharacter(lpSrc)){
 							// ２行目以降の行頭の無視する文字の時
-							ti.textType = TxtMiru::TT_SKIP_CHAR_AUTO;
+							ti.textType = TxtMiru::TextType::SKIP_CHAR_AUTO;
+							//DBGPRINT(_T("setTurnupNextLine"));
 							setTurnupNextLine(tlpTurnList, m_iTILIndex, iPos, 0);
 						} else {
 							setTurnupNextLine(tlpTurnList, m_iTILIndex, iPos, nextHeight);
@@ -2312,7 +2313,7 @@ private:
 					} while(0);
 				}
 				break;
-			case TxtMiru::TT_ROTATE_NUM      : // 縦中横
+			case TxtMiru::TextType::ROTATE_NUM      : // 縦中横
 				forceSkipLine(bSkipNextLine);
 				m_iCurChar = maxCurChar();
 				m_iCurChar += m_iCurTextL2byteSize;
@@ -2374,11 +2375,11 @@ private:
 					++m_iLineCharNum;
 				}
 				break;
-			case TxtMiru::TT_ROTATE_NUM_AUTO:
-			case TxtMiru::TT_TEXT           :
-			case TxtMiru::TT_LINE_CHAR      :
-			case TxtMiru::TT_SKIP_CHAR      :
-			case TxtMiru::TT_SKIP_CHAR_AUTO :
+			case TxtMiru::TextType::ROTATE_NUM_AUTO:
+			case TxtMiru::TextType::TEXT           :
+			case TxtMiru::TextType::LINE_CHAR      :
+			case TxtMiru::TextType::SKIP_CHAR      :
+			case TxtMiru::TextType::SKIP_CHAR_AUTO :
 				forceSkipLine(bSkipNextLine);
 				m_iCurChar = maxCurChar();
 				if(!m_bHorz && isTateChuYoko(text_list, m_iTILIndex, ti.chrType, text.c_str(), m_iTateChuNum)/* 縦中横 */){
@@ -2404,8 +2405,8 @@ private:
 								// 行頭禁則文字
 								if(m_bNoPrevLine){ /* 追い込み禁止 */
 									auto orgTextType = ti.textType;
-									ti.textType = TxtMiru::TT_ROTATE_NUM_AUTO; // 設定から縦中横自動設定
-									auto [prePi_iNum, iPrev2Index, iPrev2Pos, afterAddHeight] = getRunOutPos(tlpTurnList, text_list, m_iTILIndex, 0);
+									ti.textType = TxtMiru::TextType::ROTATE_NUM_AUTO; // 設定から縦中横自動設定
+									auto [prePi_iNum, iPrev2Index, iPrev2Pos, afterAddHeight] = getRunOutPos(tlpTurnList, text_list, m_iTILIndex, 0); DBGPRINT(_T("prePi_iNum=%d"), prePi_iNum);
 									if(prePi_iNum == -2){
 										break;
 									} else if(prePi_iNum > 0){
@@ -2439,12 +2440,12 @@ private:
 						m_iCurChar -= m_iCurTextL2byteSize;
 						setTurnupNextLine(tlpTurnList, m_iTILIndex, 0, m_iCurTextL2byteSize);
 					} while(0);
-					ti.textType = TxtMiru::TT_ROTATE_NUM_AUTO; // 設定から縦中横自動設定
+					ti.textType = TxtMiru::TextType::ROTATE_NUM_AUTO; // 設定から縦中横自動設定
 					++m_iLineCharNum;
 				} else {
-					if(/**/ti.textType == TxtMiru::TT_ROTATE_NUM_AUTO // 前回、自動で縦中横に設定されていたものを横書きに再設定(上の条件から外れているので)
-					   ||  ti.textType == TxtMiru::TT_SKIP_CHAR_AUTO ){
-						ti.textType = TxtMiru::TT_TEXT;
+					if(/**/ti.textType == TxtMiru::TextType::ROTATE_NUM_AUTO // 前回、自動で縦中横に設定されていたものを横書きに再設定(上の条件から外れているので)
+					   ||  ti.textType == TxtMiru::TextType::SKIP_CHAR_AUTO ){
+						ti.textType = TxtMiru::TextType::TEXT;
 					}
 					int nextHeightOrg = HalfCharCur(ti.chrType);
 					//
@@ -2459,7 +2460,7 @@ private:
 						if(m_iLineCharNum == 0 && tlpTurnList.size() >= 2){ // 折り返し直後
 							if(isLineStartSkipCharacter(lpSrc)){
 								// ２行目以降の行頭の無視する文字の時
-								ti.textType = TxtMiru::TT_SKIP_CHAR_AUTO;
+								ti.textType = TxtMiru::TextType::SKIP_CHAR_AUTO;
 								m_iCurChar = m_iCurSubChar = m_iLineTop;
 								continue;
 							} else if(iPos == 0 && isLineStartNGCharacters(m_param, it, tl_len, lpSrc)){
@@ -2527,8 +2528,8 @@ private:
 						   (isSeparateNGCharacter(lpSrc) && m_iCurChar < m_iLineBottom
 							&& iPos > 0 && CGrText::nCmp(CGrText::CharPrev(lpBeginSrc, lpSrc), lpSrc, 1) == 0)
 						   || // 分割禁止文字「―」 はできるだけ分割されないようにする
-						   (TxtMiru::TT_LINE_CHAR == ti.textType && m_iCurChar < m_iLineBottom
-							&& m_iTILIndex > 0 && TxtMiru::TT_LINE_CHAR == text_list[m_iTILIndex-1].textType)
+						   (TxtMiru::TextType::LINE_CHAR == ti.textType && m_iCurChar < m_iLineBottom
+							&& m_iTILIndex > 0 && TxtMiru::TextType::LINE_CHAR == text_list[m_iTILIndex-1].textType)
 						   ){
 							if(m_bNoPrevLine){ /* 追い込み禁止 */
 								// 戻す余白がない場合は、引き連れて追い出す
@@ -2638,7 +2639,7 @@ private:
 								} else if(isLineStartSkipCharacter(lpPrevSrc)){
 									// ２行目以降の行頭の無視する文字の時 ※折り返した後の先頭行が、先頭行時、非表示文字の時は 属性を非表示にして その分の高さを引いておく
 									// ※折り返しての「空白」は、無視する
-									text_list[iPrevIndex].textType = TxtMiru::TT_SKIP_CHAR_AUTO;
+									text_list[iPrevIndex].textType = TxtMiru::TextType::SKIP_CHAR_AUTO;
 									m_iCurChar -= HalfCharCur(text_list[iPrevIndex].chrType);
 									--m_iLineCharNum;
 									setTurnupNextLine(tlpTurnList, m_iTILIndex, iPos, nextHeight);
@@ -2659,7 +2660,7 @@ private:
 							}
 							if(tlpTurnList.size() > 0){ // 一文字だけ改行されないように
 								if (m_bBottomIndent && m_iTILIndex > 0) { // 字上で最初の一文字の場合は、改行する
-									if (text_list[m_iTILIndex-1].textType == TxtMiru::TT_RINDENT) {
+									if (text_list[m_iTILIndex-1].textType == TxtMiru::TextType::RINDENT) {
 										setTurnupNextLine(tlpTurnList, m_iLineBottom, m_ttpNewLine, nextHeight);
 										m_ttpNewLine.iNum = 0;
 										m_ttpNewLine.iHeight = 0;
@@ -2712,7 +2713,7 @@ private:
 							--m_iLineCharNum;
 							if(isLineStartSkipCharacter(lpSrc)){ // 行頭スキップ文字
 								// ２行目以降の行頭の無視する文字の時
-								ti.textType = TxtMiru::TT_SKIP_CHAR_AUTO;
+								ti.textType = TxtMiru::TextType::SKIP_CHAR_AUTO;
 								auto [iTmp_Index, iTmp_Pos, lpTmpChar] = getNextCharInfo(text_list, m_iTILIndex, iPos);
 								if(lpTmpChar && isLineStartNGCharacter(lpTmpChar)){
 									// 次の文字が、行頭禁則文字なら追い出す
@@ -2757,19 +2758,19 @@ private:
 					}
 				}
 				break;
-			case TxtMiru::TT_SMALL_NOTE     :
-			case TxtMiru::TT_SMALL_NOTE_R   :
-			case TxtMiru::TT_SMALL_NOTE_L   :
-			case TxtMiru::TT_SUP_NOTE       :
-			case TxtMiru::TT_SUB_NOTE       :
-			case TxtMiru::TT_GUID_MARK      :
+			case TxtMiru::TextType::SMALL_NOTE     :
+			case TxtMiru::TextType::SMALL_NOTE_R   :
+			case TxtMiru::TextType::SMALL_NOTE_L   :
+			case TxtMiru::TextType::SUP_NOTE       :
+			case TxtMiru::TextType::SUB_NOTE       :
+			case TxtMiru::TextType::GUID_MARK      :
 				forceSkipLine(bSkipNextLine);
 				m_iCurSubChar = max(m_iCurSubChar, m_iCurChar + HalfCharLHalf(ti.chrType) * CGrText::CharLen(text.c_str()));
 				break;
-			case TxtMiru::TT_RUBY:
-			case TxtMiru::TT_RUBY_L:
-			case TxtMiru::TT_NOTE_L:
-			case TxtMiru::TT_UNKOWN_ERROR:
+			case TxtMiru::TextType::RUBY:
+			case TxtMiru::TextType::RUBY_L:
+			case TxtMiru::TextType::NOTE_L:
+			case TxtMiru::TextType::UNKOWN_ERROR:
 				{
 					// ルビを振る文字列をチェック(本文)
 					int begin_col = 0;
@@ -2793,7 +2794,7 @@ private:
 					//* □RUBY長対応
 					if(ruby_line_num == 0){
 						const auto &layout = m_doc.GetConstLayout();
-						auto lsRuby = layout.GetLineSize(CGrTxtLayout::LST_Ruby);
+						auto lsRuby = layout.GetLineSize(CGrTxtLayout::LineSizeType::Ruby);
 						int ruby_len = 0;
 						auto lpRuby=ti.str.c_str();
 						while(*lpRuby){
@@ -2817,7 +2818,7 @@ private:
 						int diff_len = ruby_len - target_len;
 						if(diff_len > 0){
 							TxtMiru::TextOffset to = {0};
-							if(m_param.GetBoolean(CGrTxtParam::RubyPosition)){
+							if(m_param.GetBoolean(CGrTxtParam::PointsType::RubyPosition)){
 								// ルビが中付の場合のみ
 								// 前の文字が、記号 又は 平仮名のときは ルビ一文字分ははみ出てもＯＫに
 								for(int iTmpIndex=ti.tpBegin.iIndex-1; iTmpIndex>=0; --iTmpIndex){
@@ -2901,10 +2902,10 @@ private:
 									if(TxtMiruType::isTextOrSkipOrRotateNum(textType)){
 										break;
 									} else if(
-										/**/TxtMiru::TT_RUBY_SEP       == textType
-										||  TxtMiru::TT_RUBY           == textType
-										||  TxtMiru::TT_RUBY_L         == textType
-										||  TxtMiru::TT_NOTE_L         == textType
+										/**/TxtMiru::TextType::RUBY_SEP       == textType
+										||  TxtMiru::TextType::RUBY           == textType
+										||  TxtMiru::TextType::RUBY_L         == textType
+										||  TxtMiru::TextType::NOTE_L         == textType
 										){
 										/**/
 									} else {
@@ -2952,10 +2953,10 @@ private:
 								if(TxtMiruType::isTextOrSkipOrRotateNum(textType)){
 									break;
 								} else if(
-									/**/TxtMiru::TT_RUBY_SEP       == textType
-									||  TxtMiru::TT_RUBY           == textType
-									||  TxtMiru::TT_RUBY_L         == textType
-									||  TxtMiru::TT_NOTE_L         == textType
+									/**/TxtMiru::TextType::RUBY_SEP       == textType
+									||  TxtMiru::TextType::RUBY           == textType
+									||  TxtMiru::TextType::RUBY_L         == textType
+									||  TxtMiru::TextType::NOTE_L         == textType
 									){
 									/**/
 								} else {
@@ -2987,29 +2988,29 @@ private:
 					}
 				}
 				break;
-			case TxtMiru::TT_PICTURE_LAYOUT   : setPicture(li, 1               ); break;
-			case TxtMiru::TT_PICTURE_HALF_PAGE: setPicture(li, m_iPageLayoutNum); break;
-			case TxtMiru::TT_PICTURE_FULL_PAGE: setPicture(li, m_iLayoutMaxNum ); break;
-			case TxtMiru::TT_NEXT_LAYOUT      : nextLayout    (); li.iEndCol = m_iCurLine; break; /* 改段     *//*                    *//* +------+------+ */
-			case TxtMiru::TT_NEXT_PAPER       : nextPaper     (); li.iEndCol = m_iCurLine; break; /* 改丁     *//* 必ず奇数ページから *//* |奇数**|  偶数| */
-			case TxtMiru::TT_NEXT_PAPER_FIRST : nextPaperFirst(); li.iEndCol = m_iCurLine; break; /* 改見開き *//* 必ず偶数ページから *//* |奇数  |**偶数| */
-			case TxtMiru::TT_NEXT_PAGE        : nextPage      (); li.iEndCol = m_iCurLine; break; /* 改頁     */                        /* +------+------+ */
-			case TxtMiru::TT_COMMENT_BEGIN    : m_bInComment = true ; break; // コメント開始
-			case TxtMiru::TT_COMMENT_END      : m_bInComment = false; break; // コメント終了
-			case TxtMiru::TT_RINDENT         : // 行末からインデント (該当行以降)
+			case TxtMiru::TextType::PICTURE_LAYOUT   : setPicture(li, 1               ); break;
+			case TxtMiru::TextType::PICTURE_HALF_PAGE: setPicture(li, m_iPageLayoutNum); break;
+			case TxtMiru::TextType::PICTURE_FULL_PAGE: setPicture(li, m_iLayoutMaxNum ); break;
+			case TxtMiru::TextType::NEXT_LAYOUT      : nextLayout    (); li.iEndCol = m_iCurLine; break; /* 改段     *//*                    *//* +------+------+ */
+			case TxtMiru::TextType::NEXT_PAPER       : nextPaper     (); li.iEndCol = m_iCurLine; break; /* 改丁     *//* 必ず奇数ページから *//* |奇数**|  偶数| */
+			case TxtMiru::TextType::NEXT_PAPER_FIRST : nextPaperFirst(); li.iEndCol = m_iCurLine; break; /* 改見開き *//* 必ず偶数ページから *//* |奇数  |**偶数| */
+			case TxtMiru::TextType::NEXT_PAGE        : nextPage      (); li.iEndCol = m_iCurLine; break; /* 改頁     */                        /* +------+------+ */
+			case TxtMiru::TextType::COMMENT_BEGIN    : m_bInComment = true ; break; // コメント開始
+			case TxtMiru::TextType::COMMENT_END      : m_bInComment = false; break; // コメント終了
+			case TxtMiru::TextType::RINDENT         : // 行末からインデント (該当行以降)
 				setBottomIndent(ti);
 				// ここまでの文字数を ti.tpEnd.iPos に入れる
 				ti.tpEnd.iPos = m_iCurChar - m_iLineTop;
 				m_bBottomIndent = true;
 				break;
-			case TxtMiru::TT_RINDENT_START   : // 行末からインデント 範囲：開始
+			case TxtMiru::TextType::RINDENT_START   : // 行末からインデント 範囲：開始
 				setBottomIndent(ti);
 				m_iNewBottomIndent = m_iBottomIndent;
 				m_bNewBottomIndent = true;
 				m_bSkipNextLine = true;
 				bSkipNextLine = true;
 				break;
-			case TxtMiru::TT_RINDENT_END     : // 行末からインデント 範囲：終了
+			case TxtMiru::TextType::RINDENT_END     : // 行末からインデント 範囲：終了
 				m_bBottomIndent = m_bNewBottomIndent = false;
 				m_iNewBottomIndent = m_iLineBottom = 0;
 				m_bSkipNextLine = true;
@@ -3017,27 +3018,27 @@ private:
 					setLineBottom();
 				}
 				break;
-			case TxtMiru::TT_INDENT          : // 行頭からインデント (該当行以降)
+			case TxtMiru::TextType::INDENT          : // 行頭からインデント (該当行以降)
 				setTopInent(ti);
 				m_iCurChar += m_iTopIndent1st;
 				break;
-			case TxtMiru::TT_INDENT_START    : // 行頭からインデント 範囲：開始
+			case TxtMiru::TextType::INDENT_START    : // 行頭からインデント 範囲：開始
 				setTopInent(ti);
 				m_iNewTopIndent1st = m_iTopIndent1st;
 				m_iNewTopIndent2nd = m_iTopIndent2nd;
 				m_bSkipNextLine = true;
 				break;
-			case TxtMiru::TT_INDENT_END      : // 行頭からインデント 範囲：終了
+			case TxtMiru::TextType::INDENT_END      : // 行頭からインデント 範囲：終了
 				m_iTopIndent1st = m_iTopIndent2nd = m_iNewTopIndent1st = m_iNewTopIndent2nd = 0;
 				m_bSkipNextLine = true;
 				break;
-			case TxtMiru::TT_LIMIT_CHAR_START: // 字詰め
+			case TxtMiru::TextType::LIMIT_CHAR_START: // 字詰め
 				m_iLimitChar = ti.tpBegin.iIndex * text_l_2byte_size;
 				setLineBottom();
 				m_bSkipNextLine = true;
 				break;
-			case TxtMiru::TT_KU1_CHAR        :
-			case TxtMiru::TT_KU2_CHAR        :
+			case TxtMiru::TextType::KU1_CHAR        :
+			case TxtMiru::TextType::KU2_CHAR        :
 				forceSkipLine(bSkipNextLine);
 				m_iCurChar += m_iCurTextL2byteSize*2;
 				++m_iLineCharNum;
@@ -3054,12 +3055,12 @@ private:
 		{
 			if (m_bBottomIndent && tlpTurnList.size() > 0) { // 字上の時、前の行に入りそうなら入れる
 				const auto &ttp = tlpTurnList.back();
-				if (ttp.iIndex > 0 && text_list[ttp.iIndex-1].textType == TxtMiru::TT_RINDENT) {
+				if (ttp.iIndex > 0 && text_list[ttp.iIndex-1].textType == TxtMiru::TextType::RINDENT) {
 					// 途中で折り返し
 					auto iHeight = text_list[ttp.iIndex - 1].tpEnd.iPos;
 					auto iLeftSpace = m_iLineBottom - (m_iLineTop + iHeight);
 					if (iLeftSpace > m_iCurChar) {
-						m_iCurLine -= 1;
+						prevLine();
 					}
 				}
 				else if (ttp.iIndex == 0 && m_iLLIndex > 1) {
@@ -3071,13 +3072,13 @@ private:
 					const auto &pre2_tlptl = pre2_ll.tlpTurnList;
 					if (pre2_ll.iRIndent <= 0 && // 前の行が字上なら行を戻さない
 						(pre2_tl.size() == 0 || (pre2_tl.size() > 0 && isTextBlockArea(pre2_tl[0].textType))) &&
-						pre1_tl.size() > 0 && pre2_tlptl.size() > 0 && pre1_tl[0].textType == TxtMiru::TT_RINDENT_START) {
+						pre1_tl.size() > 0 && pre2_tlptl.size() > 0 && pre1_tl[0].textType == TxtMiru::TextType::RINDENT_START) {
 						const auto &pre2_ttp = pre2_tlptl.back();
 						auto iHeight = pre2_ttp.iHeight;
 						auto iLeftSpace = m_iLineBottom - (pre2_ll.iSecondIndent + iHeight);
 						if (iLeftSpace > m_iCurChar) {
 							int iPoint = 0;
-							m_param.GetPoints(CGrTxtFuncIParam::AozoraSetting, &iPoint, 1);
+							m_param.GetPoints(CGrTxtFuncIParam::PointsType::AozoraSetting, &iPoint, 1);
 							if (iPoint == 0/* ブロック指定は、前の行に入れない */) {
 								;
 							}
@@ -3085,12 +3086,12 @@ private:
 								// 青空文庫
 								// 地付きは、前の行に戻すが、字上は戻さない
 								if (pre1_tl[0].tpBegin.iIndex == 0) {
-									m_iCurLine -= 1;
+									prevLine();
 								}
 							}
 							else {
 								// 常に前の行に入れる
-								m_iCurLine -= 1;
+								prevLine();
 							}
 						}
 					}
@@ -3134,48 +3135,48 @@ private:
 	bool isTextBlockArea(TxtMiru::TextType tt)
 	{
 		return !(
-			tt == TxtMiru::TT_INDENT ||
-			tt == TxtMiru::TT_INDENT2 ||
-			tt == TxtMiru::TT_INDENT3 ||
-			tt == TxtMiru::TT_INDENT_START ||
-			tt == TxtMiru::TT_INDENT_START2 ||
-			tt == TxtMiru::TT_INDENT_END ||
-			tt == TxtMiru::TT_RINDENT ||
-			tt == TxtMiru::TT_RINDENT_START ||
-			tt == TxtMiru::TT_RINDENT_END ||
-			tt == TxtMiru::TT_LIMIT_CHAR_START ||
-			tt == TxtMiru::TT_LIMIT_CHAR_END ||
-			tt == TxtMiru::TT_PICTURE_LAYOUT ||
-			tt == TxtMiru::TT_PICTURE_HALF_PAGE ||
-			tt == TxtMiru::TT_PICTURE_FULL_PAGE ||
-			tt == TxtMiru::TT_LINE_BOX_START ||
-			tt == TxtMiru::TT_LINE_BOX_END ||
-			tt == TxtMiru::TT_COMMENT_BEGIN ||
-			tt == TxtMiru::TT_COMMENT ||
-			tt == TxtMiru::TT_COMMENT_END ||
-			tt == TxtMiru::TT_NEXT_LAYOUT ||
-			tt == TxtMiru::TT_NEXT_PAGE ||
-			tt == TxtMiru::TT_NEXT_PAPER ||
-			tt == TxtMiru::TT_NEXT_PAPER_FIRST ||
-			tt == TxtMiru::TT_TITLE ||
-			tt == TxtMiru::TT_AUTHOR ||
+			tt == TxtMiru::TextType::INDENT ||
+			tt == TxtMiru::TextType::INDENT2 ||
+			tt == TxtMiru::TextType::INDENT3 ||
+			tt == TxtMiru::TextType::INDENT_START ||
+			tt == TxtMiru::TextType::INDENT_START2 ||
+			tt == TxtMiru::TextType::INDENT_END ||
+			tt == TxtMiru::TextType::RINDENT ||
+			tt == TxtMiru::TextType::RINDENT_START ||
+			tt == TxtMiru::TextType::RINDENT_END ||
+			tt == TxtMiru::TextType::LIMIT_CHAR_START ||
+			tt == TxtMiru::TextType::LIMIT_CHAR_END ||
+			tt == TxtMiru::TextType::PICTURE_LAYOUT ||
+			tt == TxtMiru::TextType::PICTURE_HALF_PAGE ||
+			tt == TxtMiru::TextType::PICTURE_FULL_PAGE ||
+			tt == TxtMiru::TextType::LINE_BOX_START ||
+			tt == TxtMiru::TextType::LINE_BOX_END ||
+			tt == TxtMiru::TextType::COMMENT_BEGIN ||
+			tt == TxtMiru::TextType::COMMENT ||
+			tt == TxtMiru::TextType::COMMENT_END ||
+			tt == TxtMiru::TextType::NEXT_LAYOUT ||
+			tt == TxtMiru::TextType::NEXT_PAGE ||
+			tt == TxtMiru::TextType::NEXT_PAPER ||
+			tt == TxtMiru::TextType::NEXT_PAPER_FIRST ||
+			tt == TxtMiru::TextType::TITLE ||
+			tt == TxtMiru::TextType::AUTHOR ||
 			TxtMiruType::isSubtitle(tt) ||
-			tt == TxtMiru::TT_NOMBRE1 ||
-			tt == TxtMiru::TT_NOMBRE2 ||
-			tt == TxtMiru::TT_RUNNINGHEADS ||
-			tt == TxtMiru::TT_ENDOFCONTENTS ||
-			tt == TxtMiru::TT_TEXT_SIZE ||
-			tt == TxtMiru::TT_TEXT_SIZE_L ||
-			tt == TxtMiru::TT_TEXT_SIZE_S ||
-			tt == TxtMiru::TT_CENTER ||
-			tt == TxtMiru::TT_CAPTION ||
-			tt == TxtMiru::TT_AUTHOR ||
-			tt == TxtMiru::TT_HORZ ||
-			tt == TxtMiru::TT_HORZ_START ||
-			tt == TxtMiru::TT_HORZ_END
+			tt == TxtMiru::TextType::NOMBRE1 ||
+			tt == TxtMiru::TextType::NOMBRE2 ||
+			tt == TxtMiru::TextType::RUNNINGHEADS ||
+			tt == TxtMiru::TextType::ENDOFCONTENTS ||
+			tt == TxtMiru::TextType::TEXT_SIZE ||
+			tt == TxtMiru::TextType::TEXT_SIZE_L ||
+			tt == TxtMiru::TextType::TEXT_SIZE_S ||
+			tt == TxtMiru::TextType::CENTER ||
+			tt == TxtMiru::TextType::CAPTION ||
+			tt == TxtMiru::TextType::AUTHOR ||
+			tt == TxtMiru::TextType::HORZ ||
+			tt == TxtMiru::TextType::HORZ_START ||
+			tt == TxtMiru::TextType::HORZ_END
 			);
 	}
-	// 折り返し後、TxtMiru::TT_SKIP_CHARのみの行は tlpTurnList から抹消
+	// 折り返し後、TxtMiru::TextType::SKIP_CHARのみの行は tlpTurnList から抹消
 	void removeLastEmptyLine(const std::vector<TxtMiru::TextTurnPos> &tlpTurnList, const TxtMiru::TextInfoList &text_list)
 	{
 		if(tlpTurnList.size() < 2){
@@ -3187,7 +3188,7 @@ private:
 			const auto *it_tl = &text_list[lastindex];
 			it_tl_len -= lastindex;
 			for(; it_tl_len>0; --it_tl_len, ++it_tl){
-				if(it_tl->textType != TxtMiru::TT_SKIP_CHAR && it_tl->textType != TxtMiru::TT_SKIP_CHAR_AUTO){ return; /* 文字あり */ }
+				if(it_tl->textType != TxtMiru::TextType::SKIP_CHAR && it_tl->textType != TxtMiru::TextType::SKIP_CHAR_AUTO){ return; /* 文字あり */ }
 			}
 		}
 		prevLine();
@@ -3339,7 +3340,7 @@ private:
 			CGrArrange(const CGrTxtParam &p, const TxtMiru::TextOffsetMap &t, TxtMiru::TextTurnPos &pre)
 			: param(p), textOffsetMap(t), pre_ttp(pre){}
 			virtual bool IsValid(TxtMiru::TextType tt){
-				return tt == TxtMiru::TT_TEXT;
+				return tt == TxtMiru::TextType::TEXT;
 			}
 			virtual bool SetChar(const TxtMiru::TextPoint &cur, LPCTSTR lpSrc, LPCTSTR lpEnd){
 				auto offsetType = param.GetCharOffsetType(std::tstring(lpSrc, lpEnd));
@@ -3362,7 +3363,7 @@ private:
 			CGrArrange(const CGrTxtParam &p, TxtMiru::TextOffsetMap &t, TxtMiru::TextTurnPos &pre)
 			: param(p), textOffsetMap(t), pre_ttp(pre){}
 			virtual bool IsValid(TxtMiru::TextType tt){
-				return tt == TxtMiru::TT_TEXT;
+				return tt == TxtMiru::TextType::TEXT;
 			}
 			virtual bool SetChar(const TxtMiru::TextPoint &cur, LPCTSTR lpSrc, LPCTSTR lpEnd){
 				auto offsetType = param.GetCharOffsetType(std::tstring(lpSrc, lpEnd));
@@ -3410,12 +3411,16 @@ private:
 		// 折り返し時のフォントサイズを設定
 		if(m_iCharSize != 0){
 			auto &&textStyleMap = m_doc.GetTextStyleMap();
-			auto it = textStyleMap.find(curtp);
-			if(textStyleMap.end() == it){
-				textStyleMap[curtp].uStatus = TxtMiru::TTPStatusNone;
-				textStyleMap[curtp].fontSize = m_iCharSize;
-			} else {
-				(it->second).fontSize = m_iCharSize;
+			auto tmpCurtp = curtp;
+			for(int i=0; i<=curtp.iPos; ++i){
+				tmpCurtp.iPos = i;
+				auto it = textStyleMap.find(tmpCurtp);
+				if(textStyleMap.end() == it){
+					textStyleMap[tmpCurtp].uStatus = TxtMiru::TTPStatusNone;
+					textStyleMap[tmpCurtp].fontSize = m_iCharSize;
+				} else {
+					(it->second).fontSize = m_iCharSize;
+				}
 			}
 		}
 		// 折り返し時の横組みを設定
@@ -3486,7 +3491,7 @@ private:
 	void setBottomIndent(const TxtMiru::TextInfo &ti)
 	{
 		m_iBottomIndent = ti.tpBegin.iIndex * text_l_2byte_size;
-		setLineBottom(); //m_iLineBottom   = getCurrentTxtLayout().characters * text_l_2byte_size + 1 - m_iBottomIndent; // *****
+		setLineBottom();
 		// 行末からのインデントが指定されている場合は、その位置が行頭であること (既に配置されていると、下から配置できない)
 		//   対応するのであれば、先読みして 文字数が足りるかチェックする必要がある  ※A
 		//   ※ただし、一文字の場合 m_bForceNewLine が処理されないので 同一行で 地付きになる
@@ -3498,7 +3503,7 @@ private:
 	}
 	bool isComment(const TxtMiru::TextInfo &ti) const
 	{
-		return (m_bInComment && ti.textType != TxtMiru::TT_COMMENT_END);
+		return (m_bInComment && ti.textType != TxtMiru::TextType::COMMENT_END);
 	}
 	const TxtMiru::TxtLayout &getCurrentTxtLayout()
 	{
@@ -3525,11 +3530,11 @@ private:
 		m_iNewBottomIndent = m_iBottomIndent;
 		m_bNewBottomIndent = m_bBottomIndent;
 	}
-	bool isLineStartNGCharacter  (LPCTSTR lpSrc){ return (m_param.FindIF(CGrTxtParam::LineStartNGCharacters  , CGrMapStringCompare(lpSrc)) >= 0); }
-	bool isHangingCharacter      (LPCTSTR lpSrc){ return (m_param.FindIF(CGrTxtParam::HangingCharacters      , CGrMapStringCompare(lpSrc)) >= 0); }
-	bool isLineEndNGCharacter    (LPCTSTR lpSrc){ return (m_param.FindIF(CGrTxtParam::LineEndNGCharacters    , CGrMapStringCompare(lpSrc)) >= 0); }
-	bool isLineStartSkipCharacter(LPCTSTR lpSrc){ return (m_param.FindIF(CGrTxtParam::LineStartSkipCharacters, CGrMapStringCompare(lpSrc)) >= 0); }
-	bool isSeparateNGCharacter   (LPCTSTR lpSrc){ return (m_param.FindIF(CGrTxtParam::SeparateNGCharacters   , CGrMapStringCompare(lpSrc)) >= 0); }
+	bool isLineStartNGCharacter  (LPCTSTR lpSrc){ return (m_param.FindIF(CGrTxtParam::ValueType::LineStartNGCharacters  , CGrMapStringCompare(lpSrc)) >= 0); }
+	bool isHangingCharacter      (LPCTSTR lpSrc){ return (m_param.FindIF(CGrTxtParam::ValueType::HangingCharacters      , CGrMapStringCompare(lpSrc)) >= 0); }
+	bool isLineEndNGCharacter    (LPCTSTR lpSrc){ return (m_param.FindIF(CGrTxtParam::ValueType::LineEndNGCharacters    , CGrMapStringCompare(lpSrc)) >= 0); }
+	bool isLineStartSkipCharacter(LPCTSTR lpSrc){ return (m_param.FindIF(CGrTxtParam::ValueType::LineStartSkipCharacters, CGrMapStringCompare(lpSrc)) >= 0); }
+	bool isSeparateNGCharacter   (LPCTSTR lpSrc){ return (m_param.FindIF(CGrTxtParam::ValueType::SeparateNGCharacters   , CGrMapStringCompare(lpSrc)) >= 0); }
 	//追い込み（run-in）
 	//追い出し（run-out）
 	// 指定文字以降の行に文字が残っているかどうか
@@ -3547,7 +3552,7 @@ private:
 					}
 					++iNum;
 				}
-			} else if(TxtMiruType::isRotateNum(it->textType) || it->textType == TxtMiru::TT_UNKOWN_ERROR){
+			} else if(TxtMiruType::isRotateNum(it->textType) || it->textType == TxtMiru::TextType::UNKOWN_ERROR){
 				if(isHangingCharacter(lpSrc) || isLineStartNGCharacter(lpSrc) || isLineStartSkipCharacter(lpSrc)){
 					return iNum;
 				}
@@ -3567,7 +3572,7 @@ private:
 				if(*lpSrc){
 					return {i,iPos+1,lpSrc};
 				}
-			} else if(TxtMiruType::isRotateNum(it->textType) || it->textType == TxtMiru::TT_UNKOWN_ERROR){
+			} else if(TxtMiruType::isRotateNum(it->textType) || it->textType == TxtMiru::TextType::UNKOWN_ERROR){
 				if(i != iIndex){
 					return {i,0,lpSrc};
 				}
@@ -3599,11 +3604,11 @@ private:
 		bool bContinue = true;
 		for (int iPrevIndex = iIndex; iPrevIndex >= 0; --pti, --iPrevIndex) {
 			switch (pti->textType) {
-			case TxtMiru::TT_OTHER:
-			case TxtMiru::TT_TEXT:
-			case TxtMiru::TT_LINE_CHAR:
-			case TxtMiru::TT_SKIP_CHAR:
-			case TxtMiru::TT_SKIP_CHAR_AUTO:
+			case TxtMiru::TextType::OTHER:
+			case TxtMiru::TextType::TEXT:
+			case TxtMiru::TextType::LINE_CHAR:
+			case TxtMiru::TextType::SKIP_CHAR:
+			case TxtMiru::TextType::SKIP_CHAR_AUTO:
 				{
 					auto lpStr = pti->str.c_str();
 					int iHeight = HalfCharCur(pti->chrType);
@@ -3615,15 +3620,15 @@ private:
 					}
 				}
 				break;
-			case TxtMiru::TT_ROTATE_NUM:
-			case TxtMiru::TT_ROTATE_NUM_AUTO:
+			case TxtMiru::TextType::ROTATE_NUM:
+			case TxtMiru::TextType::ROTATE_NUM_AUTO:
 				charinfo_list.push_back({ iPrevIndex, 0, m_iCurTextL2byteSize, isLineStartNGCharacter(pti->str.c_str()), isLineEndNGCharacter(pti->str.c_str()), isHangingCharacter(pti->str.c_str()) });
 				break;
 				// 予定 Ruby付き文字が分かれるので対応予定
-			case TxtMiru::TT_RUBY:
-			case TxtMiru::TT_RUBY_L:
-			case TxtMiru::TT_NOTE_L:
-			case TxtMiru::TT_UNKOWN_ERROR:
+			case TxtMiru::TextType::RUBY:
+			case TxtMiru::TextType::RUBY_L:
+			case TxtMiru::TextType::NOTE_L:
+			case TxtMiru::TextType::UNKOWN_ERROR:
 				{
 					TxtMiru::TextPoint tp1st{m_iLLIndex, pti->tpBegin.iIndex, pti->tpBegin.iPos};
 					TxtMiru::TextPoint tp2nd{m_iLLIndex, pti->tpEnd  .iIndex, pti->tpEnd  .iPos};
@@ -3708,6 +3713,6 @@ private:
 // 改行位置判定
 void CGrTxtMapper::CreateIndex(CGrTxtDocument &doc)
 {
-	CGrIndexCreator ic(doc, doc.GetConstLayout().GetConstLayoutList(CGrTxtLayout::LLT_Text));
+	CGrIndexCreator ic(doc, doc.GetConstLayout().GetConstLayoutList(CGrTxtLayout::LayoutListType::Text));
 	ic.Create();
 }

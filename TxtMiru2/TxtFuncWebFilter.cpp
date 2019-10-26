@@ -73,7 +73,7 @@ public:
 CGrWebFilter::CGrWebFilter()
 {
 	auto &&param = CGrTxtMiru::theApp().Param();
-	if(param.GetBoolean(CGrTxtParam::WebFilter)){
+	if(param.GetBoolean(CGrTxtParam::PointsType::WebFilter)){
 		CGrTxtFuncWebFilter::WebFilter().Register();
 	}
 }

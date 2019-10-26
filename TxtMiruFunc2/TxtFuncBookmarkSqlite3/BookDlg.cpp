@@ -188,7 +188,7 @@ public:
 						url = fileName;
 					}
 				}
-			} else if(pFmtEtc->cfFormat ==CF_UNICODETEXT/*CF_TEXT*/){
+			} else if(pFmtEtc->cfFormat ==CF_UNICODETEXT){
 				if(CGrText::MultiByteToTString(CP_THREAD_ACP, static_cast<LPCSTR>(GlobalLock(medium.hGlobal)), -1, url)){
 				}
 				GlobalUnlock(medium.hGlobal);
@@ -270,8 +270,8 @@ static bool GetTagList(std::vector<TagInfo> &tag_list)
 		sqlite3_stmt* pstmt = nullptr;
 		do {
 			int ret = sqlite3_prepare16(pSqlite3
-										, _T("SELECT B.ID,B.TITLE,B.POSITION,B.PARENT FROM TXTMIRU_BOOKS B WHERE B.PLACE_ID IS NULL ORDER BY B.POSITION")
-										, -1, &pstmt, nullptr);
+				, _T("SELECT B.ID,B.TITLE,B.POSITION,B.PARENT FROM TXTMIRU_BOOKS B WHERE B.PLACE_ID IS NULL ORDER BY B.POSITION")
+				, -1, &pstmt, nullptr);
 			if (ret != SQLITE_OK || !pstmt) {
 				// コメント等、有効なSQLステートメントでないと、戻り値はOKだがstmはNULLになる。
 				bret = false;
@@ -579,7 +579,6 @@ void CGrBookDlg::getUrl()
 		m_EditURL.SetText(filename);
 	}
 }
-
 
 using TxtMiruFunc_CGrDocOpenProcCallbak = void (_stdcall *)(int ret, LPARAM lParam);
 using TxtMiruFunc_UpdateCheck = HANDLE (cdecl *)(HWND hWnd, LPCTSTR lpFilename, TxtMiruFunc_CGrDocOpenProcCallbak callback, LPARAM lParam, unsigned int *threadid);

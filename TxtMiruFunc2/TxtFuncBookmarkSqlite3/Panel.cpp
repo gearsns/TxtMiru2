@@ -15,7 +15,7 @@
 void CGrPanelWnd_SetTouchMenu(HMENU hMenu)
 {
 	const auto &param = CGrTxtFunc::Param();
-	if(param.GetBoolean(CGrTxtFuncIParam::TouchMenu)){
+	if(param.GetBoolean(CGrTxtFuncIParam::PointsType::TouchMenu)){
 		TxtMiruTheme_SetTouchMenu(hMenu);
 	}
 }

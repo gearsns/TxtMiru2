@@ -9,9 +9,9 @@ struct MatchStr {
 	int str_size;
 	TxtMiru::TextType text_type;
 public:
-	MatchStr() : str(_T("")), str_len(0), str_size(0), text_type(TxtMiru::TT_TEXT){}
-	MatchStr(LPCTSTR p, TxtMiru::TextType t=TxtMiru::TT_TEXT) :str(p), str_len(CGrText::CharLen(p)), str_size(_tcslen(p)), text_type(t){}
-	void Set(LPCTSTR p, TxtMiru::TextType t=TxtMiru::TT_TEXT);
+	MatchStr() : str(_T("")), str_len(0), str_size(0), text_type(TxtMiru::TextType::TEXT){}
+	MatchStr(LPCTSTR p, TxtMiru::TextType t=TxtMiru::TextType::TEXT) :str(p), str_len(CGrText::CharLen(p)), str_size(_tcslen(p)), text_type(t){}
+	void Set(LPCTSTR p, TxtMiru::TextType t=TxtMiru::TextType::TEXT);
 	operator LPCTSTR() const { return str; }
 	operator std::tstring() const { return str; }
 	const int len() const { return str_len; }

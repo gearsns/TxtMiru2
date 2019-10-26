@@ -1,5 +1,4 @@
 #ifndef __TXTFUNCSAVETEXT_H__
 #define __TXTFUNCSAVETEXT_H__
 
-
 #endif // __TXTFUNCSAVETEXT_H__

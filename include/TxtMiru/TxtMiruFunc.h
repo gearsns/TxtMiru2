@@ -43,10 +43,10 @@
 #else
 # ifndef TXTMIRUFUNC_ENUM
 #  define TXTMIRUFUNC_ENUM
-#  define TXTMIRUFUNCNAMELIST enum FuncNameID
-#  define TXTMIRUFL(__a__,__b__,__c__) FnN_##__a__
-#  define TXTMIRUFUNCNAMELIST_END(__b__,__c__)    FnN_MaxNum
-#  define TXTMIRUFUNCNAMELIST_EXTERN extern LPCTSTR l_TxtMiruFuncNameList  [FnN_MaxNum];
+#  define TXTMIRUFUNCNAMELIST enum class FuncNameID
+#  define TXTMIRUFL(__a__,__b__,__c__) __a__
+#  define TXTMIRUFUNCNAMELIST_END(__b__,__c__) MaxNum
+#  define TXTMIRUFUNCNAMELIST_EXTERN extern LPCTSTR l_TxtMiruFuncNameList  [static_cast<int>(FuncNameID::MaxNum)];
 # endif
 #endif
 

@@ -31,9 +31,9 @@ void CGrPictRendererMgr::Clear()
 void CGrPictRendererMgr::Initialize()
 {
 	Clear();
-	m_pictRendererMap[PRT_Spi] = new CGrPictSPIRenderer();
-	m_pictRendererMap[PRT_Ole] = new CGrPictOleRenderer();
-	m_pictRendererMap[PRT_Emf] = new CGrPictEmfRenderer();
+	m_pictRendererMap[static_cast<int>(PictRenderType::Spi)] = new CGrPictSPIRenderer();
+	m_pictRendererMap[static_cast<int>(PictRenderType::Ole)] = new CGrPictOleRenderer();
+	m_pictRendererMap[static_cast<int>(PictRenderType::Emf)] = new CGrPictEmfRenderer();
 	for (auto p : m_pictRendererMap) {
 		if (p) {
 			p->SetParam(_T("CurDir"), _T("."));

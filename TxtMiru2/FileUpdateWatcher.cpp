@@ -31,7 +31,7 @@ unsigned int __stdcall CGrFileUpdateWatcher::watch(void *arg)
 	}
 	const auto &param = CGrTxtMiru::theApp().Param();
 	int iFileAutoReload[3] = {};
-	param.GetPoints(CGrTxtParam::FileAutoReload, iFileAutoReload, sizeof(iFileAutoReload)/sizeof(int));
+	param.GetPoints(CGrTxtParam::PointsType::FileAutoReload, iFileAutoReload, sizeof(iFileAutoReload)/sizeof(int));
 	int iSleep = iFileAutoReload[2];
 	if(iSleep <= 0){
 		iSleep = 1000;

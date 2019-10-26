@@ -5,6 +5,7 @@
 #pragma warning (pop)
 #include <regex>
 #include "Text.h"
+#include "stlutil.h"
 #include "DragDropImpl.h"
 ///////////////////////////////////////////////////////////////////////////////////////////////
 CEnumFORMATETC::CEnumFORMATETC(){}
@@ -319,41 +320,6 @@ void url_encode(const char* c, std::string& dist) {
 	}
 }
 
-bool w2utf8(LPCTSTR w, std::string &c)
-{
-	bool result = false;
-
-	int clen = ::WideCharToMultiByte(CP_UTF8, 0, w, -1, NULL, 0, NULL, NULL);
-	if(clen == 0){
-		return false;
-	}
-	char* buff = new char[clen + 1];
-	if(::WideCharToMultiByte(CP_UTF8, 0, w, -1, buff, clen, NULL, NULL)){
-		result = true;
-		buff[clen] = L'\0';
-		c = buff;
-	}
-	delete[] buff;
-	return result;
-}
-bool w2acp(LPCTSTR w, std::string &c)
-{
-	bool result = false;
-
-	int clen = ::WideCharToMultiByte( CP_THREAD_ACP, 0, w, -1, NULL, 0, NULL, NULL);
-	if(clen == 0){
-		return false;
-	}
-	char* buff = new char[clen + 1];
-	if(::WideCharToMultiByte( CP_THREAD_ACP, 0, w, -1, buff, clen, NULL, NULL)){
-		result = true;
-		buff[clen] = L'\0';
-		c = buff;
-	}
-	delete[] buff;
-	return result;
-}
-
 bool CDataObject::SetUrl(LPCTSTR lpURL)
 {
 	std::tstring url = lpURL;
@@ -388,7 +354,7 @@ bool CDataObject::SetUrl(LPCTSTR lpURL)
 	}
 	{
 		std::string url_acp;
-		w2acp(url.c_str(), url_acp);
+		std::w2utf8(url.c_str(), url_acp, CP_THREAD_ACP);
 		FORMATETC fmtetc = {};
 
 		fmtetc.cfFormat = RegisterClipboardFormat(_T("UniformResourceLocator"));

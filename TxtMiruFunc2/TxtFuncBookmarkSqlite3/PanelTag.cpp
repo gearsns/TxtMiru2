@@ -260,10 +260,11 @@ bool CGrPanelTagWnd::Create(HWND hParent, HIMAGELIST hImg, HIMAGELIST hTreeImg)
 	//
 	auto &&toolBar = m_coolBar.GetToolBar();
 	TBBUTTON tbb[] = {
-		{TxtFuncBookmark::ii_stay_on_top, IDM_STAYONTOP , TBSTATE_ENABLED, TBSTYLE_CHECK  | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_IDLINKSTAY     },
-		{TxtFuncBookmark::ii_tag_add    , IDM_TAG_ADD   , TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_TIPS_TAG_ADD   },
-		{TxtFuncBookmark::ii_tag_modify , IDM_TAG_MODIFY, TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_TIPS_TAG_MODIFY},
-		{TxtFuncBookmark::ii_tag_delete , IDM_TAG_DELETE, TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_TIPS_TAG_DELETE},
+		//iBitmap                                                      idCommand       fsState          fsStyle                         bReserved[2]  dwData iString
+		{static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stay_on_top), IDM_STAYONTOP , TBSTATE_ENABLED, TBSTYLE_CHECK  | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_IDLINKSTAY     },
+		{static_cast<int>(TxtFuncBookmark::ImageIcon::ii_tag_add    ), IDM_TAG_ADD   , TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_TIPS_TAG_ADD   },
+		{static_cast<int>(TxtFuncBookmark::ImageIcon::ii_tag_modify ), IDM_TAG_MODIFY, TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_TIPS_TAG_MODIFY},
+		{static_cast<int>(TxtFuncBookmark::ImageIcon::ii_tag_delete ), IDM_TAG_DELETE, TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_TIPS_TAG_DELETE},
 	};
 	for(auto &&item : tbb){
 		if(item.iString != 0){
@@ -746,9 +747,9 @@ bool CGrPanelTagWnd::addItem(TreeListInfo *pParentInfo, TreeListInfo *pPosInfo, 
 		//
 		m_tag_list.push_back(pTagInfo);
 		if(pParentInfo){
-			m_listView.InsertItemPos(pParentInfo, pPosInfo, lpTitle, TxtFuncBookmark::ii_stat_tag_favorite, reinterpret_cast<LPARAM>(pTagInfo));
+			m_listView.InsertItemPos(pParentInfo, pPosInfo, lpTitle, static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_tag_favorite), reinterpret_cast<LPARAM>(pTagInfo));
 		} else {
-			m_listView.AddItem(lpTitle, TxtFuncBookmark::ii_stat_tag_favorite, 0, reinterpret_cast<LPARAM>(pTagInfo));
+			m_listView.AddItem(lpTitle, static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_tag_favorite), 0, reinterpret_cast<LPARAM>(pTagInfo));
 		}
 	} while(0);
 
@@ -862,7 +863,7 @@ bool CGrPanelTagWnd::DispList(bool bKeepIndex)
 				item.iSubItem  = 0;
 				item.lParam    = reinterpret_cast<LPARAM>(pTagInfo);
 				item.pszText   = const_cast<LPTSTR>(tag.title.c_str());
-				item.iImage    = TxtFuncBookmark::ii_stat_tag_favorite;
+				item.iImage    = static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_tag_favorite);
 				item.stateMask = LVIS_STATEIMAGEMASK;
 				item.state     = INDEXTOSTATEIMAGEMASK(2);
 				auto *pItemInfo = m_listView.AddItem(item.pszText, item.iImage, 0, item.lParam);
@@ -1213,7 +1214,7 @@ void CGrPanelTagWnd::OnExpandItem(TreeListInfo *pParentInfo)
 						item.iSubItem  = 0;
 						item.lParam    = reinterpret_cast<LPARAM>(pTagInfo);
 						item.pszText   = const_cast<LPTSTR>(tag.title.c_str());
-						item.iImage    = TxtFuncBookmark::ii_stat_tag_favorite;
+						item.iImage    = static_cast<int>(TxtFuncBookmark::ImageIcon::ii_stat_tag_favorite);
 						item.stateMask = LVIS_STATEIMAGEMASK;
 						item.state     = INDEXTOSTATEIMAGEMASK(2);
 						auto *pItemInfo = new TreeListInfo();

@@ -21,74 +21,74 @@ static struct KeyNameMap {
 	UINT id;
 	TxtMiru::FuncNameID fnid;
 } l_KeyNameMap[] = {
-	{IDS_READFILE            ,TxtMiru::FnN_ReadFile            },
-	{IDS_URLOPEN             ,TxtMiru::FnN_URLOpen             },
-	{IDS_OPENFOLDER          ,TxtMiru::FnN_OpenFolder          },
-	{IDS_OPENBROWSER         ,TxtMiru::FnN_OpenBrowser         },
-	{IDS_READCLIPBOAD        ,TxtMiru::FnN_ReadClipboard       },
-	{IDS_RELOAD              ,TxtMiru::FnN_Reload              },
-	{IDS_NEXTPAGE            ,TxtMiru::FnN_NextPage            },
-	{IDS_PREVPAGE            ,TxtMiru::FnN_PrevPage            },
-	{IDS_FIRSTPAGE           ,TxtMiru::FnN_FirstPage           },
-	{IDS_ENDPAGE             ,TxtMiru::FnN_EndPage             },
-	{IDS_GOTOPAGE            ,TxtMiru::FnN_GotoPage            },
-	{IDS_NEXTFILE            ,TxtMiru::FnN_NextFile            },
-	{IDS_PREVFILE            ,TxtMiru::FnN_PrevFile            },
-	{IDS_FORWARDPAGE         ,TxtMiru::FnN_ForwardPage         },
-	{IDS_BACKPAGE            ,TxtMiru::FnN_BackPage            },
-	{IDS_ADDBOOKMARK         ,TxtMiru::FnN_AddBookmark         },
-	{IDS_GOTOBOOKMARK1       ,TxtMiru::FnN_GotoBookmark1       },
-	{IDS_GOTOBOOKMARK2       ,TxtMiru::FnN_GotoBookmark2       },
-	{IDS_GOTOBOOKMARK3       ,TxtMiru::FnN_GotoBookmark3       },
-	{IDS_GOTOBOOKMARK4       ,TxtMiru::FnN_GotoBookmark4       },
-	{IDS_GOTOBOOKMARK5       ,TxtMiru::FnN_GotoBookmark5       },
-	{IDS_GOTOBOOKMARK6       ,TxtMiru::FnN_GotoBookmark6       },
-	{IDS_GOTOBOOKMARK7       ,TxtMiru::FnN_GotoBookmark7       },
-	{IDS_GOTOBOOKMARK8       ,TxtMiru::FnN_GotoBookmark8       },
-	{IDS_GOTOBOOKMARK9       ,TxtMiru::FnN_GotoBookmark9       },
-	{IDS_GOTOBOOKMARK0       ,TxtMiru::FnN_GotoBookmark0       },
-	{IDS_SHOWBOOKMARK        ,TxtMiru::FnN_ShowBookmark        },
-	{IDS_SHOW_HSCROLLBAR     ,TxtMiru::FnN_ShowHScrollBar      },
-	{IDS_SHOW_VSCROLLBAR     ,TxtMiru::FnN_ShowVScrollBar      },
-	{IDS_HIDE_HSCROLLBAR     ,TxtMiru::FnN_HideHScrollBar      },
-	{IDS_HIDE_VSCROLLBAR     ,TxtMiru::FnN_HideVScrollBar      },
-	{IDS_TOGGLE_HSCROLLBAR   ,TxtMiru::FnN_ToggleHScrollBar    },
-	{IDS_TOGGLE_VSCROLLBAR   ,TxtMiru::FnN_ToggleVScrollBar    },
-	{IDS_FULLSCREEN          ,TxtMiru::FnN_FullScreen          },
-	{IDS_SHOWSUBTITLE        ,TxtMiru::FnN_ShowSubtitle        },
-	{IDS_SHOWSUBTITLEBOOKMARK,TxtMiru::FnN_ShowSubtitleBookmark},
-	{IDS_ADDFAVORITE         ,TxtMiru::FnN_AddFavorite         },
-	{IDS_FAVORITE            ,TxtMiru::FnN_ShowBookList        },
-	{IDS_BMAOZORA            ,TxtMiru::FnN_ShowAozoraList      },
-	{IDS_SHOWRUBYLIST        ,TxtMiru::FnN_ShowRubyList        },
-	{IDS_SHOWPROPERTY        ,TxtMiru::FnN_ShowProperty        },
-	{IDS_SHOWDOCINFO         ,TxtMiru::FnN_ShowDocInfo         },
-	{IDS_COPY                ,TxtMiru::FnN_Copy                },
-	{IDS_SEARCH              ,TxtMiru::FnN_Search              },
-	{IDS_SEARCHNEXT          ,TxtMiru::FnN_SearchNext          },
-	{IDS_SEARCHPREV          ,TxtMiru::FnN_SearchPrev          },
-	{IDS_SEARCHFILES         ,TxtMiru::FnN_SearchFiles         },
-	{IDS_CONFIG              ,TxtMiru::FnN_Config              },
-	{IDS_SHOW_HELP           ,TxtMiru::FnN_Help                },
-	{IDS_SHOW_VERSION        ,TxtMiru::FnN_Version             },
-	{IDS_LAYOUTSET           ,TxtMiru::FnN_LayoutSet           },
-	{IDS_TOGGLE_LUPE         ,TxtMiru::FnN_ToggleLupe          },
-	{IDS_SHOW_LUPE           ,TxtMiru::FnN_ShowLupe            },
-	{IDS_HIDE_LUPE           ,TxtMiru::FnN_HideLupe            },
-	{IDS_LUPE100             ,TxtMiru::FnN_SetLupeZoom100      },
-	{IDS_LUPE150             ,TxtMiru::FnN_SetLupeZoom150      },
-	{IDS_LUPE200             ,TxtMiru::FnN_SetLupeZoom200      },
-	{IDS_LUPE400             ,TxtMiru::FnN_SetLupeZoom400      },
-	{IDS_REFRESHPREPARSERLIST,TxtMiru::FnN_RefreshPreParserList},
-	{IDS_TOGGLECOPYRUBY      ,TxtMiru::FnN_ToggleCopyRuby      },
-	{IDS_OPENFILEEXE         ,TxtMiru::FnN_ExecOpenFiile       },
-	{IDS_OPENFILEEXE1        ,TxtMiru::FnN_ExecOpenFiile1      },
-	{IDS_OPENFILEEXE2        ,TxtMiru::FnN_ExecOpenFiile2      },
-	{IDS_LINKGOTO            ,TxtMiru::FnN_LinkGoto            },
-	{IDS_LINKOPEN            ,TxtMiru::FnN_LinkOpen            },
-	{IDS_SHOWCONTEXTMENU     ,TxtMiru::FnN_ShowContextMenu     },
-	{IDS_EXIT                ,TxtMiru::FnN_Exit                },
-	{IDS_NOP                 ,TxtMiru::FnN_Nop                 },
+	{IDS_READFILE            ,TxtMiru::FuncNameID::ReadFile            },
+	{IDS_URLOPEN             ,TxtMiru::FuncNameID::URLOpen             },
+	{IDS_OPENFOLDER          ,TxtMiru::FuncNameID::OpenFolder          },
+	{IDS_OPENBROWSER         ,TxtMiru::FuncNameID::OpenBrowser         },
+	{IDS_READCLIPBOAD        ,TxtMiru::FuncNameID::ReadClipboard       },
+	{IDS_RELOAD              ,TxtMiru::FuncNameID::Reload              },
+	{IDS_NEXTPAGE            ,TxtMiru::FuncNameID::NextPage            },
+	{IDS_PREVPAGE            ,TxtMiru::FuncNameID::PrevPage            },
+	{IDS_FIRSTPAGE           ,TxtMiru::FuncNameID::FirstPage           },
+	{IDS_ENDPAGE             ,TxtMiru::FuncNameID::EndPage             },
+	{IDS_GOTOPAGE            ,TxtMiru::FuncNameID::GotoPage            },
+	{IDS_NEXTFILE            ,TxtMiru::FuncNameID::NextFile            },
+	{IDS_PREVFILE            ,TxtMiru::FuncNameID::PrevFile            },
+	{IDS_FORWARDPAGE         ,TxtMiru::FuncNameID::ForwardPage         },
+	{IDS_BACKPAGE            ,TxtMiru::FuncNameID::BackPage            },
+	{IDS_ADDBOOKMARK         ,TxtMiru::FuncNameID::AddBookmark         },
+	{IDS_GOTOBOOKMARK1       ,TxtMiru::FuncNameID::GotoBookmark1       },
+	{IDS_GOTOBOOKMARK2       ,TxtMiru::FuncNameID::GotoBookmark2       },
+	{IDS_GOTOBOOKMARK3       ,TxtMiru::FuncNameID::GotoBookmark3       },
+	{IDS_GOTOBOOKMARK4       ,TxtMiru::FuncNameID::GotoBookmark4       },
+	{IDS_GOTOBOOKMARK5       ,TxtMiru::FuncNameID::GotoBookmark5       },
+	{IDS_GOTOBOOKMARK6       ,TxtMiru::FuncNameID::GotoBookmark6       },
+	{IDS_GOTOBOOKMARK7       ,TxtMiru::FuncNameID::GotoBookmark7       },
+	{IDS_GOTOBOOKMARK8       ,TxtMiru::FuncNameID::GotoBookmark8       },
+	{IDS_GOTOBOOKMARK9       ,TxtMiru::FuncNameID::GotoBookmark9       },
+	{IDS_GOTOBOOKMARK0       ,TxtMiru::FuncNameID::GotoBookmark0       },
+	{IDS_SHOWBOOKMARK        ,TxtMiru::FuncNameID::ShowBookmark        },
+	{IDS_SHOW_HSCROLLBAR     ,TxtMiru::FuncNameID::ShowHScrollBar      },
+	{IDS_SHOW_VSCROLLBAR     ,TxtMiru::FuncNameID::ShowVScrollBar      },
+	{IDS_HIDE_HSCROLLBAR     ,TxtMiru::FuncNameID::HideHScrollBar      },
+	{IDS_HIDE_VSCROLLBAR     ,TxtMiru::FuncNameID::HideVScrollBar      },
+	{IDS_TOGGLE_HSCROLLBAR   ,TxtMiru::FuncNameID::ToggleHScrollBar    },
+	{IDS_TOGGLE_VSCROLLBAR   ,TxtMiru::FuncNameID::ToggleVScrollBar    },
+	{IDS_FULLSCREEN          ,TxtMiru::FuncNameID::FullScreen          },
+	{IDS_SHOWSUBTITLE        ,TxtMiru::FuncNameID::ShowSubtitle        },
+	{IDS_SHOWSUBTITLEBOOKMARK,TxtMiru::FuncNameID::ShowSubtitleBookmark},
+	{IDS_ADDFAVORITE         ,TxtMiru::FuncNameID::AddFavorite         },
+	{IDS_FAVORITE            ,TxtMiru::FuncNameID::ShowBookList        },
+	{IDS_BMAOZORA            ,TxtMiru::FuncNameID::ShowAozoraList      },
+	{IDS_SHOWRUBYLIST        ,TxtMiru::FuncNameID::ShowRubyList        },
+	{IDS_SHOWPROPERTY        ,TxtMiru::FuncNameID::ShowProperty        },
+	{IDS_SHOWDOCINFO         ,TxtMiru::FuncNameID::ShowDocInfo         },
+	{IDS_COPY                ,TxtMiru::FuncNameID::Copy                },
+	{IDS_SEARCH              ,TxtMiru::FuncNameID::Search              },
+	{IDS_SEARCHNEXT          ,TxtMiru::FuncNameID::SearchNext          },
+	{IDS_SEARCHPREV          ,TxtMiru::FuncNameID::SearchPrev          },
+	{IDS_SEARCHFILES         ,TxtMiru::FuncNameID::SearchFiles         },
+	{IDS_CONFIG              ,TxtMiru::FuncNameID::Config              },
+	{IDS_SHOW_HELP           ,TxtMiru::FuncNameID::Help                },
+	{IDS_SHOW_VERSION        ,TxtMiru::FuncNameID::Version             },
+	{IDS_LAYOUTSET           ,TxtMiru::FuncNameID::LayoutSet           },
+	{IDS_TOGGLE_LUPE         ,TxtMiru::FuncNameID::ToggleLupe          },
+	{IDS_SHOW_LUPE           ,TxtMiru::FuncNameID::ShowLupe            },
+	{IDS_HIDE_LUPE           ,TxtMiru::FuncNameID::HideLupe            },
+	{IDS_LUPE100             ,TxtMiru::FuncNameID::SetLupeZoom100      },
+	{IDS_LUPE150             ,TxtMiru::FuncNameID::SetLupeZoom150      },
+	{IDS_LUPE200             ,TxtMiru::FuncNameID::SetLupeZoom200      },
+	{IDS_LUPE400             ,TxtMiru::FuncNameID::SetLupeZoom400      },
+	{IDS_REFRESHPREPARSERLIST,TxtMiru::FuncNameID::RefreshPreParserList},
+	{IDS_TOGGLECOPYRUBY      ,TxtMiru::FuncNameID::ToggleCopyRuby      },
+	{IDS_OPENFILEEXE         ,TxtMiru::FuncNameID::ExecOpenFiile       },
+	{IDS_OPENFILEEXE1        ,TxtMiru::FuncNameID::ExecOpenFiile1      },
+	{IDS_OPENFILEEXE2        ,TxtMiru::FuncNameID::ExecOpenFiile2      },
+	{IDS_LINKGOTO            ,TxtMiru::FuncNameID::LinkGoto            },
+	{IDS_LINKOPEN            ,TxtMiru::FuncNameID::LinkOpen            },
+	{IDS_SHOWCONTEXTMENU     ,TxtMiru::FuncNameID::ShowContextMenu     },
+	{IDS_EXIT                ,TxtMiru::FuncNameID::Exit                },
+	{IDS_NOP                 ,TxtMiru::FuncNameID::Nop                 },
 };
 
 CGrPropPage* PASCAL CGrPropPageKey::CreateProp(CGrTxtConfigDlg *pDlg)
@@ -137,14 +137,13 @@ LRESULT CGrPropPageKey::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			//
 			ListView_GetSubItemRect(m_listFunc, lpdis->itemID, 1, LVIR_LABEL, &itemRect);
 			int left = itemRect.left;
+			//
 			::SetTextColor(hdc, ::GetSysColor(bFocus ? COLOR_HIGHLIGHT     : COLOR_BTNTEXT));
 			::SetBkColor  (hdc, ::GetSysColor(bFocus ? COLOR_HIGHLIGHTTEXT : COLOR_BTNFACE));
 			//
 			std::vector<std::tstring> keyname_list;
-			auto buf = TxtMiru::l_TxtMiruFuncNameList[keymap.fnid];
-			for(const auto &it : m_funcMap){
-				const auto &ks = it.first;
-				const auto &fn = it.second;
+			auto buf = TxtMiru::l_TxtMiruFuncNameList[static_cast<int>(keymap.fnid)];
+			for(const auto &[ks, fn] : m_funcMap){
 				if(fn != buf){
 					continue;
 				}
@@ -284,7 +283,7 @@ void CGrPropPageKey::OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 				break;
 			}
 			int icur = m_listFunc.GetParam(index);
-			auto buf = TxtMiru::l_TxtMiruFuncNameList[l_KeyNameMap[icur].fnid];
+			auto buf = TxtMiru::l_TxtMiruFuncNameList[static_cast<int>(l_KeyNameMap[icur].fnid)];
 			auto e = m_funcMap.end();
 			auto it = m_funcMap.find(ks_input);
 			if(it != e){
@@ -298,7 +297,7 @@ void CGrPropPageKey::OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 					CGrText::LoadString(l_KeyNameMap[icur].id, new_func);
 					CGrText::LoadString(IDS_MES_CONF         , title   );
 					for(int idx=0; idx<sizeof(l_KeyNameMap)/sizeof(KeyNameMap); ++idx){
-						if(fn == TxtMiru::l_TxtMiruFuncNameList[l_KeyNameMap[idx].fnid]){
+						if(fn == TxtMiru::l_TxtMiruFuncNameList[static_cast<int>(l_KeyNameMap[idx].fnid)]){
 							CGrText::LoadString(l_KeyNameMap[idx].id, old_func);
 							break;
 						}
@@ -337,7 +336,7 @@ void CGrPropPageKey::OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 			}
 			int icur = m_listKey.GetItemData(index);
 			m_editKeyBind.SetKeyboardState(m_keyStateList[icur]);
-			m_bDelay = m_keyStateList[icur].Delay();
+			m_bDelay = m_keyStateList[icur].Delay(); 
 			::SetCheckDlgItemID(m_hWnd, IDC_BUTTON_DELAY, m_bDelay);
 		}
 		break;
@@ -375,7 +374,7 @@ void CGrPropPageKey::updateKeyList()
 		return;
 	}
 	int icur = m_listFunc.GetParam(index);
-	auto buf = TxtMiru::l_TxtMiruFuncNameList[l_KeyNameMap[icur].fnid];
+	auto buf = TxtMiru::l_TxtMiruFuncNameList[static_cast<int>(l_KeyNameMap[icur].fnid)];
 	m_keyStateList.clear();
 	m_listKey.ResetContent();
 	for(const auto &it : m_funcMap){
@@ -440,7 +439,6 @@ void CGrPropPageKey::setWindowSize(int cx, int cy)
 		hdwp = DeferWindowPos(hdwp, hCWnd, NULL, rect.left, listKey_top, -1, -1, SWP_NOZORDER|SWP_NOACTIVATE|SWP_NOSIZE);
 		mouse_top = listKey_top + (rect.bottom - rect.top) + 1;
 	}
-	// 2.0.11.0
 	for(auto id : {IDC_STATIC_MOUSE,IDC_STATIC_MOUSE_SIDE,IDC_STATIC_MOUSE_TILT,IDC_STATIC_WHEEL,IDC_BUTTON_DELAY}){
 		auto hCWnd = GetDlgItem(m_hWnd, id);
 		GetWindowRect(hCWnd, &rect);

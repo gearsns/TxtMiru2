@@ -151,31 +151,31 @@ LRESULT CGrLinkDlg::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 		{
 			auto &&param = CGrTxtFunc::Param();
-			if(!param.GetBoolean(CGrTxtFuncIParam::SaveWindowSize)){
+			if(!param.GetBoolean(CGrTxtFuncIParam::PointsType::SaveWindowSize)){
 				PostQuitMessage(0);
 				break;
 			}
 			int window_pos[5];
 			//
-			param.GetPoints(CGrTxtFuncIParam::BookmarkPos, window_pos, sizeof(window_pos)/sizeof(int));
+			param.GetPoints(CGrTxtFuncIParam::PointsType::BookmarkPos, window_pos, sizeof(window_pos)/sizeof(int));
 			window_pos[0] = m_bBookmark ? 1 : 0;
-			param.SetPoints(CGrTxtFuncIParam::BookmarkPos, window_pos, sizeof(window_pos)/sizeof(int));
+			param.SetPoints(CGrTxtFuncIParam::PointsType::BookmarkPos, window_pos, sizeof(window_pos)/sizeof(int));
 			//
-			param.GetPoints(CGrTxtFuncIParam::SubtitlePos, window_pos, sizeof(window_pos)/sizeof(int));
+			param.GetPoints(CGrTxtFuncIParam::PointsType::SubtitlePos, window_pos, sizeof(window_pos)/sizeof(int));
 			window_pos[0] = m_bSubtitle ? 1 : 0;
-			param.SetPoints(CGrTxtFuncIParam::SubtitlePos, window_pos, sizeof(window_pos)/sizeof(int));
+			param.SetPoints(CGrTxtFuncIParam::PointsType::SubtitlePos, window_pos, sizeof(window_pos)/sizeof(int));
 			//
 			RECT rect;
 			SubtitlePos spos;
 			::GetWindowRect(m_hWnd, &rect);
-			param.GetPoints(CGrTxtFuncIParam::LinkPos, spos.data, sizeof(spos)/sizeof(int));
+			param.GetPoints(CGrTxtFuncIParam::PointsType::LinkPos, spos.data, sizeof(spos)/sizeof(int));
 			spos.iStayOn  = m_bStayOn ? 1 : 0;
 			spos.left     = rect.left   ;
 			spos.top      = rect.top    ;
 			spos.width    = rect.right  - rect.left;
 			spos.height   = rect.bottom - rect.top;
 			spos.iAutoPos = m_bAutoScroll ? 1 : 0;
-			param.SetPoints(CGrTxtFuncIParam::LinkPos, spos.data, sizeof(spos)/sizeof(int));
+			param.SetPoints(CGrTxtFuncIParam::PointsType::LinkPos, spos.data, sizeof(spos)/sizeof(int));
 			PostQuitMessage(0);
 		}
 		break;
@@ -270,15 +270,15 @@ BOOL CGrLinkDlg::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	toolBar.Create(hwnd, hInst, toolbar_id);
 	{
 		TBBUTTON tbb[] = {
-			//iBitmap  idCommand                             fsState          fsStyle                         bReserved[2]  dwData iString
-			{2       , TxtFuncBookmark::IDGOTOPAGE   , TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_IDGOTOPAGE      },
-			{0       , 0                             , 0              , TBSTYLE_SEP                   , 0, 0        , 0    , 0                   },
-			{0       , TxtFuncBookmark::IDADDBOOKMARK, TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_IDADDBOOKMARK   },
-			{1       , TxtFuncBookmark::IDDELBOOKMARK, TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_IDDELBOOKMARK   },
-			{3       , TxtFuncBookmark::IDLINKSTAY   , TBSTATE_ENABLED, TBSTYLE_CHECK  | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_IDLINKSTAY      },
-			{4       , TxtFuncBookmark::IDBOOKMARK   , TBSTATE_ENABLED, TBSTYLE_CHECK  | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_IDBOOKMARK      },
-			{5       , TxtFuncBookmark::IDSUBTITLE   , TBSTATE_ENABLED, TBSTYLE_CHECK  | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_IDSUBTITLE      },
-			{7       , TxtFuncBookmark::IDAUTOSCROLL , TBSTATE_ENABLED, TBSTYLE_CHECK  | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_TITLE_AUTOSCROLL},
+			//iBitmap  idCommand                                                  fsState          fsStyle                         bReserved[2]  dwData iString
+			{2       , static_cast<int>(TxtFuncBookmark::EventID::IDGOTOPAGE   ), TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_IDGOTOPAGE      },
+			{0       , 0                                                        , 0              , TBSTYLE_SEP                   , 0, 0        , 0    , 0                   },
+			{0       , static_cast<int>(TxtFuncBookmark::EventID::IDADDBOOKMARK), TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_IDADDBOOKMARK   },
+			{1       , static_cast<int>(TxtFuncBookmark::EventID::IDDELBOOKMARK), TBSTATE_ENABLED, TBSTYLE_BUTTON | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_IDDELBOOKMARK   },
+			{3       , static_cast<int>(TxtFuncBookmark::EventID::IDLINKSTAY   ), TBSTATE_ENABLED, TBSTYLE_CHECK  | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_IDLINKSTAY      },
+			{4       , static_cast<int>(TxtFuncBookmark::EventID::IDBOOKMARK   ), TBSTATE_ENABLED, TBSTYLE_CHECK  | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_IDBOOKMARK      },
+			{5       , static_cast<int>(TxtFuncBookmark::EventID::IDSUBTITLE   ), TBSTATE_ENABLED, TBSTYLE_CHECK  | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_IDSUBTITLE      },
+			{7       , static_cast<int>(TxtFuncBookmark::EventID::IDAUTOSCROLL ), TBSTATE_ENABLED, TBSTYLE_CHECK  | BTNS_AUTOSIZE, 0, 0        , 0    , IDS_TITLE_AUTOSCROLL},
 		};
 		for(auto &&item : tbb){
 			if(item.iString != 0){
@@ -342,7 +342,7 @@ BOOL CGrLinkDlg::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 			auto lpDir = CGrTxtFunc::GetDataPath();
 			TCHAR curPath[MAX_PATH];
 			CGrShell::GetExePath(curPath);
-			for(int i=0; i<TxtFuncBookmark::ii_max; ++i){
+			for(int i=0; i<static_cast<int>(TxtFuncBookmark::ImageIcon::ii_max); ++i){
 				TCHAR path[_MAX_PATH] = {};
 				_stprintf_s(path, _T("%s\\toolbar_icon\\toolbar_btn%d"), lpDir, i);
 				std::tstring image_filename;
@@ -369,22 +369,22 @@ BOOL CGrLinkDlg::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	auto &&param = CGrTxtFunc::Param();
 	SubtitlePos spos;
 	int window_pos[5];
-	param.GetPoints(CGrTxtFuncIParam::BookmarkPos, window_pos, sizeof(window_pos)/sizeof(int));
+	param.GetPoints(CGrTxtFuncIParam::PointsType::BookmarkPos, window_pos, sizeof(window_pos)/sizeof(int));
 	m_bBookmark = (window_pos[0] == 1);
-	param.GetPoints(CGrTxtFuncIParam::SubtitlePos, window_pos, sizeof(window_pos)/sizeof(int));
+	param.GetPoints(CGrTxtFuncIParam::PointsType::SubtitlePos, window_pos, sizeof(window_pos)/sizeof(int));
 	m_bSubtitle = (window_pos[0] == 1);
 	if(!m_bBookmark && !m_bSubtitle){
 		m_bBookmark = true;
 		m_bSubtitle = true;
 	}
-	param.GetPoints(CGrTxtFuncIParam::LinkPos, spos.data, sizeof(spos)/sizeof(int));
+	param.GetPoints(CGrTxtFuncIParam::PointsType::LinkPos, spos.data, sizeof(spos)/sizeof(int));
 	m_bStayOn = (spos.iStayOn == 1);
 	m_bAutoScroll = (spos.iAutoPos == 1);
 	//
-	SendMessage(toolBar, TB_CHECKBUTTON, TxtFuncBookmark::IDBOOKMARK  , MAKELPARAM(m_bBookmark  , 0));
-	SendMessage(toolBar, TB_CHECKBUTTON, TxtFuncBookmark::IDSUBTITLE  , MAKELPARAM(m_bSubtitle  , 0));
-	SendMessage(toolBar, TB_CHECKBUTTON, TxtFuncBookmark::IDLINKSTAY  , MAKELPARAM(m_bStayOn    , 0));
-	SendMessage(toolBar, TB_CHECKBUTTON, TxtFuncBookmark::IDAUTOSCROLL, MAKELPARAM(m_bAutoScroll, 0));
+	SendMessage(toolBar, TB_CHECKBUTTON, static_cast<WPARAM>(TxtFuncBookmark::EventID::IDBOOKMARK  ), MAKELPARAM(m_bBookmark  , 0));
+	SendMessage(toolBar, TB_CHECKBUTTON, static_cast<WPARAM>(TxtFuncBookmark::EventID::IDSUBTITLE  ), MAKELPARAM(m_bSubtitle  , 0));
+	SendMessage(toolBar, TB_CHECKBUTTON, static_cast<WPARAM>(TxtFuncBookmark::EventID::IDLINKSTAY  ), MAKELPARAM(m_bStayOn    , 0));
+	SendMessage(toolBar, TB_CHECKBUTTON, static_cast<WPARAM>(TxtFuncBookmark::EventID::IDAUTOSCROLL), MAKELPARAM(m_bAutoScroll, 0));
 
 	// モニタ内でウインドウを移動
 	MoveWindowInMonitor(spos.left, spos.top, spos.width, spos.height);
@@ -516,7 +516,7 @@ void CGrLinkDlg::Refresh()
 void CGrLinkDlg::endDialog(UINT id)
 {
 	switch(id){
-	case TxtFuncBookmark::IDGOTOPAGE:
+	case static_cast<int>(TxtFuncBookmark::EventID::IDGOTOPAGE):
 	case IDOK:
 		{
 			LVITEM lv = {LVIF_TEXT};
@@ -552,31 +552,31 @@ void CGrLinkDlg::endDialog(UINT id)
 void CGrLinkDlg::OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 {
 	switch(id){
-	case TxtFuncBookmark::IDGOTOPAGE:
+	case static_cast<int>(TxtFuncBookmark::EventID::IDGOTOPAGE):
 		endDialog(id);
 		break;
-	case TxtFuncBookmark::IDLINKSTAY:
-		m_bStayOn = (SendMessage(m_coolBar.GetToolBar(), TB_ISBUTTONCHECKED, TxtFuncBookmark::IDLINKSTAY, 0) != 0);
+	case static_cast<int>(TxtFuncBookmark::EventID::IDLINKSTAY):
+		m_bStayOn = (SendMessage(m_coolBar.GetToolBar(), TB_ISBUTTONCHECKED, static_cast<WPARAM>(TxtFuncBookmark::EventID::IDLINKSTAY), 0) != 0);
 		break;
-	case TxtFuncBookmark::IDBOOKMARK:
-		m_bBookmark = (SendMessage(m_coolBar.GetToolBar(), TB_ISBUTTONCHECKED, TxtFuncBookmark::IDBOOKMARK, 0) != 0);
+	case static_cast<int>(TxtFuncBookmark::EventID::IDBOOKMARK):
+		m_bBookmark = (SendMessage(m_coolBar.GetToolBar(), TB_ISBUTTONCHECKED, static_cast<WPARAM>(TxtFuncBookmark::EventID::IDBOOKMARK), 0) != 0);
 		Refresh();
 		break;
-	case TxtFuncBookmark::IDSUBTITLE:
-		m_bSubtitle = (SendMessage(m_coolBar.GetToolBar(), TB_ISBUTTONCHECKED, TxtFuncBookmark::IDSUBTITLE, 0) != 0);
+	case static_cast<int>(TxtFuncBookmark::EventID::IDSUBTITLE):
+		m_bSubtitle = (SendMessage(m_coolBar.GetToolBar(), TB_ISBUTTONCHECKED, static_cast<WPARAM>(TxtFuncBookmark::EventID::IDSUBTITLE), 0) != 0);
 		Refresh();
 		break;
-	case TxtFuncBookmark::IDAUTOSCROLL:
-		m_bAutoScroll = (SendMessage(m_coolBar.GetToolBar(), TB_ISBUTTONCHECKED, TxtFuncBookmark::IDAUTOSCROLL, 0) != 0);
+	case static_cast<int>(TxtFuncBookmark::EventID::IDAUTOSCROLL):
+		m_bAutoScroll = (SendMessage(m_coolBar.GetToolBar(), TB_ISBUTTONCHECKED, static_cast<WPARAM>(TxtFuncBookmark::EventID::IDAUTOSCROLL), 0) != 0);
 		break;
-	case TxtFuncBookmark::IDADDBOOKMARK:
+	case static_cast<int>(TxtFuncBookmark::EventID::IDADDBOOKMARK):
 		CGrTxtFunc::AddBookmark(m_parentWnd);
 		break;
 	case IDOK:
 	case IDCANCEL:
 		endDialog(id);
 		break;
-	case TxtFuncBookmark::IDDELBOOKMARK:
+	case static_cast<int>(TxtFuncBookmark::EventID::IDDELBOOKMARK):
 		{
 			LVITEM lv = {LVIF_PARAM};
 			lv.iItem = m_listView.GetNextItem(-1, LVNI_SELECTED);
@@ -737,7 +737,7 @@ void CGrLinkDlg::ShowBookmark(HWND hWnd, bool bVisible)
 	}
 	if(m_bBookmark != bVisible){
 		m_bBookmark = bVisible;
-		SendMessage(m_coolBar.GetToolBar(), TB_CHECKBUTTON, TxtFuncBookmark::IDBOOKMARK, MAKELPARAM(m_bBookmark, 0));
+		SendMessage(m_coolBar.GetToolBar(), TB_CHECKBUTTON, static_cast<WPARAM>(TxtFuncBookmark::EventID::IDBOOKMARK), MAKELPARAM(m_bBookmark, 0));
 		PostRefresh();
 	}
 }
@@ -748,7 +748,7 @@ void CGrLinkDlg::ShowSubtitle(HWND hWnd, bool bVisible)
 	}
 	if(m_bSubtitle != bVisible){
 		m_bSubtitle = bVisible;
-		SendMessage(m_coolBar.GetToolBar(), TB_CHECKBUTTON, TxtFuncBookmark::IDSUBTITLE, MAKELPARAM(m_bSubtitle, 0));
+		SendMessage(m_coolBar.GetToolBar(), TB_CHECKBUTTON, static_cast<WPARAM>(TxtFuncBookmark::EventID::IDSUBTITLE), MAKELPARAM(m_bSubtitle, 0));
 		PostRefresh();
 	}
 }

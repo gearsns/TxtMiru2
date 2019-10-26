@@ -23,7 +23,7 @@ CGrPictRendererMgr::~CGrPictRendererMgr()
 void CGrPictRendererMgr::Clear()
 {
 	auto *p = m_pictRendererMap;
-	for(int len=PRT_MaxNum; len>0; --len, ++p){
+	for(int len=static_cast<int>(PictRenderType::MaxNum); len>0; --len, ++p){
 		if(*p){ delete *p; }
 		*p = nullptr;
 	}
@@ -35,14 +35,14 @@ void CGrPictRendererMgr::Initialize()
 {
 	Clear();
 	auto &&param = CGrTxtFunc::Param();
-	m_pictRendererMap[PRT_Spi] = new CGrPictSPIRenderer();
-	m_pictRendererMap[PRT_Ole] = new CGrPictOleRenderer();
-	m_pictRendererMap[PRT_Emf] = new CGrPictEmfRenderer();
+	m_pictRendererMap[static_cast<int>(PictRenderType::Spi)] = new CGrPictSPIRenderer();
+	m_pictRendererMap[static_cast<int>(PictRenderType::Ole)] = new CGrPictOleRenderer();
+	m_pictRendererMap[static_cast<int>(PictRenderType::Emf)] = new CGrPictEmfRenderer();
 	TCHAR dir[_MAX_PATH] = {};
-	param.GetText(CGrTxtFuncIParam::SpiPluginFolder, dir, sizeof(dir)/sizeof(TCHAR));
-	m_pictRendererMap[PRT_Spi]->SetParam(_T("PluginDir"), dir);
+	param.GetText(CGrTxtFuncIParam::TextType::SpiPluginFolder, dir, sizeof(dir)/sizeof(TCHAR));
+	m_pictRendererMap[static_cast<int>(PictRenderType::Spi)]->SetParam(_T("PluginDir"), dir);
 	auto *p = m_pictRendererMap;
-	for(int len=PRT_MaxNum; len>0; --len, ++p){
+	for(int len= static_cast<int>(PictRenderType::MaxNum); len>0; --len, ++p){
 		if(*p){
 			(*p)->SetParam(_T("CurDir"), _T("."));
 			(*p)->SetParam(_T("DataDir"), CGrTxtFunc::GetDataPath());
@@ -59,7 +59,7 @@ CGrPictRenderer *CGrPictRendererMgr::getPictRenderer(LPCTSTR lpFileName)
 		return nullptr;
 	}
 	auto *p = m_pictRendererMap;
-	for(int len=PRT_MaxNum; len>0; --len, ++p){
+	for(int len=static_cast<int>(PictRenderType::MaxNum); len>0; --len, ++p){
 		if(!*p){ continue; }
 		(*p)->SetParam(_T("CurDir"), _T("."));
 		if((*p)->IsSupported(lpFileName)){

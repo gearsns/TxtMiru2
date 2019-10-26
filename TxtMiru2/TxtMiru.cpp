@@ -26,23 +26,23 @@ CGrTxtMiru::CGrTxtMiru()
 
 HRESULT CGrTxtMiru::InstallDLLFunc(CGrTxtMiru::DLLFncType id, CGrLoadDllFunc *pdll)
 {
-	if(!m_dllList[id]){
-		m_dllList[id] = pdll;
+	if(!m_dllList[static_cast<int>(id)]){
+		m_dllList[static_cast<int>(id)] = pdll;
 	}
 	return S_OK;
 }
 
 HRESULT CGrTxtMiru::UninstallDLLFunc(CGrTxtMiru::DLLFncType id) 
 {
-	if(m_dllList[id]){
-		m_dllList[id] = nullptr;
+	if(m_dllList[static_cast<int>(id)]){
+		m_dllList[static_cast<int>(id)] = nullptr;
 	}
 	return S_OK;
 }
 
 CGrLoadDllFunc *CGrTxtMiru::GetDllFunc(CGrTxtMiru::DLLFncType id) 
 {
-	return m_dllList[id];
+	return m_dllList[static_cast<int>(id)];
 }
 
 BOOL CGrTxtMiru::IsDialogMessage(HWND hwnd, MSG &msg)

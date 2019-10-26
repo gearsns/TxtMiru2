@@ -21,7 +21,7 @@ static bool GetUrlCacheFileName(LPCWSTR lpwUrl, LPWSTR lpszwFileName, DWORD dwFi
 {
 	if(CGrText::isMatchChar(lpwUrl, _T("file:///"))){
 		if (lstrcpynW(lpszwFileName, &(lpwUrl[sizeof(_T("file:///")) / sizeof(TCHAR) - 1]), dwFileNameInBytes)) {
-
+			;
 		}
 		return true;
 	}
@@ -90,14 +90,14 @@ LRESULT CGrCover::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_CTLCOLOREDIT:
 	case WM_CTLCOLORBTN:
 	case WM_CTLCOLORSTATIC:
-		{
-			auto hDC = reinterpret_cast<HDC>(wParam);
-			auto hCtrl = reinterpret_cast<HWND>(lParam);
-			SetBkMode(hDC, OPAQUE);
-			SetTextColor(hDC, TxtMiruTheme_GetSysColor(COLOR_WINDOWTEXT));
-			SetBkColor(hDC, TxtMiruTheme_GetSysColor(COLOR_WINDOW));
-			return reinterpret_cast<LRESULT>(TxtMiruTheme_GetSysColorBrush(COLOR_WINDOW));
-		}
+	{
+		auto hDC = reinterpret_cast<HDC>(wParam);
+		auto hCtrl = reinterpret_cast<HWND>(lParam);
+		SetBkMode(hDC, OPAQUE);
+		SetTextColor(hDC, TxtMiruTheme_GetSysColor(COLOR_WINDOWTEXT));
+		SetBkColor(hDC, TxtMiruTheme_GetSysColor(COLOR_WINDOW));
+		return reinterpret_cast<LRESULT>(TxtMiruTheme_GetSysColorBrush(COLOR_WINDOW));
+	}
 	case WM_ERASEBKGND:
 		return TRUE;
 	case WM_SIZE:

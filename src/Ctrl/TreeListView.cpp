@@ -807,46 +807,46 @@ LRESULT CGrTreeListView::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 		}
 		break;
 	case WM_LBUTTONDBLCLK:
-		{
-			auto x = static_cast<int>(static_cast<short>(LOWORD(lParam)));
-			auto y = static_cast<int>(static_cast<short>(HIWORD(lParam)));
-			auto keyFlags = static_cast<UINT>(wParam);
-			LVHITTESTINFO info;
-			info.pt.x = x;
-			info.pt.y = y;
-			info.flags = 0;
-			info.iItem = 0;
-			info.iSubItem = 0;
-			HitTest(&info);
-			if (info.flags & LVHT_ONITEMLABEL) {
-				LVITEM item = { };
-				item.mask = LVIF_INDENT | LVIF_PARAM;
-				item.iItem = info.iItem;
-				item.iSubItem = 0;
-				GetItem(&item);
-				auto *pinfo = reinterpret_cast<TreeListInfo*>(item.lParam);
-				if (!pinfo) {
-					break;
-				}
-				if (pinfo->m_bCollapsed) {
-					if (itemHasChildren(pinfo)) {
-						int nInsert = info.iItem;
-						SetRedraw(FALSE);
-						Expand(false, nInsert, pinfo);
-						SetRedraw(TRUE);
-						SetItemState(info.iItem, INDEXTOSTATEIMAGEMASK(2), LVIS_STATEIMAGEMASK);
-					}
-				}
-				else {
-					SetRedraw(FALSE);
-					Collapse(info.iItem, pinfo);
-					SetRedraw(TRUE);
-					SetItemState(info.iItem, INDEXTOSTATEIMAGEMASK(1), LVIS_STATEIMAGEMASK);
-				}
-				SetItemState(info.iItem, LVIS_FOCUSED, LVIS_FOCUSED);
+	{
+		auto x = static_cast<int>(static_cast<short>(LOWORD(lParam)));
+		auto y = static_cast<int>(static_cast<short>(HIWORD(lParam)));
+		auto keyFlags = static_cast<UINT>(wParam);
+		LVHITTESTINFO info;
+		info.pt.x = x;
+		info.pt.y = y;
+		info.flags = 0;
+		info.iItem = 0;
+		info.iSubItem = 0;
+		HitTest(&info);
+		if (info.flags & LVHT_ONITEMLABEL) {
+			LVITEM item = { };
+			item.mask = LVIF_INDENT | LVIF_PARAM;
+			item.iItem = info.iItem;
+			item.iSubItem = 0;
+			GetItem(&item);
+			auto *pinfo = reinterpret_cast<TreeListInfo*>(item.lParam);
+			if (!pinfo) {
+				break;
 			}
-			break;
+			if (pinfo->m_bCollapsed) {
+				if (itemHasChildren(pinfo)) {
+					int nInsert = info.iItem;
+					SetRedraw(FALSE);
+					Expand(false, nInsert, pinfo);
+					SetRedraw(TRUE);
+					SetItemState(info.iItem, INDEXTOSTATEIMAGEMASK(2), LVIS_STATEIMAGEMASK);
+				}
+			}
+			else {
+				SetRedraw(FALSE);
+				Collapse(info.iItem, pinfo);
+				SetRedraw(TRUE);
+				SetItemState(info.iItem, INDEXTOSTATEIMAGEMASK(1), LVIS_STATEIMAGEMASK);
+			}
+			SetItemState(info.iItem, LVIS_FOCUSED, LVIS_FOCUSED);
 		}
+		break;
+	}
 	case WM_LBUTTONDOWN:
 		{
 			auto x = static_cast<int>(static_cast<short>(LOWORD(lParam)));

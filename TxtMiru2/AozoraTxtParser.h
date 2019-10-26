@@ -24,7 +24,7 @@ private:
 	std::vector<Indent> m_Indent ;
 	std::vector<Indent> m_RIndent;
 	std::vector<LineBox> m_LineBox;
-	TextRangePoint m_RangeTextPoint[TxtMiru::TT_MaxNum]; // タグの範囲指定用
+	TextRangePoint m_RangeTextPoint[static_cast<int>(TxtMiru::TextType::MaxNum)]; // タグの範囲指定用
 	bool m_bIndentReset = false; // 当行のみの天からインデント指定有無
 	bool m_bRIndentReset = false; // 当行のみの地からインデント指定有無
 	std::vector<int> m_LimitChar;
@@ -61,13 +61,13 @@ private:
 	void indentStart(CGrTxtBuffer &buffer, TxtMiru::TextInfoList &text_list, TxtMiru::TextType textType, int iIndent1st, int iIndent2nd);
 	bool convertNoteStr(std::tstring &note, LPCTSTR lpNote = nullptr);
 private:
-	enum CommentStatus {
-		CSTAT_CONTENTS     ,
-		CSTAT_BEGIN_COMMENT,
-		CSTAT_COMMENT      ,
-		CSTAT_SKIP_LINE    ,
-		CSTAT_NO_MORE      ,
-	} m_csComment = CSTAT_CONTENTS;
+	enum class CommentStatus {
+		CONTENTS     ,
+		BEGIN_COMMENT,
+		COMMENT      ,
+		SKIP_LINE    ,
+		NO_MORE      ,
+	} m_csComment = CommentStatus::CONTENTS;
 	bool m_bEndofContents = false;
 	bool m_bUseOverlapChar = false;
 };

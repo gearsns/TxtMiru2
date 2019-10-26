@@ -49,7 +49,7 @@ BOOL CGrPropPageRubyList::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	CGrPropPageSize::OnInitDialog(hwnd, hwndFocus, lParam);
 	auto &&param = CGrTxtFunc::Param();
 	//
-	::SetDlgItemTextType(hwnd, param, IDC_EDIT_RUBYIGNORE, CGrTxtFuncIParam::RubyListIgnore);
+	::SetDlgItemTextType(hwnd, param, IDC_EDIT_RUBYIGNORE, CGrTxtFuncIParam::TextType::RubyListIgnore);
 	//
 	return TRUE;
 }
@@ -69,7 +69,7 @@ bool CGrPropPageRubyList::Apply()
 {
 	auto &&param = CGrTxtFunc::Param();
 	//
-	::GetDlgItemTextType(m_hWnd, param, IDC_EDIT_RUBYIGNORE, CGrTxtFuncIParam::RubyListIgnore);
+	::GetDlgItemTextType(m_hWnd, param, IDC_EDIT_RUBYIGNORE, CGrTxtFuncIParam::TextType::RubyListIgnore);
 	//
 	param.UpdateConfig(GetParent(GetParent(m_hWnd)));
 	//

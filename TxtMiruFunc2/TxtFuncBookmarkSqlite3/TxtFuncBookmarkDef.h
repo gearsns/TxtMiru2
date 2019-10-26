@@ -3,13 +3,13 @@
 
 namespace TxtFuncBookmark
 {
-	enum ImageTreeIcon {
+	enum class ImageTreeIcon {
 		iti_stat_tree_collapsed         ,
 		iti_stat_tree_expanded          ,
 		iti_stat_tree_none              ,
 		iti_max
 	};
-	enum ImageIcon {
+	enum class ImageIcon {
 		ii_stat_tag_favorite           ,
 		ii_stat_book_normal            ,
 		ii_stat_book_normal_update     ,
@@ -83,7 +83,7 @@ namespace TxtFuncBookmark
 		int tag_id = 0;
 		int id_list[1] = {};
 	};
-	enum EventID {
+	enum class EventID {
 		IDGOTOPAGE = 40300,
 		IDADDBOOKMARK,
 		IDDELBOOKMARK,
@@ -92,7 +92,7 @@ namespace TxtFuncBookmark
 		IDSUBTITLE   ,
 		IDAUTOSCROLL ,
 	};
-	enum ModelWindowID {
+	enum class ModelWindowID {
 		MWID_LINKDLG,
 		MWID_BOOKDLG,
 		MWID_SEARCHDLG,

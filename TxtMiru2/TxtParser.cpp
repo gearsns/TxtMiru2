@@ -10,7 +10,7 @@
 void CGrTxtParser::TextInfoList2String(std::tstring &out_str, const TxtMiru::TextInfoList &text_list)
 {
 	for(const auto &ti : text_list){
-		if(ti.textType == TxtMiru::TT_TEXT){
+		if(ti.textType == TxtMiru::TextType::TEXT){
 			out_str += ti.str;
 		}
 	}
@@ -23,7 +23,7 @@ TxtMiru::TextListPos CGrTxtParser::GetTextListPos(int offset, const TxtMiru::Tex
 	const auto *it = &text_list[0];
 	for(int index = 0; len>0; --len, ++it, ++index){
 		const auto &ti = *it;
-		if(ti.textType == TxtMiru::TT_TEXT){
+		if(ti.textType == TxtMiru::TextType::TEXT){
 			int size = ti.str.size();
 			if(offset < size){
 				return TxtMiru::TextListPos{index, offset};
@@ -53,7 +53,7 @@ int CGrTxtParser::GetTextListOffset(const TxtMiru::TextListPos &tlp, const TxtMi
 	int offset = 0;
 	for(; len>0; --len, ++it){
 		const auto &ti = *it;
-		if(ti.textType == TxtMiru::TT_TEXT){
+		if(ti.textType == TxtMiru::TextType::TEXT){
 			offset += ti.str.size();
 		}
 	}
@@ -145,25 +145,25 @@ TxtMiru::TextInfo *CGrTxtParser::GetPrevTextInfoPicture(TxtMiru::LineList &line_
 #include "HTMLTxtParser.h"
 #include "stlutil.h"
 #include "Shell.h"
-enum PARSER_FT {
-	PARSER_FT_HTML   ,
-	PARSER_FT_TEXT   ,
+enum class PARSER_FT {
+	HTML,
+	TEXT,
 };
 static PARSER_FT GetFileType(LPCTSTR lpFileName)
 {
 	if(CGrShell::IsURI(lpFileName)){
-		return PARSER_FT_HTML;
+		return PARSER_FT::HTML;
 	}
 	const auto &param = CGrTxtMiru::theApp().Param();
 	auto pext = CGrShell::GetFileExtConst(lpFileName);
-	if(pext && param.GetFileType(pext) == CGrTxtParam::FT_Html){
-		return PARSER_FT_HTML;
+	if(pext && param.GetFileType(pext) == CGrTxtParam::FileType::Html){
+		return PARSER_FT::HTML;
 	}
 	WIN32_FIND_DATA wfd;
 	if(CGrShell::getFileInfo(lpFileName, wfd) && (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)){
-		return PARSER_FT_HTML;
+		return PARSER_FT::HTML;
 	}
-	return PARSER_FT_TEXT;
+	return PARSER_FT::TEXT;
 }
 //
 
@@ -182,12 +182,12 @@ static bool ReadFile(CGrTxtParser &&parser, LPCTSTR lpFileName, CGrTxtBuffer &bu
 bool CGrTxtParserMgr::ReadFile(LPCTSTR lpFileName, CGrTxtBuffer &buffer)
 {
 	switch(GetFileType(lpFileName)){
-	case PARSER_FT_HTML:
+	case PARSER_FT::HTML:
 		if(::ReadFile(CGrHTMLTxtParser(), lpFileName, buffer)){
 			return true;
 		}
 		break;
-	case PARSER_FT_TEXT:
+	case PARSER_FT::TEXT:
 		if(::ReadFile(CGrAozoraTxtParser(), lpFileName, buffer)){
 			return true;
 		}
@@ -235,7 +235,7 @@ TextComment::~TextComment()
 }
 bool TextComment::IsValid(TxtMiru::TextType tt)
 {
-	return (tt == TxtMiru::TT_COMMENT_BEGIN || tt == TxtMiru::TT_COMMENT_END || tt == TxtMiru::TT_COMMENT);
+	return (tt == TxtMiru::TextType::COMMENT_BEGIN || tt == TxtMiru::TextType::COMMENT_END || tt == TxtMiru::TextType::COMMENT);
 }
 bool TextComment::SetChar(const TxtMiru::TextPoint &cur, LPCTSTR lpSrc, LPCTSTR lpEnd)
 {
@@ -293,15 +293,15 @@ TitleType::~TitleType()
 			return;
 		}
 		// タイトル 装飾
-		auto ttsize = TextInfoSpec(TxtMiru::TT_TEXT_SIZE , 0);
+		auto ttsize = TextInfoSpec(TxtMiru::TextType::TEXT_SIZE , 0);
 		ttsize.chrType = 2;
-		line_list[0].text_list.push_back(TextInfoSpec(TxtMiru::TT_TITLE, 0));
+		line_list[0].text_list.push_back(TextInfoSpec(TxtMiru::TextType::TITLE, 0));
 		line_list[0].text_list.push_back(ttsize);
-		line_list[0].text_list.push_back(TextInfoSpec(TxtMiru::TT_BOLD_START, 0));
-		line_list[author_point-1].text_list.push_back(TextInfoSpec(TxtMiru::TT_BOLD_END , 0));
+		line_list[0].text_list.push_back(TextInfoSpec(TxtMiru::TextType::BOLD_START, 0));
+		line_list[author_point-1].text_list.push_back(TextInfoSpec(TxtMiru::TextType::BOLD_END , 0));
 		ttsize.chrType = 0;
 		line_list[author_point-1].text_list.push_back(ttsize);
-		line_list[author_point-1].text_list.push_back(TextInfoSpec(TxtMiru::TT_AUTHOR, 0));
+		line_list[author_point-1].text_list.push_back(TextInfoSpec(TxtMiru::TextType::AUTHOR, 0));
 		// 改頁挿入位置を調べる
 		//   Title
 		//   Author
@@ -320,9 +320,9 @@ TitleType::~TitleType()
 		}
 		// 3行先までチェックして ブランク行の後にコメントがあればそこまで表紙とみなす
 		for(int iBlankCount=min(3, len-1); iBlankCount>0 && iLine < len; --iBlankCount, ++iLine){
-			if(!line_list[iLine].text_list.empty() && line_list[iLine].text_list[0].textType == TxtMiru::TT_COMMENT_BEGIN){
+			if(!line_list[iLine].text_list.empty() && line_list[iLine].text_list[0].textType == TxtMiru::TextType::COMMENT_BEGIN){
 				// コメント行読み飛ばし
-				while(iLine < len && (line_list[iLine].text_list.empty() || line_list[iLine].text_list[0].textType != TxtMiru::TT_COMMENT_END)){
+				while(iLine < len && (line_list[iLine].text_list.empty() || line_list[iLine].text_list[0].textType != TxtMiru::TextType::COMMENT_END)){
 					++iLine;
 				}
 				iNextPageLine = iLine;
@@ -340,10 +340,10 @@ TitleType::~TitleType()
 		buffer.ForEach(TxtMiru::TextPoint{0, 0, 0}, TxtMiru::TextPoint{iNextPageLine+1, -1, -1}, TextComment(info, buffer));
 		// iNextPageLine が line_listの範囲を超えないように
 		if(iNextPageLine >= 0 && iNextPageLine < static_cast<signed int>(line_list.size())){
-			line_list[iNextPageLine].text_list.push_back(TextInfoSpec(TxtMiru::TT_NEXT_PAGE, 0));
+			line_list[iNextPageLine].text_list.push_back(TextInfoSpec(TxtMiru::TextType::NEXT_PAGE, 0));
 		}
 	} else {
-		line_list[0].text_list.push_back(TextInfoSpec(TxtMiru::TT_NEXT_PAGE, 0));
+		line_list[0].text_list.push_back(TextInfoSpec(TxtMiru::TextType::NEXT_PAGE, 0));
 	}
 }
 bool TitleType::isEmptyLine(int iLine, int len, const TxtMiru::LineList &line_list)
@@ -351,17 +351,17 @@ bool TitleType::isEmptyLine(int iLine, int len, const TxtMiru::LineList &line_li
 	return (iLine < len && (line_list[iLine].text_list.empty() || line_list[iLine].text_list[0].str.empty()));
 }
 bool TitleType::IsValid(TxtMiru::TextType tt){
-	return (tt == TxtMiru::TT_TEXT || tt == TxtMiru::TT_LINE_CHAR || tt == TxtMiru::TT_COMMENT_BEGIN);
+	return (tt == TxtMiru::TextType::TEXT || tt == TxtMiru::TextType::LINE_CHAR || tt == TxtMiru::TextType::COMMENT_BEGIN);
 }
 bool TitleType::SetType(const TxtMiru::TextPoint &cur_point, const TxtMiru::TextInfo &text_info){
 	switch(text_info.textType){
-	case TxtMiru::TT_TEXT:
-	case TxtMiru::TT_LINE_CHAR:
+	case TxtMiru::TextType::TEXT:
+	case TxtMiru::TextType::LINE_CHAR:
 		if(cur_point.iLine != 0 && text_info.str.empty()){ return false; }
 		last_point = cur_point;
 		if(cur_point.iLine > max_title_line){ return false; }
 		break;
-	case TxtMiru::TT_COMMENT_BEGIN:
+	case TxtMiru::TextType::COMMENT_BEGIN:
 		return false;
 		break;
 	default:
@@ -378,7 +378,7 @@ InfoType::~InfoType()
 		buffer.ToString(str, last_point, TxtMiru::TextPoint{static_cast<signed int>(line_list.size())+1, -1, -1});
 		info += _T("\r\n");
 		info += str;
-		line_list[last_point.iLine].text_list.push_back(TextInfoSpec(TxtMiru::TT_COMMENT_BEGIN, 0));
+		line_list[last_point.iLine].text_list.push_back(TextInfoSpec(TxtMiru::TextType::COMMENT_BEGIN, 0));
 	}
 }
 bool InfoType::isEmptyLine(const TxtMiru::TextInfoList &text_list)
@@ -387,7 +387,7 @@ bool InfoType::isEmptyLine(const TxtMiru::TextInfoList &text_list)
 }
 bool InfoType::IsValid(TxtMiru::TextType tt)
 {
-	return tt == TxtMiru::TT_ENDOFCONTENTS;
+	return tt == TxtMiru::TextType::ENDOFCONTENTS;
 }
 bool InfoType::SetType(const TxtMiru::TextPoint &cur_point, const TxtMiru::TextInfo &text_info)
 {
@@ -398,7 +398,7 @@ bool InfoType::SetType(const TxtMiru::TextPoint &cur_point, const TxtMiru::TextI
 BoldSet::BoldSet(TxtMiru::TextStyleMap &tsm) : textStyleMap(tsm){}
 bool BoldSet::IsValid(TxtMiru::TextType tt)
 {
-	return (tt == TxtMiru::TT_TEXT);
+	return (tt == TxtMiru::TextType::TEXT);
 }
 bool BoldSet::SetChar(const TxtMiru::TextPoint &cur, LPCTSTR lpSrc, LPCTSTR lpEnd)
 {
@@ -415,20 +415,20 @@ bool BoldSet::SetChar(const TxtMiru::TextPoint &cur, LPCTSTR lpSrc, LPCTSTR lpEn
 BoldType::BoldType(CGrTxtBuffer &b) : buffer(b), boldSet(b.GetTextStyleMap()), tpBeginBold{-1,0,0}{}
 bool BoldType::IsValid(TxtMiru::TextType tt)
 {
-	return (tt == TxtMiru::TT_BOLD || tt == TxtMiru::TT_BOLD_START || tt == TxtMiru::TT_BOLD_END);
+	return (tt == TxtMiru::TextType::BOLD || tt == TxtMiru::TextType::BOLD_START || tt == TxtMiru::TextType::BOLD_END);
 }
 bool BoldType::SetType(const TxtMiru::TextPoint &cur_point, const TxtMiru::TextInfo &text_info)
 {
 	switch(text_info.textType){
-	case TxtMiru::TT_BOLD:
+	case TxtMiru::TextType::BOLD:
 		buffer.ForEach(TxtMiru::TextParserPoint(cur_point.iLine, text_info.tpBegin), TxtMiru::TextParserPoint(cur_point.iLine, text_info.tpEnd), static_cast<CGrTxtBuffer::CGrCharFunc&&>(boldSet));
 		break;
-	case TxtMiru::TT_BOLD_START:
+	case TxtMiru::TextType::BOLD_START:
 		if(tpBeginBold.iLine == -1){
 			tpBeginBold = cur_point;
 		}
 		break;
-	case TxtMiru::TT_BOLD_END:
+	case TxtMiru::TextType::BOLD_END:
 		if(tpBeginBold.iLine >= 0){
 			buffer.ForEach(tpBeginBold, cur_point, static_cast<CGrTxtBuffer::CGrCharFunc&&>(boldSet));
 			tpBeginBold.iLine = -1;
@@ -590,13 +590,13 @@ void ConvertAccentChar(std::tstring &line)
 bool LoadPreParser(CGrJScript &script, LPCTSTR lpType)
 {
 	const auto &param = CGrTxtMiru::theApp().Param();
-	if(!param.GetBoolean(CGrTxtParam::UsePreParser)){
+	if(!param.GetBoolean(CGrTxtParam::PointsType::UsePreParser)){
 		return false;
 	}
 	CGrCurrentDirectory cur;
 	TCHAR *lpfilepart;
 	std::tstring filename;
-	param.GetText(CGrTxtParam::PreParserFolder, filename);
+	param.GetText(CGrTxtParam::TextType::PreParserFolder, filename);
 	do {
 		if(!filename.empty()){
 			TCHAR foldername[MAX_PATH + 1];

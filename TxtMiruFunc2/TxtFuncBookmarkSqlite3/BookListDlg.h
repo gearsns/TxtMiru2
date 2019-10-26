@@ -64,7 +64,7 @@ private:
 	bool m_bBookmark = true;
 	bool m_bSubtitle = true;
 	bool m_bStayOn   = false;
-
+	
 	bool bWaitting = false;
 	int m_iCurrentTag  = -1;
 	int m_iCurrentBook = -1;

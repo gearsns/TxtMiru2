@@ -4,7 +4,7 @@
 
 namespace TxtMiruType
 {
-	UINT Attr[TxtMiru::TT_MaxNum] = {
+	UINT Attr[static_cast<int>(TxtMiru::TextType::MaxNum)] = {
 		0b0'00000000'00000000'00000000'00000001, // TT_TEXT                  ,
 		0b0'00000000'00000000'00000000'00000010, // TT_RUBY                  , // 《--》
 		0b0'00000000'00000000'00000000'00000010, // TT_RUBY_L                , // ［＃「--」の左に「...」のルビ］

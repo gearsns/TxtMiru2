@@ -49,20 +49,20 @@ BOOL CGrPropPageBookmark::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	auto &&param = CGrTxtFunc::Param();
 	// 栞の自動保存
 	int auto_save_mode[2] = {};
-	param.GetPoints(CGrTxtFuncIParam::BookMarkAutoSave, auto_save_mode, sizeof(auto_save_mode)/sizeof(int));
+	param.GetPoints(CGrTxtFuncIParam::PointsType::BookMarkAutoSave, auto_save_mode, sizeof(auto_save_mode)/sizeof(int));
 	::SetCheckDlgItemID(hwnd, IDC_CHECKBOX_BOOKMARKAUTOSAVE, (auto_save_mode[0] == 1));
 	SetDlgItemInt(hwnd, IDC_EDIT_BOOKMARKAUTOSAVE_INTERVAL, auto_save_mode[1], true);
 	// 栞ファイルは栞フォルダに保存
-	bool bBookMarkToFolder = param.GetBoolean(CGrTxtFuncIParam::BookMarkToFolder);
+	bool bBookMarkToFolder = param.GetBoolean(CGrTxtFuncIParam::PointsType::BookMarkToFolder);
 	::SetCheckDlgItemID(hwnd, IDC_RADIO_BOOKMARKSAVE_FOLDER, bBookMarkToFolder ); // 栞ファイルは栞フォルダに保存
 	::SetCheckDlgItemID(hwnd, IDC_RADIO_BOOKMARKSAVE_SAME  , !bBookMarkToFolder); // テキストファイルと同じフォルダに作成
 	// 最大 iBookMarkNum 個まで保存
 	int iBookMarkNum = 0;
-	param.GetPoints(CGrTxtFuncIParam::BookMarkNum, &iBookMarkNum, 1);
+	param.GetPoints(CGrTxtFuncIParam::PointsType::BookMarkNum, &iBookMarkNum, 1);
 	SetDlgItemInt(hwnd, IDC_EDIT_MAXBOOKMARK, iBookMarkNum, true);
 	::SendMessage(GetDlgItem(hwnd, IDC_SPIN_MAXBOOMARK), UDM_SETRANGE32, (WPARAM)10, (LPARAM)1);
 	// 栞フォルダ
-	::SetDlgItemTextType(hwnd, param, IDC_EDIT_BOOKMARKFOLDER , CGrTxtFuncIParam::BookMarkFolder );
+	::SetDlgItemTextType(hwnd, param, IDC_EDIT_BOOKMARKFOLDER , CGrTxtFuncIParam::TextType::BookMarkFolder );
 	// お気に入り画面 背面に移動を許可（※再起動）
 	std::tstring ini_filename;
 	CGrTxtFunc::GetBookmarkFolder(&param, ini_filename);
@@ -136,15 +136,15 @@ bool CGrPropPageBookmark::Apply()
 	int iAutoSaveFlag;
 	auto_save_mode[0] = (::GetCheckDlgItemID(m_hWnd, IDC_CHECKBOX_BOOKMARKAUTOSAVE) == BST_CHECKED) ? 1 : 0;
 	auto_save_mode[1] = GetDlgItemInt(m_hWnd, IDC_EDIT_BOOKMARKAUTOSAVE_INTERVAL, &iAutoSaveFlag, true);
-	param.SetPoints(CGrTxtFuncIParam::BookMarkAutoSave, auto_save_mode, sizeof(auto_save_mode)/sizeof(int));
+	param.SetPoints(CGrTxtFuncIParam::PointsType::BookMarkAutoSave, auto_save_mode, sizeof(auto_save_mode)/sizeof(int));
 	// 栞ファイルは栞フォルダに保存
-	param.SetBoolean(CGrTxtFuncIParam::BookMarkToFolder, ::GetCheckDlgItemID(m_hWnd, IDC_RADIO_BOOKMARKSAVE_FOLDER) == BST_CHECKED);
+	param.SetBoolean(CGrTxtFuncIParam::PointsType::BookMarkToFolder, ::GetCheckDlgItemID(m_hWnd, IDC_RADIO_BOOKMARKSAVE_FOLDER) == BST_CHECKED);
 	// 最大 iBookMarkNum 個まで保存
 	int iBookMarkNumFlag;
 	int iBookMarkNum = GetDlgItemInt(m_hWnd, IDC_EDIT_MAXBOOKMARK, &iBookMarkNumFlag, true);
-	param.SetPoints(CGrTxtFuncIParam::BookMarkNum, &iBookMarkNum, 1);
+	param.SetPoints(CGrTxtFuncIParam::PointsType::BookMarkNum, &iBookMarkNum, 1);
 	// 栞フォルダ
-	::GetDlgItemTextType(m_hWnd, param, IDC_EDIT_BOOKMARKFOLDER, CGrTxtFuncIParam::BookMarkFolder);
+	::GetDlgItemTextType(m_hWnd, param, IDC_EDIT_BOOKMARKFOLDER, CGrTxtFuncIParam::TextType::BookMarkFolder);
 
 	// お気に入り画面 背面に移動を許可（※再起動）
 	const TCHAR *pVal = nullptr;

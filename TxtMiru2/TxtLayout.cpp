@@ -85,20 +85,21 @@ void CGrTxtLayout::getItem(const CSV_COLMN &csv_col)
 	auto lpSrc = csv_col[0].c_str();
 	/*   */if(CGrText::isMatchChar(lpSrc, _T("PaperSize"         ))){ addSize(csv_col, m_szPaper    );
 	} else if(CGrText::isMatchChar(lpSrc, _T("PageCharCount"     ))){ addSize(csv_col, m_szPageCount);
-	} else if(CGrText::isMatchChar(lpSrc, _T("TextSize"          ))){ addLineSize(csv_col, m_ls[LST_Text        ]);
-	} else if(CGrText::isMatchChar(lpSrc, _T("RubySize"          ))){ addLineSize(csv_col, m_ls[LST_Ruby        ]);
-	} else if(CGrText::isMatchChar(lpSrc, _T("NombreSize"        ))){ addLineSize(csv_col, m_ls[LST_Nombre      ]);
-	} else if(CGrText::isMatchChar(lpSrc, _T("NoteSize"          ))){ addLineSize(csv_col, m_ls[LST_Note        ]);
-	} else if(CGrText::isMatchChar(lpSrc, _T("RunningHeadsSize"  ))){ addLineSize(csv_col, m_ls[LST_RunningHeads]);
-	} else if(CGrText::isMatchChar(lpSrc, _T("TextLayout"        ))){ addLayout(csv_col, m_ll[LLT_Text        ]);
-	} else if(CGrText::isMatchChar(lpSrc, _T("NombreLayout"      ))){ addLayout(csv_col, m_ll[LLT_Nombre      ]);
-	} else if(CGrText::isMatchChar(lpSrc, _T("RunningHeadsLayout"))){ addLayout(csv_col, m_ll[LLT_RunningHeads]);
-	} else if(CGrText::isMatchChar(lpSrc, _T("NoteLayout"        ))){ addLayout(csv_col, m_ll[LLT_Note        ]);
+	} else if(CGrText::isMatchChar(lpSrc, _T("TextSize"          ))){ addLineSize(csv_col, m_ls[static_cast<unsigned int>(LineSizeType::Text        )]);
+	} else if(CGrText::isMatchChar(lpSrc, _T("RubySize"          ))){ addLineSize(csv_col, m_ls[static_cast<unsigned int>(LineSizeType::Ruby        )]);
+	} else if(CGrText::isMatchChar(lpSrc, _T("NombreSize"        ))){ addLineSize(csv_col, m_ls[static_cast<unsigned int>(LineSizeType::Nombre      )]);
+	} else if(CGrText::isMatchChar(lpSrc, _T("NoteSize"          ))){ addLineSize(csv_col, m_ls[static_cast<unsigned int>(LineSizeType::Note        )]);
+	} else if(CGrText::isMatchChar(lpSrc, _T("RunningHeadsSize"  ))){ addLineSize(csv_col, m_ls[static_cast<unsigned int>(LineSizeType::RunningHeads)]);
+	} else if(CGrText::isMatchChar(lpSrc, _T("TextLayout"        ))){ addLayout(csv_col, m_ll[static_cast<unsigned int>(LayoutListType::Text        )]);
+	} else if(CGrText::isMatchChar(lpSrc, _T("NombreLayout"      ))){ addLayout(csv_col, m_ll[static_cast<unsigned int>(LayoutListType::Nombre      )]);
+	} else if(CGrText::isMatchChar(lpSrc, _T("RunningHeadsLayout"))){ addLayout(csv_col, m_ll[static_cast<unsigned int>(LayoutListType::RunningHeads)]);
+	} else if(CGrText::isMatchChar(lpSrc, _T("NoteLayout"        ))){ addLayout(csv_col, m_ll[static_cast<unsigned int>(LayoutListType::Note        )]);
 	} else if(CGrText::isMatchChar(lpSrc, _T("LayoutType"        ))){ m_openLayoutType = csv_col[1];
 	} else if(CGrText::isMatchChar(lpSrc, _T("LayoutName"        ))){ m_layoutName     = csv_col[1];
-	} else if(CGrText::isMatchChar(lpSrc, _T("Nombre1Format"     ))){ m_format[FT_Nombre1] = csv_col[1];
-	} else if(CGrText::isMatchChar(lpSrc, _T("Nombre2Format"     ))){ m_format[FT_Nombre2] = csv_col[1];
+	} else if(CGrText::isMatchChar(lpSrc, _T("Nombre1Format"     ))){ m_format[static_cast<unsigned int>(FormatType::Nombre1)] = csv_col[1];
+	} else if(CGrText::isMatchChar(lpSrc, _T("Nombre2Format"     ))){ m_format[static_cast<unsigned int>(FormatType::Nombre2)] = csv_col[1];
 	} else if(CGrText::isMatchChar(lpSrc, _T("NumbreFormatType"  ))){ m_nombreFormatType = static_cast<NombreFormatType>(CGrText::toInt(csv_col[1]));
+	} else if(CGrText::isMatchChar(lpSrc, _T("Orientation"       ))){ m_orientationType  = static_cast<OrientationType>(CGrText::toInt(csv_col[1]));
 	}
 }
 
@@ -125,8 +126,8 @@ bool CGrTxtLayout::Open(LPCTSTR lpFileName)
 	m_fileName = filename;
 	Clear();
 	m_openLayoutType = LayoutType();
-	m_format[FT_Nombre1] = _T("%1!d!");
-	m_format[FT_Nombre2] = _T("%1!d!");
+	m_format[static_cast<unsigned int>(FormatType::Nombre1)] = _T("%1!d!");
+	m_format[static_cast<unsigned int>(FormatType::Nombre2)] = _T("%1!d!");
 
 	for(const auto &csv_col : csv.GetCSVROW()){
 		if(csv_col.size() <= 1){
@@ -135,7 +136,7 @@ bool CGrTxtLayout::Open(LPCTSTR lpFileName)
 		getItem(csv_col);
 	}
 	struct counter { int operator()(int lines, const TxtMiru::TxtLayout &l){ return lines+l.lines; } };
-	m_szPageCount.cx = std::accumulate(m_ll[LLT_Text].begin(), m_ll[LLT_Text].end(), 0, counter());
+	m_szPageCount.cx = std::accumulate(m_ll[static_cast<unsigned int>(LayoutListType::Text)].begin(), m_ll[static_cast<unsigned int>(LayoutListType::Text)].end(), 0, counter());
 
 	if(m_szPageCount.cx <= 0){
 		SetInitialize();
@@ -162,14 +163,15 @@ void CGrTxtLayout::setItem(CGrCSVText &csv)
 	csv.AddFormatTail(_T("ss" ), _T("LayoutName"      ), m_layoutName.c_str()        );
 	csv.AddFormatTail(_T("sdd"), _T("PaperSize"       ), m_szPaper                   );
 	csv.AddFormatTail(_T("sdd"), _T("PageCharCount"   ), m_szPageCount               );
-	csv.AddFormatTail(_T("sdd"), _T("TextSize"        ), m_ls[LST_Text        ]      );
-	csv.AddFormatTail(_T("sdd"), _T("RubySize"        ), m_ls[LST_Ruby        ]      );
-	csv.AddFormatTail(_T("sdd"), _T("NombreSize"      ), m_ls[LST_Nombre      ]      );
-	csv.AddFormatTail(_T("sdd"), _T("NoteSize"        ), m_ls[LST_Note        ]      );
-	csv.AddFormatTail(_T("sdd"), _T("RunningHeadsSize"), m_ls[LST_RunningHeads]      );
-	csv.AddFormatTail(_T("ss") , _T("Nombre1Format"   ), m_format[FT_Nombre1].c_str());
-	csv.AddFormatTail(_T("ss") , _T("Nombre2Format"   ), m_format[FT_Nombre2].c_str());
+	csv.AddFormatTail(_T("sdd"), _T("TextSize"        ), m_ls[static_cast<unsigned int>(LineSizeType::Text        )]);
+	csv.AddFormatTail(_T("sdd"), _T("RubySize"        ), m_ls[static_cast<unsigned int>(LineSizeType::Ruby        )]);
+	csv.AddFormatTail(_T("sdd"), _T("NombreSize"      ), m_ls[static_cast<unsigned int>(LineSizeType::Nombre      )]);
+	csv.AddFormatTail(_T("sdd"), _T("NoteSize"        ), m_ls[static_cast<unsigned int>(LineSizeType::Note        )]);
+	csv.AddFormatTail(_T("sdd"), _T("RunningHeadsSize"), m_ls[static_cast<unsigned int>(LineSizeType::RunningHeads)]);
+	csv.AddFormatTail(_T("ss") , _T("Nombre1Format"   ), m_format[static_cast<unsigned int>(FormatType::Nombre1)].c_str());
+	csv.AddFormatTail(_T("ss") , _T("Nombre2Format"   ), m_format[static_cast<unsigned int>(FormatType::Nombre2)].c_str());
 	csv.AddFormatTail(_T("sd") , _T("NumbreFormatType"), m_nombreFormatType          );
+	csv.AddFormatTail(_T("sd") , _T("Orientation"     ), m_orientationType           );
 	struct LayoutListConvert
 	{
 		CGrCSVText &csv;
@@ -180,10 +182,10 @@ void CGrTxtLayout::setItem(CGrCSVText &csv)
 			}
 		}
 	} llc(csv);
-	llc.AddTail(_T("TextLayout"        ), m_ll[LLT_Text        ]);
-	llc.AddTail(_T("NombreLayout"      ), m_ll[LLT_Nombre      ]);
-	llc.AddTail(_T("RunningHeadsLayout"), m_ll[LLT_RunningHeads]);
-	llc.AddTail(_T("NoteLayout"        ), m_ll[LLT_Note        ]);
+	llc.AddTail(_T("TextLayout"        ), m_ll[static_cast<unsigned int>(LayoutListType::Text        )]);
+	llc.AddTail(_T("NombreLayout"      ), m_ll[static_cast<unsigned int>(LayoutListType::Nombre      )]);
+	llc.AddTail(_T("RunningHeadsLayout"), m_ll[static_cast<unsigned int>(LayoutListType::RunningHeads)]);
+	llc.AddTail(_T("NoteLayout"        ), m_ll[static_cast<unsigned int>(LayoutListType::Note        )]);
 }
 
 bool CGrTxtLayout::Save(LPCTSTR lpFileName)
@@ -213,13 +215,13 @@ void CGrTxtLayout::Clear()
 void CGrTxtLayout::SetNombreFormatType(NombreFormatType lft)
 {
 	switch(lft){
-	case NFT_center :
-	case NFT_inside :
-	case NFT_outside:
+	case NombreFormatType::center :
+	case NombreFormatType::inside :
+	case NombreFormatType::outside:
 		m_nombreFormatType = lft;
 		break;
 	default:
-		m_nombreFormatType = NFT_outside;
+		m_nombreFormatType = NombreFormatType::outside;
 		break;
 	}
 }
@@ -258,22 +260,23 @@ int CGrCustomTxtLayout::ConfigurationDlg(HWND hWnd, CGrTxtDocument &doc)
 void CGrCustomTxtLayout::SetInitialize()
 {
 	Clear();
-	m_nombreFormatType = NFT_outside;
+	m_nombreFormatType = NombreFormatType::outside;
 	m_szPaper    .cx = 21000; m_szPaper    .cy = 14800;
 	m_szPageCount.cx =    34; m_szPageCount.cy =    40;
-	m_ls[LST_Text        ].width = 310; m_ls[LST_Text        ].space = 20;
-	m_ls[LST_Ruby        ].width = 160; m_ls[LST_Ruby        ].space = 20;
-	m_ls[LST_Nombre      ].width = 300; m_ls[LST_Nombre      ].space =  0;
-	m_ls[LST_Note        ].width = 200; m_ls[LST_Note        ].space = 20;
-	m_ls[LST_RunningHeads].width = 300; m_ls[LST_RunningHeads].space =  0;
-	m_format[FT_Nombre1] = _T("%1!d!");
-	m_format[FT_Nombre2] = _T("%1!d!");
-	m_ll[LLT_Text        ].push_back({11500,1000,20000,13800,17,40});
-	m_ll[LLT_Text        ].push_back({ 1000,1000, 9500,13800,17,40});
-	m_ll[LLT_Nombre      ].push_back({ 1000, 300, 1900,  600,17,40});
-	m_ll[LLT_Nombre      ].push_back({19242, 300,20142,  600,17,40});
-	m_ll[LLT_RunningHeads].push_back({ 2500, 300,10500,  600,17,40});
-	m_ll[LLT_Note        ].push_back({    0,1000, 1000,13800, 4,64});
+	m_ls[static_cast<unsigned int>(LineSizeType::Text        )].width = 310; m_ls[static_cast<unsigned int>(LineSizeType::Text        )].space = 20;
+	m_ls[static_cast<unsigned int>(LineSizeType::Ruby        )].width = 160; m_ls[static_cast<unsigned int>(LineSizeType::Ruby        )].space = 20;
+	m_ls[static_cast<unsigned int>(LineSizeType::Nombre      )].width = 300; m_ls[static_cast<unsigned int>(LineSizeType::Nombre      )].space =  0;
+	m_ls[static_cast<unsigned int>(LineSizeType::Note        )].width = 200; m_ls[static_cast<unsigned int>(LineSizeType::Note        )].space = 20;
+	m_ls[static_cast<unsigned int>(LineSizeType::RunningHeads)].width = 300; m_ls[static_cast<unsigned int>(LineSizeType::RunningHeads)].space =  0;
+	m_format[static_cast<unsigned int>(FormatType::Nombre1)] = _T("%1!d!");
+	m_format[static_cast<unsigned int>(FormatType::Nombre2)] = _T("%1!d!");
+	m_orientationType = OrientationType::Vertical;
+	m_ll[static_cast<unsigned int>(LayoutListType::Text        )].push_back({11500,1000,20000,13800,17,40});
+	m_ll[static_cast<unsigned int>(LayoutListType::Text        )].push_back({ 1000,1000, 9500,13800,17,40});
+	m_ll[static_cast<unsigned int>(LayoutListType::Nombre      )].push_back({ 1000, 300, 1900,  600,17,40});
+	m_ll[static_cast<unsigned int>(LayoutListType::Nombre      )].push_back({19242, 300,20142,  600,17,40});
+	m_ll[static_cast<unsigned int>(LayoutListType::RunningHeads)].push_back({ 2500, 300,10500,  600,17,40});
+	m_ll[static_cast<unsigned int>(LayoutListType::Note        )].push_back({    0,1000, 1000,13800, 4,64});
 }
 bool CGrCustomTxtLayout::IsSupported(LPCTSTR lpFileName) const { return true; }
 bool CGrCustomTxtLayout::IsSupported(CGrCSVText &csv) const { return true; };

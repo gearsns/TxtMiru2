@@ -108,9 +108,9 @@ struct CGrTxtOutLinerFunc : public CGrTxtBuffer::CGrTypeFunc {
 	}
 	virtual bool SetType(const TxtMiru::TextPoint &cur, const TxtMiru::TextInfo &text_info){
 		switch(text_info.textType){
-		case TxtMiru::TT_COMMENT_BEGIN: m_bComment = true ; break;
-		case TxtMiru::TT_COMMENT_END  : m_bComment = false; break;
-		case TxtMiru::TT_COMMENT      : break;
+		case TxtMiru::TextType::COMMENT_BEGIN: m_bComment = true ; break;
+		case TxtMiru::TextType::COMMENT_END  : m_bComment = false; break;
+		case TxtMiru::TextType::COMMENT      : break;
 		default:
 			if(!m_bComment && cur.iIndex == 0){
 				auto lpSrc = text_info.str.c_str();
@@ -142,23 +142,23 @@ struct CGrTxtSubtileFunc : public CGrTxtBuffer::CGrTypeFunc {
 	CGrTxtSubtileFunc(CGrTxtBuffer &t, std::vector<CGrTxtSubtitle::Subtitle> &s) : m_txtBuffer(t), m_subtitles(s){}
 	~CGrTxtSubtileFunc(){}
 	virtual bool IsValid(TxtMiru::TextType tt){
-		return TxtMiruType::isSubtitle(tt) || tt == TxtMiru::TT_ID || tt == TxtMiru::TT_FILE;
+		return TxtMiruType::isSubtitle(tt) || tt == TxtMiru::TextType::ID || tt == TxtMiru::TextType::FILE;
 	}
 	virtual bool SetType(const TxtMiru::TextPoint &cur, const TxtMiru::TextInfo &text_info){
 		int lvl = 1;
 		switch(text_info.textType){
-		case TxtMiru::TT_SUBTITLE1: lvl=1; break;
-		case TxtMiru::TT_SUBTITLE2: lvl=2; break;
-		case TxtMiru::TT_SUBTITLE3: lvl=3; break;
+		case TxtMiru::TextType::SUBTITLE1: lvl=1; break;
+		case TxtMiru::TextType::SUBTITLE2: lvl=2; break;
+		case TxtMiru::TextType::SUBTITLE3: lvl=3; break;
 		}
 		CGrTxtSubtitle::Subtitle subtitle;
 		subtitle.order = 0;
-		if(text_info.textType == TxtMiru::TT_ID){ // ID ページ内リンク用
+		if(text_info.textType == TxtMiru::TextType::ID){ // ID ページ内リンク用
 			subtitle.tpb   = cur;
 			subtitle.tpe   = cur;
 			subtitle.str   = text_info.str;
 			subtitle.level = 999;
-		} else if(text_info.textType == TxtMiru::TT_FILE){ // NextFile用
+		} else if(text_info.textType == TxtMiru::TextType::FILE){ // NextFile用
 			const auto &lineList = m_txtBuffer.GetLineList();
 			if(cur.iLine < 0 || cur.iLine >= static_cast<signed int>(lineList.size())){
 				return true;
@@ -196,7 +196,7 @@ struct CGrTxtSubtileFunc : public CGrTxtBuffer::CGrTypeFunc {
 bool CGrTxtSubtitle::AddLeaf(CGrTxtBuffer &txtBuffer)
 {
 	const auto &param = CGrTxtMiru::theApp().Param();
-	if(param.GetBoolean(CGrTxtParam::WzMemoMode)){
+	if(param.GetBoolean(CGrTxtParam::PointsType::WzMemoMode)){
 		CGrTxtOutLinerFunc outline(txtBuffer, m_subtitles);
 		txtBuffer.ForEachAll(static_cast<CGrTxtBuffer::CGrTypeFunc&&>(outline));
 	}
@@ -221,7 +221,7 @@ LPCTSTR CGrTxtSubtitle::GetNameByPage(int page) const
 	LPCTSTR lpName = nullptr;
 	const auto &param = CGrTxtMiru::theApp().Param();
 	int points[2] = {1,1};
-	param.GetPoints(CGrTxtParam::RunningHeadLevel, points, _countof(points));
+	param.GetPoints(CGrTxtParam::PointsType::RunningHeadLevel, points, _countof(points));
 	bool b1st_title = (points[0] == 1);
 	int max_title_level = points[1];
 	for(const auto &item : m_subtitles){

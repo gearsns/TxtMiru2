@@ -15,51 +15,51 @@
 #include "MessageBox.h"
 
 static struct FontSpacing l_font_spacing[] = {
-	{IDC_EDIT_TEXT_FONTSPACING         , IDC_CHECKBOX_TEXT_CENTER         , CGrTxtFuncIParam::Text        },
-	{IDC_EDIT_BOLD_FONTSPACING         , IDC_CHECKBOX_BOLD_CENTER         , CGrTxtFuncIParam::Bold        },
-	{IDC_EDIT_RUBY_FONTSPACING         , IDC_CHECKBOX_RUBY_CENTER         , CGrTxtFuncIParam::Ruby        },
-	{IDC_EDIT_NOTE_FONTSPACING         , IDC_CHECKBOX_NOTE_CENTER         , CGrTxtFuncIParam::Note        },
-	{IDC_EDIT_NOMBRE_FONTSPACING       , IDC_CHECKBOX_NOMBRE_CENTER       , CGrTxtFuncIParam::Nombre      },
-	{IDC_EDIT_RUNNING_HEADS_FONTSPACING, IDC_CHECKBOX_RUNNING_HEADS_CENTER, CGrTxtFuncIParam::RunningHeads},
+	{IDC_EDIT_TEXT_FONTSPACING         , IDC_CHECKBOX_TEXT_CENTER         , CGrTxtFuncIParam::CharType::Text        },
+	{IDC_EDIT_BOLD_FONTSPACING         , IDC_CHECKBOX_BOLD_CENTER         , CGrTxtFuncIParam::CharType::Bold        },
+	{IDC_EDIT_RUBY_FONTSPACING         , IDC_CHECKBOX_RUBY_CENTER         , CGrTxtFuncIParam::CharType::Ruby        },
+	{IDC_EDIT_NOTE_FONTSPACING         , IDC_CHECKBOX_NOTE_CENTER         , CGrTxtFuncIParam::CharType::Note        },
+	{IDC_EDIT_NOMBRE_FONTSPACING       , IDC_CHECKBOX_NOMBRE_CENTER       , CGrTxtFuncIParam::CharType::Nombre      },
+	{IDC_EDIT_RUNNING_HEADS_FONTSPACING, IDC_CHECKBOX_RUNNING_HEADS_CENTER, CGrTxtFuncIParam::CharType::RunningHeads},
 };
 static struct FontWeightName l_font_weight_name[] = {
 	{IDS_FW_REGULAR, FW_REGULAR},
 	{IDS_FW_BOLD   , FW_BOLD   },
 };
 static struct FontWeight l_font_weight[] = {
-	{IDC_COMBO_TEXT_WEIGHT         , CGrTxtFuncIParam::Text        },
-	{IDC_COMBO_BOLD_WEIGHT         , CGrTxtFuncIParam::Bold        },
-	{IDC_COMBO_RUBY_WEIGHT         , CGrTxtFuncIParam::Ruby        },
-	{IDC_COMBO_NOTE_WEIGHT         , CGrTxtFuncIParam::Note        },
-	{IDC_COMBO_NOMBRE_WEIGHT       , CGrTxtFuncIParam::Nombre      },
-	{IDC_COMBO_RUNNING_HEADS_WEIGHT, CGrTxtFuncIParam::RunningHeads},
+	{IDC_COMBO_TEXT_WEIGHT         , CGrTxtFuncIParam::CharType::Text        },
+	{IDC_COMBO_BOLD_WEIGHT         , CGrTxtFuncIParam::CharType::Bold        },
+	{IDC_COMBO_RUBY_WEIGHT         , CGrTxtFuncIParam::CharType::Ruby        },
+	{IDC_COMBO_NOTE_WEIGHT         , CGrTxtFuncIParam::CharType::Note        },
+	{IDC_COMBO_NOMBRE_WEIGHT       , CGrTxtFuncIParam::CharType::Nombre      },
+	{IDC_COMBO_RUNNING_HEADS_WEIGHT, CGrTxtFuncIParam::CharType::RunningHeads},
 };
 static struct FontName l_font_name[] = {
-	{IDC_COMBO_TEXT_FONT         , CGrTxtFuncIParam::Text        },
-	{IDC_COMBO_BOLD_FONT         , CGrTxtFuncIParam::Bold        },
-	{IDC_COMBO_RUBY_FONT         , CGrTxtFuncIParam::Ruby        },
-	{IDC_COMBO_NOTE_FONT         , CGrTxtFuncIParam::Note        },
-	{IDC_COMBO_NOMBRE_FONT       , CGrTxtFuncIParam::Nombre      },
-	{IDC_COMBO_RUNNING_HEADS_FONT, CGrTxtFuncIParam::RunningHeads},
+	{IDC_COMBO_TEXT_FONT         , CGrTxtFuncIParam::CharType::Text        },
+	{IDC_COMBO_BOLD_FONT         , CGrTxtFuncIParam::CharType::Bold        },
+	{IDC_COMBO_RUBY_FONT         , CGrTxtFuncIParam::CharType::Ruby        },
+	{IDC_COMBO_NOTE_FONT         , CGrTxtFuncIParam::CharType::Note        },
+	{IDC_COMBO_NOMBRE_FONT       , CGrTxtFuncIParam::CharType::Nombre      },
+	{IDC_COMBO_RUNNING_HEADS_FONT, CGrTxtFuncIParam::CharType::RunningHeads},
 };
 static struct PointSet l_style_point_set[] = {
-	{IDC_EDIT_TATECHUNUM          , CGrTxtFuncIParam::TateChuNum      },
-	{IDC_EDIT_PAGEFLIP_TIME       , CGrTxtFuncIParam::PageFlipInterval},
-	{IDC_EDIT_WHITE_RATE          , CGrTxtFuncIParam::WhiteTransRate  },
+	{IDC_EDIT_TATECHUNUM          , CGrTxtFuncIParam::PointsType::TateChuNum      },
+	{IDC_EDIT_PAGEFLIP_TIME       , CGrTxtFuncIParam::PointsType::PageFlipInterval},
+	{IDC_EDIT_WHITE_RATE          , CGrTxtFuncIParam::PointsType::WhiteTransRate  },
 };
 static struct ValueSet l_style_value_set[] = {
-	{IDC_EDIT_FIRST_CHAR  , CGrTxtFuncIParam::LineStartNGCharacters},
-	{IDC_EDIT_END_CHAR    , CGrTxtFuncIParam::LineEndNGCharacters  },
-	{IDC_EDIT_HANG_CHAR   , CGrTxtFuncIParam::HangingCharacters    },
-	{IDC_EDIT_SEP_NG_CHAR , CGrTxtFuncIParam::SeparateNGCharacters },
-	{IDC_EDIT_ROTATE_CHAR , CGrTxtFuncIParam::RotateCharacters     },
-	{IDC_EDIT_RROTATE_CHAR, CGrTxtFuncIParam::RRotateCharacters    },
+	{IDC_EDIT_FIRST_CHAR  , CGrTxtFuncIParam::ValueType::LineStartNGCharacters},
+	{IDC_EDIT_END_CHAR    , CGrTxtFuncIParam::ValueType::LineEndNGCharacters  },
+	{IDC_EDIT_HANG_CHAR   , CGrTxtFuncIParam::ValueType::HangingCharacters    },
+	{IDC_EDIT_SEP_NG_CHAR , CGrTxtFuncIParam::ValueType::SeparateNGCharacters },
+	{IDC_EDIT_ROTATE_CHAR , CGrTxtFuncIParam::ValueType::RotateCharacters     },
+	{IDC_EDIT_RROTATE_CHAR, CGrTxtFuncIParam::ValueType::RRotateCharacters    },
 };
 static struct PointRange l_style_point_range[] = {
 	{IDC_SPIN_TATECHUNUM          , 0, 4   , IDS_FONT_SIZE             },
 	{IDC_SPIN_PAGEFLIP_TIME       , 0, 100 , IDS_PAGE_FLIP_INTERVAL    },
 	{IDC_SPIN_WHITE_RATE          , 0, 100 , IDS_WHITE_TRANS_RATE_RANGE},
-	{IDC_SPIN_RUNNINGHEAD_LEVEL   , 1, 6   , IDS_EDIT_RUNNINGHEAD_LEVEL}, // 2.0.27.0
+	{IDC_SPIN_RUNNINGHEAD_LEVEL   , 1, 6   , IDS_EDIT_RUNNINGHEAD_LEVEL},
 };
 
 LRESULT CGrEditImgFile::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -147,14 +147,14 @@ BOOL CGrPropPageStyle::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	auto &&param = CGrTxtFunc::Param();
 	COLORREF page_color[3] = {};
 	COLORREF link_color = {};
-	param.GetPoints(CGrTxtFuncIParam::PageColor    , reinterpret_cast<int*>(page_color ), sizeof(page_color)/sizeof(COLORREF));
-	param.GetPoints(CGrTxtFuncIParam::LinkTextColor, reinterpret_cast<int*>(&link_color), 1                                  );
-	attachBtn(IDC_BUTTON_TEXT_COLOR          , m_colBtnText              , param.GetColor(CGrTxtFuncIParam::Text        ));
-	attachBtn(IDC_BUTTON_BOLD_COLOR          , m_colBtnBold              , param.GetColor(CGrTxtFuncIParam::Bold        ));
-	attachBtn(IDC_BUTTON_RUBY_COLOR          , m_colBtnRuby              , param.GetColor(CGrTxtFuncIParam::Ruby        ));
-	attachBtn(IDC_BUTTON_NOTE_COLOR          , m_colBtnNote              , param.GetColor(CGrTxtFuncIParam::Note        ));
-	attachBtn(IDC_BUTTON_NOMBRE_COLOR        , m_colBtnNombre            , param.GetColor(CGrTxtFuncIParam::Nombre      ));
-	attachBtn(IDC_BUTTON_RUNNING_HEADS_COLOR , m_colBtnRunningHeads      , param.GetColor(CGrTxtFuncIParam::RunningHeads));
+	param.GetPoints(CGrTxtFuncIParam::PointsType::PageColor    , reinterpret_cast<int*>(page_color ), sizeof(page_color)/sizeof(COLORREF));
+	param.GetPoints(CGrTxtFuncIParam::PointsType::LinkTextColor, reinterpret_cast<int*>(&link_color), 1                                  );
+	attachBtn(IDC_BUTTON_TEXT_COLOR          , m_colBtnText              , param.GetColor(CGrTxtFuncIParam::CharType::Text        ));
+	attachBtn(IDC_BUTTON_BOLD_COLOR          , m_colBtnBold              , param.GetColor(CGrTxtFuncIParam::CharType::Bold        ));
+	attachBtn(IDC_BUTTON_RUBY_COLOR          , m_colBtnRuby              , param.GetColor(CGrTxtFuncIParam::CharType::Ruby        ));
+	attachBtn(IDC_BUTTON_NOTE_COLOR          , m_colBtnNote              , param.GetColor(CGrTxtFuncIParam::CharType::Note        ));
+	attachBtn(IDC_BUTTON_NOMBRE_COLOR        , m_colBtnNombre            , param.GetColor(CGrTxtFuncIParam::CharType::Nombre      ));
+	attachBtn(IDC_BUTTON_RUNNING_HEADS_COLOR , m_colBtnRunningHeads      , param.GetColor(CGrTxtFuncIParam::CharType::RunningHeads));
 	attachBtn(IDC_BUTTON_PAPER_BKCOLOR       , m_colBtnPaperBkColor      , page_color[0]                                 );
 	attachBtn(IDC_BUTTON_BKCOLOR             , m_colBtnBkColor           , page_color[2]                                 );
 	attachBtn(IDC_BUTTON_LINKCOLOR           , m_colBtnLinkColor         , link_color                                    );
@@ -168,12 +168,12 @@ BOOL CGrPropPageStyle::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	lfFont.lfPitchAndFamily = 0;
 	auto hdc = ::GetDC(m_hWnd);
 	::EnumFontFamiliesEx(hdc, &lfFont,
-						 [](CONST LOGFONTW *lpelfe, CONST TEXTMETRICW *lpntme, DWORD FontType, LPARAM lParam) {
-							 auto *lp_font_name_list = reinterpret_cast<FontNameList*>(lParam);
-							 lp_font_name_list->insert(lpelfe->lfFaceName);
-							 return static_cast<int>(TRUE);
-						 },
-						 reinterpret_cast<LPARAM>(&m_fontNameList), 0);
+		[](CONST LOGFONTW *lpelfe, CONST TEXTMETRICW *lpntme, DWORD FontType, LPARAM lParam) {
+			auto *lp_font_name_list = reinterpret_cast<FontNameList*>(lParam);
+			lp_font_name_list->insert(lpelfe->lfFaceName);
+			return static_cast<int>(TRUE);
+		},
+		reinterpret_cast<LPARAM>(&m_fontNameList), 0);
 	::ReleaseDC(m_hWnd, hdc);
 	{
 		auto hwnd_text         = GetDlgItem(m_hWnd, IDC_COMBO_TEXT_FONT         );
@@ -190,16 +190,16 @@ BOOL CGrPropPageStyle::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 			ComboBox_AddString(hwnd_nombre      , item.c_str());
 			ComboBox_AddString(hwnd_runningheads, item.c_str());
 		}
-		SetWindowText(hwnd_text        , param.GetFontName(CGrTxtFuncIParam::Text        ));
-		SetWindowText(hwnd_bold        , param.GetFontName(CGrTxtFuncIParam::Bold        ));
-		SetWindowText(hwnd_ruby        , param.GetFontName(CGrTxtFuncIParam::Ruby        ));
-		SetWindowText(hwnd_note        , param.GetFontName(CGrTxtFuncIParam::Note        ));
-		SetWindowText(hwnd_nombre      , param.GetFontName(CGrTxtFuncIParam::Nombre      ));
-		SetWindowText(hwnd_runningheads, param.GetFontName(CGrTxtFuncIParam::RunningHeads));
+		SetWindowText(hwnd_text        , param.GetFontName(CGrTxtFuncIParam::CharType::Text        ));
+		SetWindowText(hwnd_bold        , param.GetFontName(CGrTxtFuncIParam::CharType::Bold        ));
+		SetWindowText(hwnd_ruby        , param.GetFontName(CGrTxtFuncIParam::CharType::Ruby        ));
+		SetWindowText(hwnd_note        , param.GetFontName(CGrTxtFuncIParam::CharType::Note        ));
+		SetWindowText(hwnd_nombre      , param.GetFontName(CGrTxtFuncIParam::CharType::Nombre      ));
+		SetWindowText(hwnd_runningheads, param.GetFontName(CGrTxtFuncIParam::CharType::RunningHeads));
 	}
 	{
 		TCHAR buf[1024];
-		param.GetText(CGrTxtFuncIParam::LayoutFile, buf, sizeof(buf)/sizeof(TCHAR));
+		param.GetText(CGrTxtFuncIParam::TextType::LayoutFile, buf, sizeof(buf)/sizeof(TCHAR));
 		std::tstring filename(buf);
 
 		CGrTxtLayoutMgr mgr;
@@ -251,11 +251,11 @@ BOOL CGrPropPageStyle::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	}
 	// 背景画像
 	m_imgEditBox.Attach(GetDlgItem(m_hWnd, IDC_EDIT_BACK_IMG));
-	::SetDlgItemTextType(m_hWnd, param, IDC_EDIT_BACK_IMG, CGrTxtFuncIParam::BackgroundImage);
+	::SetDlgItemTextType(m_hWnd, param, IDC_EDIT_BACK_IMG, CGrTxtFuncIParam::TextType::BackgroundImage);
 	//
-	::CheckDlgButton(m_hWnd, param, IDC_CHECKBOX_WZMEMO           , CGrTxtFuncIParam::WzMemoMode     );
-	::CheckDlgButton(m_hWnd, param, IDC_CHECKBOX_OVERLAPCHAR      , CGrTxtFuncIParam::UseOverlapChar );
-	::CheckDlgButton(m_hWnd, param, IDC_CHECKBOX_IMAGE_NEXT_LAYOUT, CGrTxtFuncIParam::ImageNextLayout);
+	::CheckDlgButton(m_hWnd, param, IDC_CHECKBOX_WZMEMO           , CGrTxtFuncIParam::PointsType::WzMemoMode     );
+	::CheckDlgButton(m_hWnd, param, IDC_CHECKBOX_OVERLAPCHAR      , CGrTxtFuncIParam::PointsType::UseOverlapChar );
+	::CheckDlgButton(m_hWnd, param, IDC_CHECKBOX_IMAGE_NEXT_LAYOUT, CGrTxtFuncIParam::PointsType::ImageNextLayout);
 	//
 	for(idx=0; idx<sizeof(l_style_value_set)/sizeof(ValueSet); ++idx){
 		TCHAR buf[1024] = {};
@@ -263,26 +263,26 @@ BOOL CGrPropPageStyle::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 		SetDlgItemText(m_hWnd, l_style_value_set[idx].id , buf);
 	}
 	//
-	::CheckDlgButton(m_hWnd, param, IDC_CHECKBOX_PAGEFLIP, CGrTxtFuncIParam::PageFlip);
+	::CheckDlgButton(m_hWnd, param, IDC_CHECKBOX_PAGEFLIP, CGrTxtFuncIParam::PointsType::PageFlip);
 	::EnableCheckDlgItemID(m_hWnd, IDC_CHECKBOX_PAGEFLIP, IDC_SPIN_PAGEFLIP_TIME, IDC_EDIT_PAGEFLIP_TIME);
 	// アンチエイリアス
 	int iAntiAlias = 0;
-	param.GetPoints(CGrTxtFuncIParam::AntiAlias, &iAntiAlias, 1);
+	param.GetPoints(CGrTxtFuncIParam::PointsType::AntiAlias, &iAntiAlias, 1);
 	CheckDlgButton(m_hWnd, IDC_ANTIALIAS_NORMAL, iAntiAlias == 1);
 	CheckDlgButton(m_hWnd, IDC_ANTIALIAS_LCD   , iAntiAlias == 2);
 	// ルビ
 	int iRubyPosition = 0;
-	param.GetPoints(CGrTxtFuncIParam::RubyPosition, &iRubyPosition, 1);
+	param.GetPoints(CGrTxtFuncIParam::PointsType::RubyPosition, &iRubyPosition, 1);
 	CheckDlgButton(m_hWnd, IDC_RUBYPOSITION_TOP   , iRubyPosition == 0);
 	CheckDlgButton(m_hWnd, IDC_RUBYPOSITION_CENTER, iRubyPosition == 1);
 	// 白色画像透過
-	::CheckDlgButton(m_hWnd, param, IDC_CHECKBOX_WHITETRANS, CGrTxtFuncIParam::WhiteTrans);
+	::CheckDlgButton(m_hWnd, param, IDC_CHECKBOX_WHITETRANS, CGrTxtFuncIParam::PointsType::WhiteTrans);
 	::EnableCheckDlgItemID(m_hWnd, IDC_CHECKBOX_WHITETRANS, IDC_SPIN_WHITE_RATE, IDC_EDIT_WHITE_RATE);
 	// 画像をページ一杯に表示
-	::CheckDlgButton(m_hWnd, param, IDC_CHECKBOX_PICTPADDINGNONE, CGrTxtFuncIParam::PictPaddingNone);
+	::CheckDlgButton(m_hWnd, param, IDC_CHECKBOX_PICTPADDINGNONE, CGrTxtFuncIParam::PointsType::PictPaddingNone);
 	// ページ内で最初に見つかった見出しを柱にする
 	int iRunningHeadLevel[2] = {1,1};
-	param.GetPoints(CGrTxtFuncIParam::RunningHeadLevel, iRunningHeadLevel, _countof(iRunningHeadLevel));
+	param.GetPoints(CGrTxtFuncIParam::PointsType::RunningHeadLevel, iRunningHeadLevel, _countof(iRunningHeadLevel));
 	::CheckDlgButton(m_hWnd, IDC_CHECKBOX_RUNNINGHEAD_1ST, iRunningHeadLevel[0] == 1);
 	// レベルnまでの見出しを柱の対象にする
 	::SetDlgItemInt(hwnd, IDC_EDIT_RUNNINGHEAD_LEVEL, iRunningHeadLevel[1], true);
@@ -295,7 +295,7 @@ BOOL CGrPropPageStyle::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	// 青空文庫設定
 	auto hAozoraBottom = GetDlgItem(hwnd, IDC_COMBOBOX_AOZORA_BOTTOM);
 	int iAozoraSetting[1] = {};
-	param.GetPoints(CGrTxtFuncIParam::AozoraSetting, iAozoraSetting, sizeof(iAozoraSetting) / sizeof(int));
+	param.GetPoints(CGrTxtFuncIParam::PointsType::AozoraSetting, iAozoraSetting, sizeof(iAozoraSetting) / sizeof(int));
 	for (auto id : { IDS_AOZORA_BOTTOM_NEXT, IDS_AOZORA_BOTTOM_LIMIT, IDS_AOZORA_BOTTOM_NONE }) {
 		std::tstring str;
 		CGrText::LoadString(id, str);
@@ -303,7 +303,7 @@ BOOL CGrPropPageStyle::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 	}
 	SendMessage(hAozoraBottom, CB_SETCURSEL, iAozoraSetting[0], 0);
 	// 起動時に、Fontフォルダ以下のフォントをロードする
-	::CheckDlgButton(m_hWnd, param, IDC_CHECKBOX_USEFONT, CGrTxtFuncIParam::UseFont);
+	::CheckDlgButton(m_hWnd, param, IDC_CHECKBOX_USEFONT, CGrTxtFuncIParam::PointsType::UseFont);
 
 	return TRUE;
 }
@@ -412,7 +412,7 @@ void CGrPropPageStyle::OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotif
 	case IDC_CHECKBOX_PICTPADDINGNONE     :
 	case IDC_CHECKBOX_RUNNINGHEAD_1ST     :
 	case IDC_CHECKBOX_DARKMODE            :
-	case IDC_CHECKBOX_USEFONT             :	// 起動時に、Fontフォルダ以下のフォントをロードする
+	case IDC_CHECKBOX_USEFONT             : // 起動時に、Fontフォルダ以下のフォントをロードする
 		PropSheet_Changed(::GetParent(hwnd), hwnd);
 		break;
 	case IDC_CHECKBOX_PAGEFLIP            :
@@ -495,7 +495,7 @@ bool CGrPropPageStyle::Apply()
 		idx = ComboBox_GetCurSel(hwnd_layout);
 		idx = ComboBox_GetItemData(hwnd_layout, idx);
 		const auto &li = m_lil[idx];
-		param.SetText(CGrTxtFuncIParam::LayoutFile, li.filename.c_str());
+		param.SetText(CGrTxtFuncIParam::TextType::LayoutFile, li.filename.c_str());
 
 		CGrTxtLayoutMgr mgr;
 		auto *pLayout = mgr.GetTxtLayout(m_lil[idx]);
@@ -541,18 +541,18 @@ bool CGrPropPageStyle::Apply()
 	//
 	COLORREF page_color[3] = {};
 	COLORREF link_color = {};
-	param.SetColor(CGrTxtFuncIParam::Text        , m_colBtnText        .GetColor());
-	param.SetColor(CGrTxtFuncIParam::Bold        , m_colBtnBold        .GetColor());
-	param.SetColor(CGrTxtFuncIParam::Ruby        , m_colBtnRuby        .GetColor());
-	param.SetColor(CGrTxtFuncIParam::Note        , m_colBtnNote        .GetColor());
-	param.SetColor(CGrTxtFuncIParam::Nombre      , m_colBtnNombre      .GetColor());
-	param.SetColor(CGrTxtFuncIParam::RunningHeads, m_colBtnRunningHeads.GetColor());
+	param.SetColor(CGrTxtFuncIParam::CharType::Text        , m_colBtnText        .GetColor());
+	param.SetColor(CGrTxtFuncIParam::CharType::Bold        , m_colBtnBold        .GetColor());
+	param.SetColor(CGrTxtFuncIParam::CharType::Ruby        , m_colBtnRuby        .GetColor());
+	param.SetColor(CGrTxtFuncIParam::CharType::Note        , m_colBtnNote        .GetColor());
+	param.SetColor(CGrTxtFuncIParam::CharType::Nombre      , m_colBtnNombre      .GetColor());
+	param.SetColor(CGrTxtFuncIParam::CharType::RunningHeads, m_colBtnRunningHeads.GetColor());
 	page_color[0] = m_colBtnPaperBkColor      .GetColor();
 	page_color[1] = m_colBtnPaperShadowBkColor.GetColor();
 	page_color[2] = m_colBtnBkColor           .GetColor();
 	link_color    = m_colBtnLinkColor         .GetColor();
-	param.SetPoints(CGrTxtFuncIParam::PageColor    , reinterpret_cast<int*>(page_color) , sizeof(page_color)/sizeof(COLORREF));
-	param.SetPoints(CGrTxtFuncIParam::LinkTextColor, reinterpret_cast<int*>(&link_color), 1                                  );
+	param.SetPoints(CGrTxtFuncIParam::PointsType::PageColor    , reinterpret_cast<int*>(page_color) , sizeof(page_color)/sizeof(COLORREF));
+	param.SetPoints(CGrTxtFuncIParam::PointsType::LinkTextColor, reinterpret_cast<int*>(&link_color), 1                                  );
 	// ページ設定 NxN
 	::GetDlgItemPointSet(m_hWnd, l_style_point_set, sizeof(l_style_point_set)/sizeof(PointSet));
 	//
@@ -561,33 +561,33 @@ bool CGrPropPageStyle::Apply()
 		GetDlgItemText(m_hWnd, l_font_name[idx].id, fontName, sizeof(fontName)/sizeof(TCHAR));
 		param.SetFontName(l_font_name[idx].type, fontName);
 	}
-	::GetDlgItemTextType(m_hWnd, param, IDC_EDIT_BACK_IMG, CGrTxtFuncIParam::BackgroundImage);
-	param.SetBoolean(CGrTxtFuncIParam::WzMemoMode     , IsDlgButtonChecked(m_hWnd, IDC_CHECKBOX_WZMEMO           ) == TRUE);
-	param.SetBoolean(CGrTxtFuncIParam::UseOverlapChar , IsDlgButtonChecked(m_hWnd, IDC_CHECKBOX_OVERLAPCHAR      ) == TRUE);
-	param.SetBoolean(CGrTxtFuncIParam::ImageNextLayout, IsDlgButtonChecked(m_hWnd, IDC_CHECKBOX_IMAGE_NEXT_LAYOUT) == TRUE);
+	::GetDlgItemTextType(m_hWnd, param, IDC_EDIT_BACK_IMG, CGrTxtFuncIParam::TextType::BackgroundImage);
+	param.SetBoolean(CGrTxtFuncIParam::PointsType::WzMemoMode     , IsDlgButtonChecked(m_hWnd, IDC_CHECKBOX_WZMEMO           ) == TRUE);
+	param.SetBoolean(CGrTxtFuncIParam::PointsType::UseOverlapChar , IsDlgButtonChecked(m_hWnd, IDC_CHECKBOX_OVERLAPCHAR      ) == TRUE);
+	param.SetBoolean(CGrTxtFuncIParam::PointsType::ImageNextLayout, IsDlgButtonChecked(m_hWnd, IDC_CHECKBOX_IMAGE_NEXT_LAYOUT) == TRUE);
 	//
 	for(idx=0; idx<sizeof(l_style_value_set)/sizeof(ValueSet); ++idx){
 		GetDlgItemText(m_hWnd, l_style_value_set[idx].id , buf, sizeof(buf)/sizeof(TCHAR));
 		param.SetTextList(l_style_value_set[idx].type, buf);
 	}
 	//
-	param.SetBoolean(CGrTxtFuncIParam::PageFlip, IsDlgButtonChecked(m_hWnd, IDC_CHECKBOX_PAGEFLIP) == TRUE);
+	param.SetBoolean(CGrTxtFuncIParam::PointsType::PageFlip, IsDlgButtonChecked(m_hWnd, IDC_CHECKBOX_PAGEFLIP) == TRUE);
 	// アンチエイリアス
 	int iAntiAlias = 1;
 	if(IsDlgButtonChecked(m_hWnd, IDC_ANTIALIAS_LCD)){
 		iAntiAlias = 2;
 	}
-	param.SetPoints(CGrTxtFuncIParam::AntiAlias, &iAntiAlias, 1);
+	param.SetPoints(CGrTxtFuncIParam::PointsType::AntiAlias, &iAntiAlias, 1);
 	// ルビ
 	int iRubyPosition = 0;
 	if(IsDlgButtonChecked(m_hWnd, IDC_RUBYPOSITION_CENTER)){
 		iRubyPosition = 1;
 	}
-	param.SetPoints(CGrTxtFuncIParam::RubyPosition, &iRubyPosition, 1);
+	param.SetPoints(CGrTxtFuncIParam::PointsType::RubyPosition, &iRubyPosition, 1);
 	// 白色画像透過
-	param.SetBoolean(CGrTxtFuncIParam::WhiteTrans, IsDlgButtonChecked(m_hWnd, IDC_CHECKBOX_WHITETRANS) == TRUE);
+	param.SetBoolean(CGrTxtFuncIParam::PointsType::WhiteTrans, IsDlgButtonChecked(m_hWnd, IDC_CHECKBOX_WHITETRANS) == TRUE);
 	// 画像をページ一杯に表示
-	param.SetBoolean(CGrTxtFuncIParam::PictPaddingNone, IsDlgButtonChecked(m_hWnd, IDC_CHECKBOX_PICTPADDINGNONE) == TRUE);
+	param.SetBoolean(CGrTxtFuncIParam::PointsType::PictPaddingNone, IsDlgButtonChecked(m_hWnd, IDC_CHECKBOX_PICTPADDINGNONE) == TRUE);
 	// ページ内で最初に見つかった見出しを柱にする
 	int iRunningHeadLevel[2] = {1,1};
 	if(IsDlgButtonChecked(m_hWnd, IDC_CHECKBOX_RUNNINGHEAD_1ST)){
@@ -598,7 +598,7 @@ bool CGrPropPageStyle::Apply()
 	// レベルnまでの見出しを柱の対象にする
 	int iRunningHeadLevelFlag;
 	iRunningHeadLevel[1] = ::GetDlgItemInt(m_hWnd, IDC_EDIT_RUNNINGHEAD_LEVEL, &iRunningHeadLevelFlag, true);
-	param.SetPoints(CGrTxtFuncIParam::RunningHeadLevel, iRunningHeadLevel, _countof(iRunningHeadLevel));
+	param.SetPoints(CGrTxtFuncIParam::PointsType::RunningHeadLevel, iRunningHeadLevel, _countof(iRunningHeadLevel));
 	// Dark mode
 	const TCHAR *pVal = nullptr;
 	if (::GetCheckDlgItemID(m_hWnd, IDC_CHECKBOX_DARKMODE) == BST_CHECKED) {
@@ -619,9 +619,9 @@ bool CGrPropPageStyle::Apply()
 	// 青空文庫設定
 	int iAozoraSetting[1] = {};
 	iAozoraSetting[0] = SendMessage(GetDlgItem(m_hWnd, IDC_COMBOBOX_AOZORA_BOTTOM), CB_GETCURSEL, 0, 0);
-	param.SetPoints(CGrTxtFuncIParam::AozoraSetting, iAozoraSetting, sizeof(iAozoraSetting) / sizeof(int));
+	param.SetPoints(CGrTxtFuncIParam::PointsType::AozoraSetting, iAozoraSetting, sizeof(iAozoraSetting) / sizeof(int));
 	// 起動時に、Fontフォルダ以下のフォントをロードする
-	param.SetBoolean(CGrTxtFuncIParam::UseFont, IsDlgButtonChecked(m_hWnd, IDC_CHECKBOX_USEFONT) == TRUE);
+	param.SetBoolean(CGrTxtFuncIParam::PointsType::UseFont, IsDlgButtonChecked(m_hWnd, IDC_CHECKBOX_USEFONT) == TRUE);
 	//
 	param.UpdateConfig(GetParent(GetParent(m_hWnd)));
 	return true;

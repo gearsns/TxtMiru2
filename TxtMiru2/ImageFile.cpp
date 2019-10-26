@@ -28,12 +28,12 @@ CGrImageFile::IMAGE_TYPE CGrImageFile::getImagePath(int icon_no, std::tstring &o
 	static LPCTSTR l_check_ext[] = { _T("emf"), _T("png"), _T("jpg"), _T("jpeg") };
 	auto lpDir = CGrTxtMiru::GetDataPath();
 	int i=0;
-	if(ft == FT_NONE || im == IT_NONE || ext_no == -1){
+	if(ft == FOLDER_TYPE::NONE || im == IMAGE_TYPE::NONE || ext_no == -1){
 		for(i=0; i<sizeof(l_check_ext)/sizeof(LPCTSTR); ++i){
 			if(getImagePath(lpDir, icon_no, l_check_ext[i], outFileName)){
 				ext_no = i;
-				ft = FT_DATA;
-				im = i == 0 ? IT_EMF : IT_OLE;
+				ft = FOLDER_TYPE::DATA;
+				im = i == 0 ? IMAGE_TYPE::EMF : IMAGE_TYPE::OLE;
 				return im;
 			}
 		}
@@ -43,13 +43,13 @@ CGrImageFile::IMAGE_TYPE CGrImageFile::getImagePath(int icon_no, std::tstring &o
 		for(i=0; i<sizeof(l_check_ext)/sizeof(LPCTSTR); ++i){
 			if(getImagePath(lpDir, icon_no, l_check_ext[i], outFileName)){
 				ext_no = i;
-				ft = FT_EXEPATH;
-				im = i == 0 ? IT_EMF : IT_OLE;
+				ft = FOLDER_TYPE::EXEPATH;
+				im = i == 0 ? IMAGE_TYPE::EMF : IMAGE_TYPE::OLE;
 				return im;
 			}
 		}
 	} else {
-		if(ft == FT_EXEPATH){
+		if(ft == FOLDER_TYPE::EXEPATH){
 			TCHAR curPath[MAX_PATH];
 			CGrShell::GetExePath(curPath);
 			lpDir = curPath;
@@ -59,17 +59,17 @@ CGrImageFile::IMAGE_TYPE CGrImageFile::getImagePath(int icon_no, std::tstring &o
 		}
 	}
 	ext_no = -1;
-	ft = FT_NONE;
-	im = IT_NONE;
-	return IT_NONE;
+	ft = FOLDER_TYPE::NONE;
+	im = IMAGE_TYPE::NONE;
+	return IMAGE_TYPE::NONE;
 }
 
 bool CGrImageFile::Draw(CGrBitmap &bmp, int icon_num, int width, int height)
 {
 	std::tstring image_filename;
 	switch(getImagePath(icon_num, image_filename)){
-	case IT_EMF: pict_emf.Draw(bmp, 0, 0, width, height, image_filename.c_str()); break;
-	case IT_OLE: pict_ole.Draw(bmp, 0, 0, width, height, image_filename.c_str()); break;
+	case IMAGE_TYPE::EMF: pict_emf.Draw(bmp, 0, 0, width, height, image_filename.c_str()); break;
+	case IMAGE_TYPE::OLE: pict_ole.Draw(bmp, 0, 0, width, height, image_filename.c_str()); break;
 	default:
 		return false;
 	}
@@ -80,8 +80,8 @@ bool CGrImageFile::Draw(HDC hdc, int icon_num, int x, int y, int width, int heig
 {
 	std::tstring image_filename;
 	switch(getImagePath(icon_num, image_filename)){
-	case IT_EMF: pict_emf.Draw(hdc, x, y, width, height, image_filename.c_str()); break;
-	case IT_OLE: pict_ole.Draw(hdc, x, y, width, height, image_filename.c_str()); break;
+	case IMAGE_TYPE::EMF: pict_emf.Draw(hdc, x, y, width, height, image_filename.c_str()); break;
+	case IMAGE_TYPE::OLE: pict_ole.Draw(hdc, x, y, width, height, image_filename.c_str()); break;
 	default:
 		return false;
 	}

@@ -46,7 +46,7 @@ static bool setPage(const CGrTxtDocument &doc, CGrTxtBookmark::Bookmark &bookmar
 			const auto &text_list = ll[bookmark.tp.iLine].text_list;
 			if(bookmark.tp.iIndex < static_cast<signed int>(text_list.size())){
 				switch(text_list[bookmark.tp.iIndex].textType){
-				case TxtMiru::TT_NEXT_PAPER:
+				case TxtMiru::TextType::NEXT_PAPER:
 					// Šï”‚É
 					if(page % 2 == 0){
 						page += 1;
@@ -54,14 +54,14 @@ static bool setPage(const CGrTxtDocument &doc, CGrTxtBookmark::Bookmark &bookmar
 						page += 2;
 					}
 					break;
-				case TxtMiru::TT_NEXT_PAPER_FIRST:
+				case TxtMiru::TextType::NEXT_PAPER_FIRST:
 					if(page % 2 == 0){
 						page += 2;
 					} else {
 						page += 1;
 					}
 					break;
-				case TxtMiru::TT_NEXT_PAGE:
+				case TxtMiru::TextType::NEXT_PAGE:
 					if(page == 0 && bookmark.tp.iIndex == 0 && bookmark.tp.iLine == 0){
 						;
 					} else {
@@ -165,32 +165,32 @@ LPCTSTR CGrTxtBookmark::GetExtName()
 	return ExtSiori;
 }
 
-enum PARAMTYPE {
-	PARAMTYPE_AUTHOR       ,
-	PARAMTYPE_BMFILENAME   ,
-	PARAMTYPE_FILENAME     ,
-	PARAMTYPE_LASTWRITETIME,
-	PARAMTYPE_PAGE         ,
-	PARAMTYPE_TITLE        ,
-	PARAMTYPE_VER          ,
-	PARAMTYPE_IS_UPDATECHEK,
-	PARAMTYPE_IS_WAITTING  ,
-	PARAMTYPE_MaxNum
+enum class PARAMTYPE {
+	AUTHOR       ,
+	BMFILENAME   ,
+	FILENAME     ,
+	LASTWRITETIME,
+	PAGE         ,
+	TITLE        ,
+	VER          ,
+	IS_UPDATECHEK,
+	IS_WAITTING  ,
+	MaxNum
 };
 static struct NameTypeMap {
 	LPCTSTR name;
-	int type;
+	PARAMTYPE type;
 } l_param_map[] = {
 	// —\‚ß name ‚Å ƒ\[ƒg‚µ‚Ä‚¨‚­‚±‚Æ
-	{_T("Author"       ), PARAMTYPE_AUTHOR       },
-	{_T("BMFileName"   ), PARAMTYPE_BMFILENAME   },
-	{_T("FileName"     ), PARAMTYPE_FILENAME     },
-	{_T("IsUpdateCheck"), PARAMTYPE_IS_UPDATECHEK},
-	{_T("IsWaitting"   ), PARAMTYPE_IS_WAITTING  },
-	{_T("LastWriteTime"), PARAMTYPE_LASTWRITETIME},
-	{_T("Page"         ), PARAMTYPE_PAGE         },
-	{_T("Title"        ), PARAMTYPE_TITLE        },
-	{_T("Ver"          ), PARAMTYPE_VER          },
+	{_T("Author"       ), PARAMTYPE::AUTHOR       },
+	{_T("BMFileName"   ), PARAMTYPE::BMFILENAME   },
+	{_T("FileName"     ), PARAMTYPE::FILENAME     },
+	{_T("IsUpdateCheck"), PARAMTYPE::IS_UPDATECHEK},
+	{_T("IsWaitting"   ), PARAMTYPE::IS_WAITTING  },
+	{_T("LastWriteTime"), PARAMTYPE::LASTWRITETIME},
+	{_T("Page"         ), PARAMTYPE::PAGE         },
+	{_T("Title"        ), PARAMTYPE::TITLE        },
+	{_T("Ver"          ), PARAMTYPE::VER          },
 };
 static int NameTypeMapCompare(const void *key, const void *pdata)
 {
@@ -199,33 +199,33 @@ static int NameTypeMapCompare(const void *key, const void *pdata)
 	return _tcscmp(name, pntm->name);
 }
 
-static int GetParamType(LPCTSTR str)
+static PARAMTYPE GetParamType(LPCTSTR str)
 {
 	auto *pntm = static_cast<NameTypeMap*>(bsearch(str, l_param_map, sizeof(l_param_map)/sizeof(NameTypeMap), sizeof(NameTypeMap), NameTypeMapCompare));
 	if(pntm){
-		return static_cast<PARAMTYPE>(pntm->type);
+		return pntm->type;
 	}
-	return PARAMTYPE_MaxNum;
+	return PARAMTYPE::MaxNum;
 }
 
 void CGrTxtBookmark::SetParamString(LPCTSTR lpName, LPCTSTR lpValue)
 {
 	switch(GetParamType(lpName)){
-	case PARAMTYPE_BMFILENAME   :
+	case PARAMTYPE::BMFILENAME   :
 		if(lpValue){
 			SetFileName(std::tstring(lpValue));
 		} else {
 			m_fileName.clear();
 		}
 		break;
-	case PARAMTYPE_FILENAME     :
+	case PARAMTYPE::FILENAME     :
 		if(lpValue){
 			SetTextFileName(std::tstring(lpValue));
 		} else {
 			m_txtFileName.clear();
 		}
 		break;
-	case PARAMTYPE_LASTWRITETIME:
+	case PARAMTYPE::LASTWRITETIME:
 		if(lpValue){
 			SetLastWriteTime(std::tstring(lpValue));
 		} else {
@@ -237,7 +237,7 @@ void CGrTxtBookmark::SetParamString(LPCTSTR lpName, LPCTSTR lpValue)
 void CGrTxtBookmark::SetParamInteger(LPCTSTR lpName, int iValue)
 {
 	switch(GetParamType(lpName)){
-	case PARAMTYPE_IS_UPDATECHEK: m_iUpdateCheck = iValue; break;
+	case PARAMTYPE::IS_UPDATECHEK: m_iUpdateCheck = iValue; break;
 	}
 }
 
@@ -247,12 +247,12 @@ static LPCTSTR STR_BOOKMARK_EMPTY = _T(""                );
 LPCTSTR CGrTxtBookmark::GetParamString(LPCTSTR lpName)
 {
 	switch(GetParamType(lpName)){
-	case PARAMTYPE_AUTHOR       : return m_pDoc->GetAuthor().c_str(); break;
-	case PARAMTYPE_BMFILENAME   : return m_fileName         .c_str(); break;
-	case PARAMTYPE_FILENAME     : return m_txtFileName      .c_str(); break;
-	case PARAMTYPE_LASTWRITETIME: return m_lastWriteTime    .c_str(); break;
-	case PARAMTYPE_TITLE        : return m_pDoc->GetTitle() .c_str(); break;
-	case PARAMTYPE_VER          : return STR_BOOKMARK_VER           ; break;
+	case PARAMTYPE::AUTHOR       : return m_pDoc->GetAuthor().c_str(); break;
+	case PARAMTYPE::BMFILENAME   : return m_fileName         .c_str(); break;
+	case PARAMTYPE::FILENAME     : return m_txtFileName      .c_str(); break;
+	case PARAMTYPE::LASTWRITETIME: return m_lastWriteTime    .c_str(); break;
+	case PARAMTYPE::TITLE        : return m_pDoc->GetTitle() .c_str(); break;
+	case PARAMTYPE::VER          : return STR_BOOKMARK_VER           ; break;
 	}
 	return STR_BOOKMARK_EMPTY;
 }
@@ -260,9 +260,9 @@ LPCTSTR CGrTxtBookmark::GetParamString(LPCTSTR lpName)
 int CGrTxtBookmark::GetParamInteger(LPCTSTR lpName)
 {
 	switch(GetParamType(lpName)){
-	case PARAMTYPE_PAGE         : return m_pDoc->GetTotalPage(); break;
-	case PARAMTYPE_IS_UPDATECHEK: return m_iUpdateCheck; break;
-	case PARAMTYPE_IS_WAITTING  : return CGrTxtMiru::theApp().IsWaitting() ? TRUE : FALSE; break;
+	case PARAMTYPE::PAGE         : return m_pDoc->GetTotalPage(); break;
+	case PARAMTYPE::IS_UPDATECHEK: return m_iUpdateCheck; break;
+	case PARAMTYPE::IS_WAITTING  : return CGrTxtMiru::theApp().IsWaitting() ? TRUE : FALSE; break;
 	}
 	return -1;
 }
@@ -306,7 +306,12 @@ void CGrTxtBookmark::SetLastPage(int page)
 {
 	if(!m_pDoc){ return; }
 	if(!getBookmark(page, *m_pDoc, m_lastPage)){
-		m_lastPage.iPage     = 0;
+		if (page > m_pDoc->GetTotalPage()) {
+			m_lastPage.iPage = m_pDoc->GetTotalPage();
+		}
+		else {
+			m_lastPage.iPage = page;
+		}
 		m_lastPage.tp.iLine  = 0;
 		m_lastPage.tp.iIndex = 0;
 		m_lastPage.tp.iPos   = 0;
@@ -330,14 +335,14 @@ void CGrTxtBookmark::Delete(int idx)
 bool CGrTxtBookmark::Open(LPCTSTR lpFileName)
 {
 	Clear();
-	auto *pFunc = static_cast<CGrTxtFuncBookmark*>(CGrTxtMiru::theApp().GetDllFunc(CGrTxtMiru::DLLFNC_TxtFuncBookmark));
+	auto *pFunc = static_cast<CGrTxtFuncBookmark*>(CGrTxtMiru::theApp().GetDllFunc(CGrTxtMiru::DLLFncType::TxtFuncBookmark));
 	return pFunc ? pFunc->Open(lpFileName, this, &(m_pDoc->GetSubtitle())) : false;
 
 }
 
 bool CGrTxtBookmark::saveAs(LPCTSTR lpFileName)
 {
-	auto *pFunc = static_cast<CGrTxtFuncBookmark*>(CGrTxtMiru::theApp().GetDllFunc(CGrTxtMiru::DLLFNC_TxtFuncBookmark));
+	auto *pFunc = static_cast<CGrTxtFuncBookmark*>(CGrTxtMiru::theApp().GetDllFunc(CGrTxtMiru::DLLFncType::TxtFuncBookmark));
 	return pFunc ? pFunc->SaveAs(lpFileName, this, &(m_pDoc->GetSubtitle())) : false;
 }
 
@@ -410,7 +415,7 @@ int CGrTxtBookmark::GetPageById(LPCTSTR lpID) const
 
 bool CGrTxtBookmark::ShowBookmarkList(HWND hWnd, bool bShow)
 {
-	auto *pFunc = static_cast<CGrTxtFuncBookmark*>(CGrTxtMiru::theApp().GetDllFunc(CGrTxtMiru::DLLFNC_TxtFuncBookmark));
+	auto *pFunc = static_cast<CGrTxtFuncBookmark*>(CGrTxtMiru::theApp().GetDllFunc(CGrTxtMiru::DLLFncType::TxtFuncBookmark));
 	if (pFunc) {
 		if (bShow) {
 			return pFunc->ShowBook(hWnd, m_txtFileName.c_str(), this);

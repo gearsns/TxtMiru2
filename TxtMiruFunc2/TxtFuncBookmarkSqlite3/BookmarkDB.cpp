@@ -317,9 +317,9 @@ bool CGrDBHistory::Put(sqlite3 *pSqlite3, History &in_history)
 	sqlite3_stmt *pstmt = nullptr;
 	do {
 		int ret = sqlite3_prepare16(pSqlite3,
-									_T("INSERT OR REPLACE INTO TXTMIRU_HISTORY (ID,PLACE_ID,URL,TITLE,AUTHOR,PAGE,READ_PAGE,INSERT_DATE,LAST_VISIT_DATE)")
-									_T(" VALUES (@ID,@PLACE_ID,@URL,@TITLE,@AUTHOR,@PAGE,@READ_PAGE,@INSERT_DATE,@LAST_VISIT_DATE)")
-									, -1, &pstmt, nullptr);
+								_T("INSERT OR REPLACE INTO TXTMIRU_HISTORY (ID,PLACE_ID,URL,TITLE,AUTHOR,PAGE,READ_PAGE,INSERT_DATE,LAST_VISIT_DATE)")
+								_T(" VALUES (@ID,@PLACE_ID,@URL,@TITLE,@AUTHOR,@PAGE,@READ_PAGE,@INSERT_DATE,@LAST_VISIT_DATE)")
+								, -1, &pstmt, nullptr);
 		if(ret != SQLITE_OK || !pstmt) {
 			// コメント等、有効なSQLステートメントでないと、戻り値はOKだがstmはNULLになる。
 			bret = false;
@@ -417,9 +417,9 @@ bool CGrDBBookmarks::Put(sqlite3 *pSqlite3, Bookmark &in_bookmark)
 	sqlite3_stmt *pstmt = nullptr;
 	do {
 		int ret = sqlite3_prepare16(pSqlite3,
-									_T("INSERT OR REPLACE INTO TXTMIRU_BOOKMARKS (ID,PLACE_ID,TITLE,PAGE,B_LINE,B_INDEX,B_POS,INSERT_DATE)")
-									_T(" VALUES (@ID,@PLACE_ID,@TITLE,@PAGE,@B_LINE,@B_INDEX,@B_POS,@INSERT_DATE)")
-									, -1, &pstmt, nullptr);
+								_T("INSERT OR REPLACE INTO TXTMIRU_BOOKMARKS (ID,PLACE_ID,TITLE,PAGE,B_LINE,B_INDEX,B_POS,INSERT_DATE)")
+								_T(" VALUES (@ID,@PLACE_ID,@TITLE,@PAGE,@B_LINE,@B_INDEX,@B_POS,@INSERT_DATE)")
+								, -1, &pstmt, nullptr);
 		if(ret != SQLITE_OK || !pstmt) {
 			// コメント等、有効なSQLステートメントでないと、戻り値はOKだがstmはNULLになる。
 			bret = false;
@@ -563,9 +563,9 @@ bool CGrDBSubtitles::Put(sqlite3 *pSqlite3, Subtitle &in_subtitle)
 	sqlite3_stmt *pstmt = nullptr;
 	do {
 		int ret = sqlite3_prepare16(pSqlite3,
-									_T("INSERT OR REPLACE INTO TXTMIRU_SUBTITLES (ID,PLACE_ID,B_ORDER,TITLE,URL,PAGE,B_LINE,B_INDEX,B_POS,LEVEL,INSERT_DATE)")
-									_T(" VALUES (@ID,@PLACE_ID,@B_ORDER,@TITLE,@URL,@PAGE,@B_LINE,@B_INDEX,@B_POS,@LEVEL,@INSERT_DATE)")
-									, -1, &pstmt, nullptr);
+								_T("INSERT OR REPLACE INTO TXTMIRU_SUBTITLES (ID,PLACE_ID,B_ORDER,TITLE,URL,PAGE,B_LINE,B_INDEX,B_POS,LEVEL,INSERT_DATE)")
+								_T(" VALUES (@ID,@PLACE_ID,@B_ORDER,@TITLE,@URL,@PAGE,@B_LINE,@B_INDEX,@B_POS,@LEVEL,@INSERT_DATE)")
+								, -1, &pstmt, nullptr);
 		if(ret != SQLITE_OK || !pstmt) {
 			// コメント等、有効なSQLステートメントでないと、戻り値はOKだがstmはNULLになる。
 			bret = false;
@@ -828,9 +828,9 @@ bool CGrDBBooks::Put(sqlite3 *pSqlite3, const Book &in_book)
 	sqlite3_stmt *pstmt = nullptr;
 	do {
 		int ret = sqlite3_prepare16(pSqlite3,
-									_T("INSERT OR REPLACE INTO TXTMIRU_BOOKS (ID,PLACE_ID,PARENT,TYPE,POSITION,BASE_URL,TITLE,AUTHOR,INSERT_DATE)")
-									_T(" VALUES (@ID,@PLACE_ID,@PARENT,@TYPE,@POSITION,@BASE_URL,@TITLE,@AUTHOR,@INSERT_DATE)")
-									, -1, &pstmt, nullptr);
+								_T("INSERT OR REPLACE INTO TXTMIRU_BOOKS (ID,PLACE_ID,PARENT,TYPE,POSITION,BASE_URL,TITLE,AUTHOR,INSERT_DATE)")
+								_T(" VALUES (@ID,@PLACE_ID,@PARENT,@TYPE,@POSITION,@BASE_URL,@TITLE,@AUTHOR,@INSERT_DATE)")
+								, -1, &pstmt, nullptr);
 		if(ret != SQLITE_OK || !pstmt) {
 			// コメント等、有効なSQLステートメントでないと、戻り値はOKだがstmはNULLになる。
 			break;
@@ -1088,7 +1088,6 @@ bool CGrBookmarkDB::DeleteBookmark(int iID)
 {
 	return m_bookmarks.Delete(m_pSqlite3, iID);
 }
-
 bool CGrBookmarkDB::PutSubtitle(Subtitle &in_subtitle)
 {
 	return m_subtitles.Put(m_pSqlite3, in_subtitle);
@@ -1172,7 +1171,7 @@ bool CGrDBSearchHistory::Create()
 		const auto &param = CGrTxtFunc::Param();
 		for(int idx=0; idx<9; ++idx){
 			TCHAR buf[2048] = {};
-			param.GetText(static_cast<CGrTxtFuncIParam::TextType>(CGrTxtFuncIParam::HistSearchWord1+idx), buf, _countof(buf));
+			param.GetText(static_cast<CGrTxtFuncIParam::TextType>(static_cast<int>(CGrTxtFuncIParam::TextType::HistSearchWord1)+idx), buf, _countof(buf));
 			if(buf[0]){
 				history.value = buf;
 				if(!Put(history)){

@@ -87,145 +87,145 @@ void CGrImportDlg::OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 {
 	switch (id) {
 	case IDC_BUTTON_FOLDER:
-		{
-			if (BrowseForFolder(hwnd, IDC_EDIT_FOLDER, IDS_IMPORT_FOLDER)) {
-			}
+	{
+		if (BrowseForFolder(hwnd, IDC_EDIT_FOLDER, IDS_IMPORT_FOLDER)) {
 		}
+	}
 		break;
 	case IDOK:
-		{
-			m_EditFolder.GetText(m_folder);
-			if (m_folder.empty()) {
-				SetFocus(m_EditFolder);
-				// Error
-				CGrMessageBox::Show(m_hWnd, IDS_ERROR_IMPORT_FOLDER, TXTMIRU_APP_NAME);
-				break;
-			}
-			m_EditURL.GetText(m_url);
-			if (m_url.empty() && !CGrShell::IsURI(m_url.c_str())) {
-				SetFocus(m_EditURL);
-				// Error
-				CGrMessageBox::Show(m_hWnd, IDS_ERROR_IMPORT_URL, TXTMIRU_APP_NAME);
-				break;
-			}
-			CGrShell::ToPrettyFileName(m_url);
-			if (!CGrShell::EndBackSlash(const_cast<TCHAR*>(m_url.c_str()))) {
-				m_url += _T("/");
-			}
-			CGrShell::ToPrettyFileName(m_folder);
-			if (!CGrShell::EndBackSlash(const_cast<TCHAR*>(m_folder.c_str()))) {
-				m_folder += _T("/");
-			}
-			//
-			bool bCopy = true;
-			std::tstring cache_dir(CGrTxtMiru::GetDataPath());
-			if (!CGrShell::EndBackSlash(const_cast<TCHAR*>(cache_dir.c_str()))) {
-				cache_dir += _T("/");
-			}
-			cache_dir += _T("Cache/");
-			CGrShell::ToPrettyFileName(cache_dir);
-			if (0 == _tcsnicmp(cache_dir.c_str(), m_folder.c_str(), cache_dir.size())) {
-				bCopy = false;
-			}
-			std::tstring folder;
-			if (bCopy) {
-				std::tstring sysdate;
-				time_t now;
+	{
+		m_EditFolder.GetText(m_folder);
+		if (m_folder.empty()) {
+			SetFocus(m_EditFolder);
+			// Error
+			CGrMessageBox::Show(m_hWnd, IDS_ERROR_IMPORT_FOLDER, TXTMIRU_APP_NAME);
+			break;
+		}
+		m_EditURL.GetText(m_url);
+		if (m_url.empty() && !CGrShell::IsURI(m_url.c_str())) {
+			SetFocus(m_EditURL);
+			// Error
+			CGrMessageBox::Show(m_hWnd, IDS_ERROR_IMPORT_URL, TXTMIRU_APP_NAME);
+			break;
+		}
+		CGrShell::ToPrettyFileName(m_url);
+		if (!CGrShell::EndBackSlash(const_cast<TCHAR*>(m_url.c_str()))) {
+			m_url += _T("/");
+		}
+		CGrShell::ToPrettyFileName(m_folder);
+		if (!CGrShell::EndBackSlash(const_cast<TCHAR*>(m_folder.c_str()))) {
+			m_folder += _T("/");
+		}
+		//
+		bool bCopy = true;
+		std::tstring cache_dir(CGrTxtMiru::GetDataPath());
+		if (!CGrShell::EndBackSlash(const_cast<TCHAR*>(cache_dir.c_str()))) {
+			cache_dir += _T("/");
+		}
+		cache_dir += _T("Cache/");
+		CGrShell::ToPrettyFileName(cache_dir);
+		if (0 == _tcsnicmp(cache_dir.c_str(), m_folder.c_str(), cache_dir.size())) {
+			bCopy = false;
+		}
+		std::tstring folder;
+		if (bCopy) {
+			std::tstring sysdate;
+			time_t now;
 
-				time(&now);
-				struct tm ltm = {};
-				if (0 == localtime_s(&ltm, &now)) {
-					TCHAR date_str[512] = {};
-					_tcsftime(date_str, sizeof(date_str) / sizeof(TCHAR), _T("%Y%m%d%H%M%S"), &ltm);
-					sysdate = date_str;
-				}
-				else {
-					// Error
-					CGrMessageBox::Show(m_hWnd, IDS_ERROR_IMPORT_DATE, TXTMIRU_APP_NAME);
-					break;
-				}
-				folder = cache_dir + _T("Import/") + sysdate + _T("/");
-				try {
-					std::filesystem::path from(m_folder);
-					std::filesystem::path to(folder);
-					from.make_preferred();
-					to.make_preferred();
-					std::filesystem::create_directories(to);
-					std::filesystem::copy(from, to, std::filesystem::copy_options::recursive);
-				}
-				catch (std::filesystem::filesystem_error& err) {
-					CGrMessageBox::Show(m_hWnd, IDS_ERROR_IMPORT_COPY, TXTMIRU_APP_NAME);
-					break;
-				}
-				catch (std::error_code& err) {
-					CGrMessageBox::Show(m_hWnd, IDS_ERROR_IMPORT_COPY, TXTMIRU_APP_NAME);
-					break;
-				}
-				catch (...) {
-					CGrMessageBox::Show(m_hWnd, IDS_ERROR_IMPORT_COPY, TXTMIRU_APP_NAME);
-					break;
-				}
+			time(&now);
+			struct tm ltm = {};
+			if (0 == localtime_s(&ltm, &now)) {
+				TCHAR date_str[512] = {};
+				_tcsftime(date_str, sizeof(date_str) / sizeof(TCHAR), _T("%Y%m%d%H%M%S"), &ltm);
+				sysdate = date_str;
 			}
 			else {
-				folder = m_folder;
-			}
-			//
-			std::vector<std::tstring> ftarget_list;
-			try {
-				for (const auto f : std::filesystem::recursive_directory_iterator(folder.c_str())) {
-					auto filename = f.path().wstring();
-					CGrShell::ToPrettyFileName(filename);
-					ftarget_list.push_back(filename);
-				}
-			} catch(...) {
-				CGrMessageBox::Show(m_hWnd, IDS_ERROR_IMPORT_FILELIST, TXTMIRU_APP_NAME);
-				break;
-			}
-			if (ftarget_list.empty()) {
 				// Error
-				CGrMessageBox::Show(m_hWnd, IDS_ERROR_IMPORT_FILELIST, TXTMIRU_APP_NAME);
+				CGrMessageBox::Show(m_hWnd, IDS_ERROR_IMPORT_DATE, TXTMIRU_APP_NAME);
 				break;
 			}
-			CGrDBCache db;
-			if (db.Open()) {
-				CacheItem item;
-				db.BeginSession();
-				std::tstring datapath = CGrTxtMiru::GetDataPath();
-				CGrShell::ToPrettyFileName(datapath);
-				{
-					std::tstring sysdate;
-					CGrDBFunc::GetSysDate(sysdate);
-					sysdate = _T("Import ") + sysdate;
-					std::tstring filename(folder);
-					if (0 == CGrText::niCmp(datapath.c_str(), filename.c_str(), datapath.size())) {
-						filename.replace(0, datapath.size(), L"%DATADIR%");
-					}
-					db.Put(m_url.c_str(), filename.c_str(), sysdate.c_str(), L"");
-					db.Get(item, m_url.c_str());
-				}
-				for (const auto& fullpath : ftarget_list) {
-					std::tstring url(m_url);
-					url += CGrShell::RemovePath(fullpath.c_str(), folder.c_str());
-					CGrShell::ToPrettyFileName(url);
-					std::tstring filename(fullpath);
-					if (0 == CGrText::niCmp(datapath.c_str(), filename.c_str(), datapath.size())) {
-						filename.replace(0, datapath.size(), L"%DATADIR%");
-					}
-					db.Put(item, url.c_str(), filename.c_str());
-				}
-				db.Commit();
-				CGrMessageBox::Show(m_hWnd, IDS_SUCCESS_IMPORT, TXTMIRU_APP_NAME);
+			folder = cache_dir + _T("Import/") + sysdate + _T("/");
+			try {
+				std::filesystem::path from(m_folder);
+				std::filesystem::path to(folder);
+				from.make_preferred();
+				to.make_preferred();
+				std::filesystem::create_directories(to);
+				std::filesystem::copy(from, to, std::filesystem::copy_options::recursive);
 			}
-			else {
-				CGrMessageBox::Show(m_hWnd, IDS_ERROR_IMPORT_OPENDB, TXTMIRU_APP_NAME);
+			catch (std::filesystem::filesystem_error& err) {
+				CGrMessageBox::Show(m_hWnd, IDS_ERROR_IMPORT_COPY, TXTMIRU_APP_NAME);
+				break;
+			}
+			catch (std::error_code& err) {
+				CGrMessageBox::Show(m_hWnd, IDS_ERROR_IMPORT_COPY, TXTMIRU_APP_NAME);
+				break;
+			}
+			catch (...) {
+				CGrMessageBox::Show(m_hWnd, IDS_ERROR_IMPORT_COPY, TXTMIRU_APP_NAME);
 				break;
 			}
 		}
-		break;
+		else {
+			folder = m_folder;
+		}
+		//
+		std::vector<std::tstring> ftarget_list;
+		try {
+			for (const auto f : std::filesystem::recursive_directory_iterator(folder.c_str())) {
+				auto filename = f.path().wstring();
+				CGrShell::ToPrettyFileName(filename);
+				ftarget_list.push_back(filename);
+			}
+		} catch(...) {
+			CGrMessageBox::Show(m_hWnd, IDS_ERROR_IMPORT_FILELIST, TXTMIRU_APP_NAME);
+			break;
+		}
+		if (ftarget_list.empty()) {
+			// Error
+			CGrMessageBox::Show(m_hWnd, IDS_ERROR_IMPORT_FILELIST, TXTMIRU_APP_NAME);
+			break;
+		}
+		CGrDBCache db;
+		if (db.Open()) {
+			CacheItem item;
+			db.BeginSession();
+			std::tstring datapath = CGrTxtMiru::GetDataPath();
+			CGrShell::ToPrettyFileName(datapath);
+			{
+				std::tstring sysdate;
+				CGrDBFunc::GetSysDate(sysdate);
+				sysdate = _T("Import ") + sysdate;
+				std::tstring filename(folder);
+				if (0 == CGrText::niCmp(datapath.c_str(), filename.c_str(), datapath.size())) {
+					filename.replace(0, datapath.size(), L"%DATADIR%");
+				}
+				db.Put(m_url.c_str(), filename.c_str(), sysdate.c_str(), L"");
+				db.Get(item, m_url.c_str());
+			}
+			for (const auto& fullpath : ftarget_list) {
+				std::tstring url(m_url);
+				url += CGrShell::RemovePath(fullpath.c_str(), folder.c_str());
+				CGrShell::ToPrettyFileName(url);
+				std::tstring filename(fullpath);
+				if (0 == CGrText::niCmp(datapath.c_str(), filename.c_str(), datapath.size())) {
+					filename.replace(0, datapath.size(), L"%DATADIR%");
+				}
+				db.Put(item, url.c_str(), filename.c_str());
+			}
+			db.Commit();
+			CGrMessageBox::Show(m_hWnd, IDS_SUCCESS_IMPORT, TXTMIRU_APP_NAME);
+		}
+		else {
+			CGrMessageBox::Show(m_hWnd, IDS_ERROR_IMPORT_OPENDB, TXTMIRU_APP_NAME);
+			break;
+		}
+	}
+	break;
 	case IDCANCEL:
-		{
-			::EndDialog(m_hWnd, IDCANCEL);
-		}
-		break;
+	{
+		::EndDialog(m_hWnd, IDCANCEL);
+	}
+	break;
 	}
 }

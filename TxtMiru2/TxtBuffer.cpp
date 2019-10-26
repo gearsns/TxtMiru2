@@ -26,7 +26,7 @@ void CGrTxtBuffer::ForEachAll(CGrTypeFunc &&func) const
 		const auto &text_list=it_ll->text_list;
 		auto tl_len = text_list.size();
 		if(tl_len <= 0){
-			if(func.IsValid(TxtMiru::TT_TEXT) && !func.SetType(cur_point, TxtMiru::TextInfo())){
+			if(func.IsValid(TxtMiru::TextType::TEXT) && !func.SetType(cur_point, TxtMiru::TextInfo())){
 				return;
 			}
 		} else {
@@ -170,7 +170,7 @@ struct RubyMap : public CGrTxtBuffer::CGrTypeFunc {
 	std::vector<TextRange> ruby_map;
 	RubyMap(){}
 	virtual bool IsValid(TxtMiru::TextType tt){
-		return tt == TxtMiru::TT_RUBY;
+		return tt == TxtMiru::TextType::RUBY;
 	}
 	virtual bool SetType(const TxtMiru::TextPoint &cur, const TxtMiru::TextInfo &text_info){
 		ruby_map.push_back({
@@ -202,12 +202,12 @@ struct TextRuby : public CGrTxtBuffer::CGrCharFunc {
 	~TextRuby(){
 	}
 	virtual bool IsValid(TxtMiru::TextType tt){
-		return (/**/tt == TxtMiru::TT_TEXT
-				||  tt == TxtMiru::TT_LINE_CHAR
-				||  tt == TxtMiru::TT_SKIP_CHAR_AUTO
-				||  tt == TxtMiru::TT_ROTATE_NUM
-				||  tt == TxtMiru::TT_ROTATE_NUM_AUTO
-				||  tt == TxtMiru::TT_RUBY
+		return (/**/tt == TxtMiru::TextType::TEXT
+				||  tt == TxtMiru::TextType::LINE_CHAR
+				||  tt == TxtMiru::TextType::SKIP_CHAR_AUTO
+				||  tt == TxtMiru::TextType::ROTATE_NUM
+				||  tt == TxtMiru::TextType::ROTATE_NUM_AUTO
+				||  tt == TxtMiru::TextType::RUBY
 				);
 	}
 	virtual bool SetChar(const TxtMiru::TextPoint &cur, LPCTSTR lpSrc, LPCTSTR lpEnd){

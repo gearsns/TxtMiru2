@@ -40,7 +40,7 @@
 #define BEGIN_FUNC {\
 	TCHAR szLanguageName[100];\
 	LCID idLocal = GetSystemDefaultLCID();\
-	::GetLocaleInfo(idLocal, LOCALE_SENGLANGUAGE, szLanguageName, sizeof(szLanguageName));\
+	::GetLocaleInfo(idLocal, LOCALE_SENGLANGUAGE, szLanguageName, _countof(szLanguageName));\
 	_tsetlocale(LC_ALL,szLanguageName);\
 }
 #else
@@ -50,7 +50,7 @@
 #define TXTMIRUAPP
 
 static const TCHAR *ExtSiori = _T(".siori");
-enum BM_ATTR { BM_NONE = 0x00, BM_LAST = 0x01, BM_LAST_PAGE = 0x02 };
+enum class BM_ATTR { BM_NONE = 0x00, BM_LAST = 0x01, BM_LAST_PAGE = 0x02 };
 
 LPCTSTR g_dataDir = nullptr;
 CGrTxtFuncIParam    *g_pParam = nullptr;
@@ -83,7 +83,7 @@ namespace CGrTxtFunc
 	{
 		TCHAR file_path[512];
 		TCHAR buf[1024];
-		pParam->GetText(CGrTxtFuncIParam::BookMarkFolder, buf, sizeof(buf)/sizeof(TCHAR));
+		pParam->GetText(CGrTxtFuncIParam::TextType::BookMarkFolder, buf, sizeof(buf)/sizeof(TCHAR));
 		str = buf;
 		_tcscpy_s(file_path, CGrTxtFunc::GetDataPath());
 		switch(str.size()){
@@ -151,23 +151,23 @@ namespace CGrTxtFunc
 	}
 	int GetCurrentPage(HWND hWnd)
 	{
-		return SendMessage(hWnd, g_wm_funcCall, static_cast<WPARAM>(CGrTxtFuncIParam::FncCT_GetCurrentPage)/*FuncNo*/, 0);
+		return SendMessage(hWnd, g_wm_funcCall, static_cast<WPARAM>(CGrTxtFuncIParam::FunCallType::GetCurrentPage)/*FuncNo*/, 0);
 	}
 	int GetCurrentDisplayPage(HWND hWnd)
 	{
-		return SendMessage(hWnd, g_wm_funcCall, static_cast<WPARAM>(CGrTxtFuncIParam::FncCT_GetCurrentDisplayPage)/*FuncNo*/, 0);
+		return SendMessage(hWnd, g_wm_funcCall, static_cast<WPARAM>(CGrTxtFuncIParam::FunCallType::GetCurrentDisplayPage)/*FuncNo*/, 0);
 	}
 	bool GetSinglePage(HWND hWnd)
 	{
-		return SendMessage(hWnd, g_wm_funcCall, static_cast<WPARAM>(CGrTxtFuncIParam::FncCT_GetSinglePage)/*FuncNo*/, 0) == 1 ? true : false;
+		return SendMessage(hWnd, g_wm_funcCall, static_cast<WPARAM>(CGrTxtFuncIParam::FunCallType::GetSinglePage)/*FuncNo*/, 0) == 1 ? true : false;
 	}
 	int AddBookmark(HWND hWnd)
 	{
-		return PostMessage(hWnd, g_wm_funcCall, static_cast<WPARAM>(CGrTxtFuncIParam::FunCT_AddBookmark)/*FuncNo*/, reinterpret_cast<LPARAM>(hWnd));
+		return PostMessage(hWnd, g_wm_funcCall, static_cast<WPARAM>(CGrTxtFuncIParam::FunCallType::AddBookmark)/*FuncNo*/, reinterpret_cast<LPARAM>(hWnd));
 	}
 	int DeleteBookmark(HWND hWnd, int idx)
 	{
-		return PostMessage(hWnd, g_wm_funcCall, static_cast<WPARAM>(CGrTxtFuncIParam::FunCT_DeleteBookmark)/*FuncNo*/, static_cast<LPARAM>(idx));
+		return PostMessage(hWnd, g_wm_funcCall, static_cast<WPARAM>(CGrTxtFuncIParam::FunCallType::DeleteBookmark)/*FuncNo*/, static_cast<LPARAM>(idx));
 	}
 	bool BackupImgFile(int id)
 	{
@@ -217,7 +217,7 @@ namespace CGrTxtFunc
 			os.wFunc  = FO_DELETE;
 			os.fFlags = FOF_ALLOWUNDO|FOF_NOCONFIRMATION;
 			os.pFrom  = &folder[0];
-
+			
 			bool ret = (SHFileOperation(&os) == 0);
 
 			return ret;
@@ -339,10 +339,10 @@ static bool openBookmark(CGrTxtFuncIBookmark *pBookmark, LPCTSTR lpFileName, std
 					continue;
 				}
 				// ûxÉfÅ[É^
-				switch(array[0]){
-				case BM_LAST     : pBookmark->SetLatest(-1, array[1],array[2],array[3], nullptr); break;
-				case BM_LAST_PAGE: pBookmark->SetLatest(array[1],-1,-1,-1, nullptr); break;
-				case BM_NONE     : pBookmark->AddLeaf(-1, array[1],array[2],array[3], nullptr); break;
+				switch(static_cast<BM_ATTR>(array[0])){
+				case BM_ATTR::BM_LAST     : pBookmark->SetLatest(-1, array[1],array[2],array[3], nullptr); break;
+				case BM_ATTR::BM_LAST_PAGE: pBookmark->SetLatest(array[1],-1,-1,-1, nullptr); break;
+				case BM_ATTR::BM_NONE     : pBookmark->AddLeaf(-1, array[1],array[2],array[3], nullptr); break;
 				}
 			}
 		}
@@ -380,7 +380,7 @@ static void add_data(CGrCSVText &csv, enum BM_ATTR attr, CGrTxtFuncIBookmarkLeaf
 {
 	csv.AddTail(_T(",,,,"));
 	int row = csv.GetRowSize() - 1;
-	csv.SetIntegerExAdd(row, 0, attr             );
+	csv.SetIntegerExAdd(row, 0, static_cast<int>(attr));
 	csv.SetIntegerExAdd(row, 1, pLeaf->GetLine ());
 	csv.SetIntegerExAdd(row, 2, pLeaf->GetIndex());
 	csv.SetIntegerExAdd(row, 3, pLeaf->GetPos  ());
@@ -419,11 +419,11 @@ static bool saveBookmark(CGrTxtFuncIBookmark *pBookmark, LPCTSTR lpBookmarkFileN
 	add_row(pBookmark, csv, STR_PARAMTYPE_AUTHOR       );
 	add_row(pBookmark, csv, STR_PARAMTYPE_LASTWRITETIME);
 	add_row(csv, _T("#%1!s!:%2!d!/%3!d!"   ), STR_PARAMTYPE_PAGE, pLatestLeaf->GetPage(), pBookmark->GetParamInteger(STR_PARAMTYPE_PAGE));
-	add_data(csv, BM_LAST, pLatestLeaf);
+	add_data(csv, BM_ATTR::BM_LAST, pLatestLeaf);
 	int len = pBookmark->Count();
 	if(len > 0){
 		for(int idx=0; idx<len; ++idx){
-			add_data(csv, BM_NONE, pBookmark->GetLeaf(idx));
+			add_data(csv, BM_ATTR::BM_NONE, pBookmark->GetLeaf(idx));
 		}
 	}
 	return csv.Save(lpBookmarkFileName) == TRUE;
@@ -484,6 +484,7 @@ static bool saveDB(LPCTSTR lpOpenTextFileName, CGrTxtFuncIBookmark *pBookmark, C
 	CGrDBFunc::GetSysDate(sysdate);
 	Place place;
 	if(db.GetPlace(place, lpOpenTextFileName)){
+		;
 	} else {
 		place.id          = NULL_INT_VALUE    ;
 		place.url         = lpOpenTextFileName;
@@ -643,7 +644,7 @@ extern "C" TXTFUNCBOOKMARK_API bool cdecl TxtFuncBookmarkOpen(LPCTSTR lpFileName
 	} else {
 		// ûxÉtÉ@ÉCÉãÇ≈ÇÕÇ»Ç¢
 		CGrShell::ToPrettyFileName(lpFileName, open_text_filename);
-		if(pParam->GetBoolean(CGrTxtFuncIParam::BookMarkToFolder)){
+		if(pParam->GetBoolean(CGrTxtFuncIParam::PointsType::BookMarkToFolder)){
 			// DBÇ≈ûxÇä«óùÇ∑ÇÈèÍçá [ûxÉtÉ@ÉCÉãÇÕûxÉtÉHÉãÉ_Ç…ï€ë∂]
 			bLoadBookMark = openDB(pBookmark, lpFileName); // DBÇ©ÇÁûxéÊìæ
 		}
@@ -679,7 +680,7 @@ extern "C" TXTFUNCBOOKMARK_API bool cdecl TxtFuncBookmarkSaveAs(LPCTSTR lpFileNa
 	}
 	std::tstring open_text_filename = pBookmark->GetParamString(STR_PARAMTYPE_FILENAME);
 	//
-	if(pParam->GetBoolean(CGrTxtFuncIParam::BookMarkToFolder)){
+	if(pParam->GetBoolean(CGrTxtFuncIParam::PointsType::BookMarkToFolder)){
 		// DBÇ≈ûxÇä«óùÇ∑ÇÈèÍçá
 		if(!saveDB(open_text_filename.c_str(), pBookmark, pSubTitle, pParam)){
 			return false;
@@ -696,7 +697,7 @@ extern "C" TXTFUNCBOOKMARK_API bool cdecl TxtFuncShowBookList(HWND hWnd, LPCTSTR
 {
 	BEGIN_FUNC;
 	if(hWnd == NULL){
-		auto* pWnd = static_cast<CGrBookListDlg*>(GetInstallWnd(TxtFuncBookmark::MWID_BOOKDLG));
+		auto* pWnd = static_cast<CGrBookListDlg*>(GetInstallWnd(TxtFuncBookmark::ModelWindowID::MWID_BOOKDLG));
 		if(pWnd && pWnd->GetWnd()){
 			ShowWindow(pWnd->GetWnd(), SW_HIDE);
 		}
@@ -711,16 +712,16 @@ extern "C" TXTFUNCBOOKMARK_API bool cdecl TxtFuncShowBookList(HWND hWnd, LPCTSTR
 	if(g_wm_funcCall == 0){
 		g_wm_funcCall = RegisterWindowMessage(WM_TXTMIRU_FUNC_CALL);
 	}
-	auto* pWnd = static_cast<CGrBookListDlg*>(GetInstallWnd(TxtFuncBookmark::MWID_BOOKDLG));
+	auto* pWnd = static_cast<CGrBookListDlg*>(GetInstallWnd(TxtFuncBookmark::ModelWindowID::MWID_BOOKDLG));
 	if(pWnd && !pWnd->GetWnd()){
-		UnInstallWnd(TxtFuncBookmark::MWID_BOOKDLG);
+		UnInstallWnd(TxtFuncBookmark::ModelWindowID::MWID_BOOKDLG);
 	}
 	if(pWnd){
 		pWnd->SetFilename(lpFileName);
 		pWnd->Show(hWnd);
 	} else {
 		pWnd = new CGrBookListDlg(hWnd, lpFileName, pBookmark);
-		InstallWnd(TxtFuncBookmark::MWID_BOOKDLG, pWnd);
+		InstallWnd(TxtFuncBookmark::ModelWindowID::MWID_BOOKDLG, pWnd);
 	}
 	return true;
 }
@@ -728,7 +729,7 @@ extern "C" TXTFUNCBOOKMARK_API bool cdecl TxtFuncShowBookList(HWND hWnd, LPCTSTR
 extern "C" TXTFUNCBOOKMARK_API bool cdecl TxtFuncRefreshBookList()
 {
 	BEGIN_FUNC;
-	auto* pWnd = static_cast<CGrBookListDlg*>(GetInstallWnd(TxtFuncBookmark::MWID_BOOKDLG));
+	auto* pWnd = static_cast<CGrBookListDlg*>(GetInstallWnd(TxtFuncBookmark::ModelWindowID::MWID_BOOKDLG));
 	if(pWnd){
 		auto hWnd = pWnd->GetWnd();
 		if(hWnd && IsWindowVisible(hWnd)){
@@ -745,7 +746,7 @@ extern "C" TXTFUNCBOOKMARK_API bool cdecl TxtFuncIsShowBookList()
 {
 	BEGIN_FUNC;
 	//
-	auto* pWnd = static_cast<CGrBookListDlg*>(GetInstallWnd(TxtFuncBookmark::MWID_BOOKDLG));
+	auto* pWnd = static_cast<CGrBookListDlg*>(GetInstallWnd(TxtFuncBookmark::ModelWindowID::MWID_BOOKDLG));
 	return (pWnd && pWnd->GetWnd() && IsWindowVisible(pWnd->GetWnd()));
 }
 
@@ -753,7 +754,7 @@ extern "C" TXTFUNCBOOKMARK_API bool cdecl TxtFuncIsBookListMember(HWND hWnd)
 {
 	BEGIN_FUNC;
 	//
-	auto* pWnd = static_cast<CGrBookListDlg*>(GetInstallWnd(TxtFuncBookmark::MWID_BOOKDLG));
+	auto* pWnd = static_cast<CGrBookListDlg*>(GetInstallWnd(TxtFuncBookmark::ModelWindowID::MWID_BOOKDLG));
 	if(pWnd){
 		auto hLinkWnd = pWnd->GetWnd();
 		return (hLinkWnd && IsWindowVisible(hLinkWnd) && (hLinkWnd == hWnd || IsChild(hLinkWnd, hWnd)));
@@ -778,13 +779,13 @@ extern "C" TXTFUNCBOOKMARK_API bool cdecl TxtFuncShowLinkList(HWND hWnd, int mod
 	if(g_wm_funcCall == 0){
 		g_wm_funcCall = RegisterWindowMessage(WM_TXTMIRU_FUNC_CALL);
 	}
-	auto* pWnd = static_cast<CGrLinkDlg*>(GetInstallWnd(TxtFuncBookmark::MWID_LINKDLG));
+	auto* pWnd = static_cast<CGrLinkDlg*>(GetInstallWnd(TxtFuncBookmark::ModelWindowID::MWID_LINKDLG));
 	if(pWnd && !pWnd->GetWnd()){
-		UnInstallWnd(TxtFuncBookmark::MWID_LINKDLG);
+		UnInstallWnd(TxtFuncBookmark::ModelWindowID::MWID_LINKDLG);
 	}
 	if(!pWnd && mode != 3){
 		pWnd = new CGrLinkDlg(hWnd, mode, pBookmark, pSubTitle);
-		InstallWnd(TxtFuncBookmark::MWID_LINKDLG, pWnd);
+		InstallWnd(TxtFuncBookmark::ModelWindowID::MWID_LINKDLG, pWnd);
 	} else if(pWnd){
 		switch(mode){
 		case 1: pWnd->ShowBookmark(hWnd, true); break;
@@ -803,7 +804,7 @@ extern "C" TXTFUNCBOOKMARK_API bool cdecl TxtFuncShowLinkList(HWND hWnd, int mod
 extern "C" TXTFUNCBOOKMARK_API bool cdecl TxtFuncRefreshLinkList()
 {
 	BEGIN_FUNC;
-	auto* pWnd = static_cast<CGrLinkDlg*>(GetInstallWnd(TxtFuncBookmark::MWID_LINKDLG));
+	auto* pWnd = static_cast<CGrLinkDlg*>(GetInstallWnd(TxtFuncBookmark::ModelWindowID::MWID_LINKDLG));
 	if(pWnd){
 		pWnd->PostRefresh();
 	}
@@ -815,7 +816,7 @@ extern "C" TXTFUNCBOOKMARK_API bool cdecl TxtFuncIsShowLinkList()
 {
 	BEGIN_FUNC;
 	//
-	auto* pWnd = static_cast<CGrLinkDlg*>(GetInstallWnd(TxtFuncBookmark::MWID_LINKDLG));
+	auto* pWnd = static_cast<CGrLinkDlg*>(GetInstallWnd(TxtFuncBookmark::ModelWindowID::MWID_LINKDLG));
 	return (pWnd && pWnd->GetWnd() && IsWindowVisible(pWnd->GetWnd()));
 }
 
@@ -823,7 +824,7 @@ extern "C" TXTFUNCBOOKMARK_API bool cdecl TxtFuncIsLinkListMember(HWND hWnd)
 {
 	BEGIN_FUNC;
 	//
-	auto* pWnd = static_cast<CGrLinkDlg*>(GetInstallWnd(TxtFuncBookmark::MWID_LINKDLG));
+	auto* pWnd = static_cast<CGrLinkDlg*>(GetInstallWnd(TxtFuncBookmark::ModelWindowID::MWID_LINKDLG));
 	if(pWnd){
 		auto hLinkWnd = pWnd->GetWnd();
 		return (hLinkWnd && IsWindowVisible(hLinkWnd) && (hLinkWnd == hWnd || IsChild(hLinkWnd, hWnd)));
@@ -835,13 +836,13 @@ extern "C" TXTFUNCBOOKMARK_API bool cdecl TxtFuncUpdatePage()
 {
 	BEGIN_FUNC;
 	{
-		auto* pWnd = static_cast<CGrBookListDlg*>(GetInstallWnd(TxtFuncBookmark::MWID_BOOKDLG));
+		auto* pWnd = static_cast<CGrBookListDlg*>(GetInstallWnd(TxtFuncBookmark::ModelWindowID::MWID_BOOKDLG));
 		if(pWnd){
 			pWnd->PostRefreshSubtitleList();
 		}
 	}
 	{
-		auto* pWnd = static_cast<CGrLinkDlg*>(GetInstallWnd(TxtFuncBookmark::MWID_LINKDLG));
+		auto* pWnd = static_cast<CGrLinkDlg*>(GetInstallWnd(TxtFuncBookmark::ModelWindowID::MWID_LINKDLG));
 		if(pWnd){
 			pWnd->PtstUpdatePage();
 		}
@@ -864,7 +865,7 @@ extern "C" TXTFUNCBOOKMARK_API bool cdecl TxtFuncSearchFiles(HWND hWnd, LPCTSTR 
 	BEGIN_FUNC;
 
 	if(hWnd == NULL){
-		auto* pWnd = static_cast<CGrTxtSearchFiles*>(GetInstallWnd(TxtFuncBookmark::MWID_SEARCHDLG));
+		auto* pWnd = static_cast<CGrTxtSearchFiles*>(GetInstallWnd(TxtFuncBookmark::ModelWindowID::MWID_SEARCHDLG));
 		if(pWnd && pWnd->GetWnd()){
 			ShowWindow(pWnd->GetWnd(), SW_HIDE);
 		}
@@ -878,15 +879,15 @@ extern "C" TXTFUNCBOOKMARK_API bool cdecl TxtFuncSearchFiles(HWND hWnd, LPCTSTR 
 	if(g_wm_funcCall == 0){
 		g_wm_funcCall = RegisterWindowMessage(WM_TXTMIRU_FUNC_CALL);
 	}
-	auto* pWnd = static_cast<CGrTxtSearchFiles*>(GetInstallWnd(TxtFuncBookmark::MWID_SEARCHDLG));
+	auto* pWnd = static_cast<CGrTxtSearchFiles*>(GetInstallWnd(TxtFuncBookmark::ModelWindowID::MWID_SEARCHDLG));
 	if(pWnd && !pWnd->GetWnd()){
-		UnInstallWnd(TxtFuncBookmark::MWID_SEARCHDLG);
+		UnInstallWnd(TxtFuncBookmark::ModelWindowID::MWID_SEARCHDLG);
 	}
 	if(pWnd){
 		pWnd->Show(hWnd);
 	} else {
 		pWnd = new CGrTxtSearchFiles(hWnd);
-		InstallWnd(TxtFuncBookmark::MWID_SEARCHDLG, pWnd);
+		InstallWnd(TxtFuncBookmark::ModelWindowID::MWID_SEARCHDLG, pWnd);
 	}
 	return true;
 }
@@ -896,7 +897,7 @@ extern "C" TXTFUNCBOOKMARK_API bool cdecl TxtFuncShowRubyList(HWND hWnd, void *p
 {
 	BEGIN_FUNC;
 	if(hWnd == NULL){
-		auto* pWnd = static_cast<CGrRubyListDlg*>(GetInstallWnd(TxtFuncBookmark::MWID_RUBYDLG));
+		auto* pWnd = static_cast<CGrRubyListDlg*>(GetInstallWnd(TxtFuncBookmark::ModelWindowID::MWID_RUBYDLG));
 		if(pWnd && pWnd->GetWnd()){
 			ShowWindow(pWnd->GetWnd(), SW_HIDE);
 		}
@@ -911,28 +912,28 @@ extern "C" TXTFUNCBOOKMARK_API bool cdecl TxtFuncShowRubyList(HWND hWnd, void *p
 	if(g_wm_funcCall == 0){
 		g_wm_funcCall = RegisterWindowMessage(WM_TXTMIRU_FUNC_CALL);
 	}
-	auto* pWnd = static_cast<CGrRubyListDlg*>(GetInstallWnd(TxtFuncBookmark::MWID_RUBYDLG));
+	auto* pWnd = static_cast<CGrRubyListDlg*>(GetInstallWnd(TxtFuncBookmark::ModelWindowID::MWID_RUBYDLG));
 	if(pWnd && !pWnd->GetWnd()){
-		UnInstallWnd(TxtFuncBookmark::MWID_RUBYDLG);
+		UnInstallWnd(TxtFuncBookmark::ModelWindowID::MWID_RUBYDLG);
 	}
 	if(pWnd){
 		pWnd->Show(hWnd);
 	} else {
 		pWnd = new CGrRubyListDlg(hWnd, pDoc);
-		InstallWnd(TxtFuncBookmark::MWID_RUBYDLG, pWnd);
+		InstallWnd(TxtFuncBookmark::ModelWindowID::MWID_RUBYDLG, pWnd);
 	}
 	return true;
 }
 extern "C" TXTFUNCBOOKMARK_API bool cdecl TxtFuncIsShowRubyList()
 {
 	BEGIN_FUNC;
-	auto* pWnd = static_cast<CGrRubyListDlg*>(GetInstallWnd(TxtFuncBookmark::MWID_RUBYDLG));
+	auto* pWnd = static_cast<CGrRubyListDlg*>(GetInstallWnd(TxtFuncBookmark::ModelWindowID::MWID_RUBYDLG));
 	return (pWnd && pWnd->GetWnd() && IsWindowVisible(pWnd->GetWnd()));
 }
 extern "C" TXTFUNCBOOKMARK_API bool cdecl TxtFuncRefreshRubyList()
 {
 	BEGIN_FUNC;
-	auto* pWnd = static_cast<CGrRubyListDlg*>(GetInstallWnd(TxtFuncBookmark::MWID_RUBYDLG));
+	auto* pWnd = static_cast<CGrRubyListDlg*>(GetInstallWnd(TxtFuncBookmark::ModelWindowID::MWID_RUBYDLG));
 	if(pWnd){
 		pWnd->PostRefresh();
 	}
@@ -967,10 +968,10 @@ extern "C" TXTFUNCBOOKMARK_API bool cdecl TxtFuncSearch(HWND hWnd, void *pDoc, c
 extern "C" TXTFUNCBOOKMARK_API bool cdecl TxtFuncRefresh(int id)
 {
 	BEGIN_FUNC;
-	switch(id){
-	case TxtFuncBookmark::MWID_BOOKDLG:
+	switch(static_cast<TxtFuncBookmark::ModelWindowID>(id)){
+	case TxtFuncBookmark::ModelWindowID::MWID_BOOKDLG:
 		{
-			auto* pWnd = static_cast<CGrBookListDlg*>(GetInstallWnd(TxtFuncBookmark::MWID_BOOKDLG));
+			auto* pWnd = static_cast<CGrBookListDlg*>(GetInstallWnd(TxtFuncBookmark::ModelWindowID::MWID_BOOKDLG));
 			if(pWnd){
 				auto hWnd = pWnd->GetWnd();
 				if(hWnd && IsWindowVisible(hWnd)){
@@ -982,17 +983,17 @@ extern "C" TXTFUNCBOOKMARK_API bool cdecl TxtFuncRefresh(int id)
 			}
 		}
 		break;
-	case TxtFuncBookmark::MWID_LINKDLG:
+	case TxtFuncBookmark::ModelWindowID::MWID_LINKDLG:
 		{
-			auto* pWnd = static_cast<CGrLinkDlg*>(GetInstallWnd(TxtFuncBookmark::MWID_LINKDLG));
+			auto* pWnd = static_cast<CGrLinkDlg*>(GetInstallWnd(TxtFuncBookmark::ModelWindowID::MWID_LINKDLG));
 			if(pWnd){
 				pWnd->PostRefresh();
 			}
 		}
 		break;
-	case TxtFuncBookmark::MWID_RUBYDLG:
+	case TxtFuncBookmark::ModelWindowID::MWID_RUBYDLG:
 		{
-			auto* pWnd = static_cast<CGrRubyListDlg*>(GetInstallWnd(TxtFuncBookmark::MWID_RUBYDLG));
+			auto* pWnd = static_cast<CGrRubyListDlg*>(GetInstallWnd(TxtFuncBookmark::ModelWindowID::MWID_RUBYDLG));
 			if(pWnd){
 				pWnd->PostRefresh();
 			}
