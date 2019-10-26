@@ -1,13 +1,12 @@
 # TxtMiru2
-<<<<<<< HEAD
-* �c�����e�L�X�g�r���[�A�[
+* 縦書きテキストビューアー
 
-### �T�|�[�gOS
+### サポートOS
 
-* Windows 10�ȍ~
+* Windows 10以降
 
-### �r���h���@
-#### �g�p���C�u����
+### ビルド方法
+#### 使用ライブラリ
 
 * libpng http://www.libpng.org/pub/png/libpng.html
 * zlib https://zlib.net/
@@ -16,13 +15,10 @@
 * Onigmo https://github.com/k-takata/Onigmo
 * SQLite https://www.sqlite.org/index.html
 
-#### ��
+#### 環境
 
-* Visual Studio 2019 Version 16.3.4�ȏ�
+* Visual Studio 2019 Version 16.3.4以上
 
-#### �r���h
+#### ビルド
 
-* �e�t�H���_�[��*.sln�����ׂăR���p�C��
-=======
-縦書きテキストビューア
->>>>>>> 0bd900a... Create README.md
+* 各フォルダーの*.slnをすべてコンパイル
