@@ -32,7 +32,7 @@ static void addLayout(const CSV_COLMN &csv_col, TxtMiru::TxtLayoutList &layout)
 		/**/CGrText::toInt(csv_col[4])    ,
 		max(CGrText::toInt(csv_col[5]), 2), /* パーサー上 1以下の場合、無限ループになるので */
 		/**/CGrText::toInt(csv_col[6])
-		});
+	});
 }
 
 static void addLineSize(const CSV_COLMN &csv_col, TxtMiru::LineSize &ls)
@@ -79,9 +79,6 @@ bool CGrTxtLayout::IsSupported(CGrCSVText &csv) const
 
 void CGrTxtLayout::getItem(const CSV_COLMN &csv_col)
 {
-	if(csv_col.size() <= 2){
-		return;
-	}
 	auto lpSrc = csv_col[0].c_str();
 	/*   */if(CGrText::isMatchChar(lpSrc, _T("PaperSize"         ))){ addSize(csv_col, m_szPaper    );
 	} else if(CGrText::isMatchChar(lpSrc, _T("PageCharCount"     ))){ addSize(csv_col, m_szPageCount);
@@ -94,12 +91,14 @@ void CGrTxtLayout::getItem(const CSV_COLMN &csv_col)
 	} else if(CGrText::isMatchChar(lpSrc, _T("NombreLayout"      ))){ addLayout(csv_col, m_ll[static_cast<unsigned int>(LayoutListType::Nombre      )]);
 	} else if(CGrText::isMatchChar(lpSrc, _T("RunningHeadsLayout"))){ addLayout(csv_col, m_ll[static_cast<unsigned int>(LayoutListType::RunningHeads)]);
 	} else if(CGrText::isMatchChar(lpSrc, _T("NoteLayout"        ))){ addLayout(csv_col, m_ll[static_cast<unsigned int>(LayoutListType::Note        )]);
-	} else if(CGrText::isMatchChar(lpSrc, _T("LayoutType"        ))){ m_openLayoutType = csv_col[1];
-	} else if(CGrText::isMatchChar(lpSrc, _T("LayoutName"        ))){ m_layoutName     = csv_col[1];
-	} else if(CGrText::isMatchChar(lpSrc, _T("Nombre1Format"     ))){ m_format[static_cast<unsigned int>(FormatType::Nombre1)] = csv_col[1];
-	} else if(CGrText::isMatchChar(lpSrc, _T("Nombre2Format"     ))){ m_format[static_cast<unsigned int>(FormatType::Nombre2)] = csv_col[1];
-	} else if(CGrText::isMatchChar(lpSrc, _T("NumbreFormatType"  ))){ m_nombreFormatType = static_cast<NombreFormatType>(CGrText::toInt(csv_col[1]));
-	} else if(CGrText::isMatchChar(lpSrc, _T("Orientation"       ))){ m_orientationType  = static_cast<OrientationType>(CGrText::toInt(csv_col[1]));
+	} else if(csv_col.size() >= 2){
+		/*   */if(CGrText::isMatchChar(lpSrc, _T("LayoutType"        ))){ m_openLayoutType = csv_col[1];
+		} else if(CGrText::isMatchChar(lpSrc, _T("LayoutName"        ))){ m_layoutName     = csv_col[1];
+		} else if(CGrText::isMatchChar(lpSrc, _T("Nombre1Format"     ))){ m_format[static_cast<unsigned int>(FormatType::Nombre1)] = csv_col[1];
+		} else if(CGrText::isMatchChar(lpSrc, _T("Nombre2Format"     ))){ m_format[static_cast<unsigned int>(FormatType::Nombre2)] = csv_col[1];
+		} else if(CGrText::isMatchChar(lpSrc, _T("NumbreFormatType"  ))){ m_nombreFormatType = static_cast<NombreFormatType>(CGrText::toInt(csv_col[1]));
+		} else if(CGrText::isMatchChar(lpSrc, _T("Orientation"       ))){ m_orientationType  = static_cast<OrientationType>(CGrText::toInt(csv_col[1]));
+		}
 	}
 }
 

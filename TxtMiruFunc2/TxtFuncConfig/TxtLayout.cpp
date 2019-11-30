@@ -86,9 +86,6 @@ bool CGrTxtLayout::IsSupported(CGrCSVText &csv) const
 
 void CGrTxtLayout::getItem(const CSV_COLMN &csv_col)
 {
-	if(csv_col.size() <= 2){
-		return;
-	}
 	auto lpSrc = csv_col[0].c_str();
 	/*   */if(CGrText::isMatchChar(lpSrc, _T("PaperSize"         ))){ addSize(csv_col, m_szPaper    );
 	} else if(CGrText::isMatchChar(lpSrc, _T("PageCharCount"     ))){ addSize(csv_col, m_szPageCount);
@@ -101,11 +98,13 @@ void CGrTxtLayout::getItem(const CSV_COLMN &csv_col)
 	} else if(CGrText::isMatchChar(lpSrc, _T("NombreLayout"      ))){ addLayout(csv_col, m_ll[static_cast<int>(LayoutListType::Nombre      )]);
 	} else if(CGrText::isMatchChar(lpSrc, _T("RunningHeadsLayout"))){ addLayout(csv_col, m_ll[static_cast<int>(LayoutListType::RunningHeads)]);
 	} else if(CGrText::isMatchChar(lpSrc, _T("NoteLayout"        ))){ addLayout(csv_col, m_ll[static_cast<int>(LayoutListType::Note        )]);
-	} else if(CGrText::isMatchChar(lpSrc, _T("LayoutType"        ))){ m_openLayoutType = csv_col[1];
-	} else if(CGrText::isMatchChar(lpSrc, _T("LayoutName"        ))){ m_layoutName     = csv_col[1];
-	} else if(CGrText::isMatchChar(lpSrc, _T("Nombre1Format"     ))){ m_format[static_cast<int>(FormatType::Nombre1)] = csv_col[1];
-	} else if(CGrText::isMatchChar(lpSrc, _T("Nombre2Format"     ))){ m_format[static_cast<int>(FormatType::Nombre2)] = csv_col[1];
-	} else if(CGrText::isMatchChar(lpSrc, _T("NumbreFormatType"  ))){ m_nombreFormatType = static_cast<NombreFormatType>(CGrText::toInt(csv_col[1]));
+	} else if(csv_col.size() >= 2){
+		/*   */if(CGrText::isMatchChar(lpSrc, _T("LayoutType"        ))){ m_openLayoutType = csv_col[1];
+		} else if(CGrText::isMatchChar(lpSrc, _T("LayoutName"        ))){ m_layoutName     = csv_col[1];
+		} else if(CGrText::isMatchChar(lpSrc, _T("Nombre1Format"     ))){ m_format[static_cast<unsigned int>(FormatType::Nombre1)] = csv_col[1];
+		} else if(CGrText::isMatchChar(lpSrc, _T("Nombre2Format"     ))){ m_format[static_cast<unsigned int>(FormatType::Nombre2)] = csv_col[1];
+		} else if(CGrText::isMatchChar(lpSrc, _T("NumbreFormatType"  ))){ m_nombreFormatType = static_cast<NombreFormatType>(CGrText::toInt(csv_col[1]));
+		}
 	}
 }
 

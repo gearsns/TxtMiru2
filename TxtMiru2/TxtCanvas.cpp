@@ -277,59 +277,8 @@ public:
 				case TxtMiru::TextType::SUB_NOTE          : drawSTxt(lpNextSrc); break;
 				case TxtMiru::TextType::KU1_CHAR          : drawKuCh(_T("／"  )); break;
 				case TxtMiru::TextType::KU2_CHAR          : drawKuCh(_T("／″")); break;
-				case TxtMiru::TextType::LINE_CHAR         :
-					{ // 先読みして、線が途切れないようにする
-						int to_iIndex = m_tp.iIndex;
-						auto prefetch_tp = m_tp;
-						const auto &cp = m_txtMap.GetCharPoint(m_tp);
-						const auto *pref_it = it;
-						for(int prefetch = it_len; prefetch>0; --prefetch, ++pref_it, ++prefetch_tp.iIndex){
-							const auto &pref_ti = (*pref_it);
-							if(pref_ti.textType != TxtMiru::TextType::LINE_CHAR){ break; }
-							if(pref_ti.str != lpNextSrc){ break; }
-							if(cp.zx != m_txtMap.GetCharPoint(prefetch_tp).zx){ break; }
-							to_iIndex = prefetch_tp.iIndex;
-						}
-						int x=-1, w=0, y=0, h=0;
-						if(to_iIndex == m_tp.iIndex){
-							const auto &cp = m_txtMap.GetCharPoint(m_tp);
-							x = cp.zx;
-							y = cp.zy;
-							w = cp.w;
-							h = cp.h;
-							if(cp.w <= 0 || !isDrawArea(cp.lcol)){
-								break;
-							}
-						} else {
-							auto ref_tp = m_tp;
-							auto end_tp = m_tp;
-							end_tp.iIndex = to_iIndex;
-							//
-							++it_len, --it, --m_tp.iIndex;
-							for(; ref_tp <= end_tp; ++ref_tp.iIndex, --it_len, ++it, ++m_tp.iIndex){
-								const auto &cp = m_txtMap.GetCharPoint(ref_tp);
-								if(isDrawArea(cp.lcol)){
-									if(x < 0){
-										y = cp.zy;
-									} else if(x != cp.zx){
-										m_txtRenderer.PatternFillVert(CGrTxtRendererMgr::FontType::Text, x, y, w, h, lpNextSrc, -1);
-										y = cp.zy;
-									}
-									x = cp.zx;
-									w = cp.w;
-									h = cp.zy + cp.w - y; /* cp.wより、cp.h が正しいが余白分も付加されているので余白分が無い (縦横の幅が同一とみなして) cp.wの方を使用する */
-								}
-							}
-						}
-						h -= (m_fontTextSize / 4); // padding
-						m_txtRenderer.PatternFillVert(CGrTxtRendererMgr::FontType::Text, x, y, w, h, lpNextSrc, -1);
-				}
-					break;
-				case TxtMiru::TextType::MOVING_BORDER       :
-					// 文字囲み   ※文文章の囲みとは別
-					drawBorder(_T("傍線") , ti, text_list);
-					break;
-					// 文字囲み   ※文章の囲みとは別
+				case TxtMiru::TextType::LINE_CHAR         : drawLineChar(lpNextSrc, &it, it_len, text_list); break;
+				case TxtMiru::TextType::MOVING_BORDER     : drawBorder(_T("傍線"), ti, text_list); break;// 文字囲み   ※文文章の囲みとは別
 				case TxtMiru::TextType::LINE_BOX_START: // through
 				case TxtMiru::TextType::LINE_BOX_END  :
 					// 文字囲み   ※文章の囲みとは別
@@ -600,6 +549,53 @@ private:
 		borderType.bottom = (lcol_end   == prelcol);
 		m_txtRenderer.DrawBorder(lx-1, y-1, x-lx+1, b-y-1, borderType);
 	}
+	void drawLineChar(LPCTSTR lpNextSrc, const TxtMiru::TextInfo **pit, int &it_len, const TxtMiru::TextInfoList &text_list)
+	{ // 先読みして、線が途切れないようにする
+		int to_iIndex = m_tp.iIndex;
+		auto prefetch_tp = m_tp;
+		const auto &cp = m_txtMap.GetCharPoint(m_tp);
+		const auto *pref_it = *pit;
+		for(int prefetch = it_len; prefetch>0; --prefetch, ++pref_it, ++prefetch_tp.iIndex){
+			const auto &pref_ti = (*pref_it);
+			if(pref_ti.textType != TxtMiru::TextType::LINE_CHAR){ break; }
+			if(pref_ti.str != lpNextSrc){ break; }
+			if(cp.zx != m_txtMap.GetCharPoint(prefetch_tp).zx){ break; }
+			to_iIndex = prefetch_tp.iIndex;
+		}
+		int x=-1, w=0, y=0, h=0;
+		if(to_iIndex == m_tp.iIndex){
+			const auto &cp = m_txtMap.GetCharPoint(m_tp);
+			x = cp.zx;
+			y = cp.zy;
+			w = cp.w;
+			h = cp.h;
+			if(cp.w <= 0 || !isDrawArea(cp.lcol)){
+				return;
+			}
+		} else {
+			auto ref_tp = m_tp;
+			auto end_tp = m_tp;
+			end_tp.iIndex = to_iIndex;
+			//
+			++it_len, --(*pit), --m_tp.iIndex;
+			for(; ref_tp <= end_tp; ++ref_tp.iIndex, --it_len, ++(*pit), ++m_tp.iIndex){
+				const auto &cp = m_txtMap.GetCharPoint(ref_tp);
+				if(isDrawArea(cp.lcol)){
+					if(x < 0){
+						y = cp.zy;
+					} else if(x != cp.zx){
+						m_txtRenderer.PatternFillVert(CGrTxtRendererMgr::FontType::Text, x, y, w, h, lpNextSrc, -1);
+						y = cp.zy;
+					}
+					x = cp.zx;
+					w = cp.w;
+					h = cp.zy + cp.w - y; /* cp.wより、cp.h が正しいが余白分も付加されているので余白分が無い (縦横の幅が同一とみなして) cp.wの方を使用する */
+				}
+			}
+		}
+		h -= (m_fontTextSize / 4); // padding
+		m_txtRenderer.PatternFillVert(CGrTxtRendererMgr::FontType::Text, x, y, w, h, lpNextSrc, -1);
+	}
 	void drawLine(LPCTSTR lpNextSrc, const TxtMiru::TextInfo &ti, const TxtMiru::TextInfoList &text_list)
 	{
 		TxtMiru::TextPoint ref_tp = TxtMiru::TextParserPoint(m_tp.iLine, ti.tpBegin);
@@ -857,17 +853,32 @@ int CGrTxtCanvas::SetPageFlip(int page, bool bScroll)
 	if(page < 0){
 		page = m_currentPage;
 	}
+	auto orientation = m_pDoc->GetConstLayout().GetOrientation();
 	int scrolltype = 0;
 	if(bScroll){
 		int page_d = m_currentPage-page;
-		bScroll = false;
-		if(page % 2 == 0){
-			if(page_d == 0){
-				scrolltype = 1;
+		if (CGrTxtLayout::OrientationType::Vertical == orientation) {
+			if (page % 2 == 0) {
+				if (page_d == 0) {
+					scrolltype = 1;
+				}
 			}
-		} else {
-			if(page_d == -1){
-				scrolltype = 2;
+			else {
+				if (page_d == -1) {
+					scrolltype = 2;
+				}
+			}
+		}
+		else {
+			if (page % 2 == 0) {
+				if (page_d == 0) {
+					scrolltype = 2;
+				}
+			}
+			else {
+				if (page_d == -1) {
+					scrolltype = 1;
+				}
 			}
 		}
 	}
@@ -875,10 +886,10 @@ int CGrTxtCanvas::SetPageFlip(int page, bool bScroll)
 	if(scrolltype == 0){
 		switch(m_currentPage-page){
 		case -2:
-			m_pageFlip.Initialize(m_rectCanvas, true);
+			m_pageFlip.Initialize(m_rectCanvas, CGrTxtLayout::OrientationType::Vertical == orientation);
 			break;
 		case 2:
-			m_pageFlip.Initialize(m_rectCanvas, false);
+			m_pageFlip.Initialize(m_rectCanvas, CGrTxtLayout::OrientationType::Vertical != orientation);
 			break;
 		default:
 			return Update(page);
@@ -1146,6 +1157,16 @@ int CGrTxtCanvas::Update(int page)
 					}
 					if(bNoDisp){
 						break;
+					}
+					if (CGrText::isMatchChar(lpSrc, L"―")) {
+						auto end_cp = cp;
+						while (CGrText::isMatchChar(lpNextSrc, L"―")) {
+							++tp.iPos;
+							lpNextSrc = CGrText::CharNext(lpNextSrc);
+							end_cp = m_txtMap.GetLayoutCharPoint(tp);
+						}
+						m_txtRenderer.PatternFillHorz(ft, cp.zx, cp.zy, end_cp.zx + end_cp.w - cp.zx, cp.h, L"@―", -1);
+						continue;
 					}
 					m_txtRenderer.DrawText(ft, cp.zx, cp.zy, lpSrc, lpNextSrc);
 				}

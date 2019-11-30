@@ -39,7 +39,7 @@ public:
 		Horizontal  ,
 		MaxNum      ,
 	};
-	virtual OrientationType GetOrientation(){ return m_orientationType; }
+	virtual OrientationType GetOrientation() const { return m_orientationType; }
 	//
 	virtual int ConfigurationDlg(HWND hWnd, CGrTxtDocument &doc) = 0;
 	//

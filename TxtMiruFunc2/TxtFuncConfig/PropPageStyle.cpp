@@ -14,6 +14,8 @@
 #include "TxtConfigFunc.h"
 #include "MessageBox.h"
 
+extern int DoModalLayoutSetting(HWND hWnd, LPCTSTR type, LPCTSTR name, LPCTSTR lpFileName, bool bAutoUpdateLayout);
+
 static struct FontSpacing l_font_spacing[] = {
 	{IDC_EDIT_TEXT_FONTSPACING         , IDC_CHECKBOX_TEXT_CENTER         , CGrTxtFuncIParam::CharType::Text        },
 	{IDC_EDIT_BOLD_FONTSPACING         , IDC_CHECKBOX_BOLD_CENTER         , CGrTxtFuncIParam::CharType::Bold        },
@@ -141,6 +143,33 @@ void CGrPropPageStyle::attachBtn(UINT id, CGrColorButton &btn, COLORREF color)
 	btn.SetColor(color);
 }
 
+void CGrPropPageStyle::comboLayoutList()
+{
+	auto&& param = CGrTxtFunc::Param();
+	TCHAR buf[1024];
+	param.GetText(CGrTxtFuncIParam::TextType::LayoutFile, buf, sizeof(buf) / sizeof(TCHAR));
+	std::tstring filename(buf);
+
+	CGrTxtLayoutMgr mgr;
+	m_lil.clear();
+	mgr.GetLayoutList(m_lil);
+	auto hwnd_layout = GetDlgItem(m_hWnd, IDC_COMBO_LAYOUT);
+	ComboBox_ResetContent(hwnd_layout);
+	int iselect = 0;
+	int len = m_lil.size();
+	if (len > 0) {
+		const auto* it = &m_lil[0];
+		for (int idx = 0; len > 0; --len, ++it, ++idx) {
+			const auto& li = *it;
+			int iItem = ComboBox_AddString(hwnd_layout, li.name.c_str());
+			ComboBox_SetItemData(hwnd_layout, iItem, idx);
+			if (li.filename == filename) {
+				iselect = idx;
+			}
+		}
+	}
+	ComboBox_SetCurSel(hwnd_layout, iselect);
+}
 BOOL CGrPropPageStyle::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 {
 	CGrPropPageSize::OnInitDialog(hwnd, hwndFocus, lParam);
@@ -197,30 +226,7 @@ BOOL CGrPropPageStyle::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 		SetWindowText(hwnd_nombre      , param.GetFontName(CGrTxtFuncIParam::CharType::Nombre      ));
 		SetWindowText(hwnd_runningheads, param.GetFontName(CGrTxtFuncIParam::CharType::RunningHeads));
 	}
-	{
-		TCHAR buf[1024];
-		param.GetText(CGrTxtFuncIParam::TextType::LayoutFile, buf, sizeof(buf)/sizeof(TCHAR));
-		std::tstring filename(buf);
-
-		CGrTxtLayoutMgr mgr;
-		m_lil.clear();
-		mgr.GetLayoutList(m_lil);
-		auto hwnd_layout = GetDlgItem(m_hWnd, IDC_COMBO_LAYOUT);
-		int iselect = 0;
-		int len = m_lil.size();
-		if(len > 0){
-			const auto *it = &m_lil[0];
-			for(int idx=0; len>0; --len, ++it, ++idx){
-				const auto &li = *it;
-				int iItem = ComboBox_AddString(hwnd_layout, li.name.c_str());
-				ComboBox_SetItemData(hwnd_layout, iItem, idx);
-				if(li.filename == filename){
-					iselect = idx;
-				}
-			}
-		}
-		ComboBox_SetCurSel(hwnd_layout, iselect);
-	}
+	comboLayoutList();
 	// •¶ŽšŠÔŠu
 	// ’†‰›‘µ‚¦
 	int idx = 0;
@@ -460,11 +466,26 @@ void CGrPropPageStyle::OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotif
 		break;
 	case ID_SHOW_STYLE_FOLDER:
 		{
+
 			TCHAR styleFolderName[MAX_PATH+1];
 			_stprintf_s(styleFolderName, _T("%s/Style/"), CGrTxtFunc::GetDataPath());
 			CGrShell::CreateFolder(styleFolderName);
 			CGrShell::Execute(m_hWnd, styleFolderName);
 		}
+		break;
+	case IDC_LAYOUT:
+	{
+		auto&& param = CGrTxtFunc::Param();
+		auto hwnd_layout = GetDlgItem(m_hWnd, IDC_COMBO_LAYOUT);
+		auto idx = ComboBox_GetCurSel(hwnd_layout);
+		idx = ComboBox_GetItemData(hwnd_layout, idx);
+		const auto& li = m_lil[idx];
+
+		auto ret = DoModalLayoutSetting(m_hWnd, li.type.c_str(), li.name.c_str(), li.filename.c_str(), false);
+		if (ret == IDOK || ret == IDSAVEAS) {
+			comboLayoutList();
+		}
+	}
 		break;
 	}
 }

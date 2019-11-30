@@ -144,6 +144,8 @@
 #define IDC_CHECKBOX_CLICK_SPSELECTIONMODE2 1093
 #define IDC_CHECKBOX_KEYREPAT           1093
 #define IDC_COMBOBOX_AOZORA_BOTTOM      1094
+#define IDC_BUTTON1                     1095
+#define IDC_LAYOUT                      1095
 #define IDC_CHECKBOX_BOOKMARKAUTOSAVE   40000
 #define IDC_EDIT_FILETYPEHTML           40001
 #define ID_CONFIG_TITLE                 40002

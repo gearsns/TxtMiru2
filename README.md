@@ -22,3 +22,6 @@
 #### ビルド
 
 * 各フォルダーの*.slnをすべてコンパイル
+
+### 配布
+https://sites.google.com/site/gearsns/

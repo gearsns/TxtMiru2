@@ -57,6 +57,7 @@ protected:
 	//   btn   [in]: CGrColorButton
 	//   color [in]: color
 	void attachBtn(UINT id, CGrColorButton &btn, COLORREF color);
+	void comboLayoutList();
 };
 
 

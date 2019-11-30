@@ -573,18 +573,34 @@ public:
 								if(w <= delta){
 									m_gestureBeginPos.x = INT_MIN;
 									m_gestureBeginPos.y = INT_MIN;
-									if(dwDist > 0){
-										callFunc(IDPREVFILE);
+									if (CGrTxtLayout::OrientationType::Vertical == m_doc.GetConstLayout().GetOrientation()) {
+										if(dwDist > 0){
+											callFunc(IDPREVFILE);
+										} else {
+											callFunc(IDPREVPAGE);
+										}
 									} else {
-										callFunc(IDPREVPAGE);
+										if(dwDist > 0){
+											callFunc(IDNEXTFILE);
+										} else {
+											callFunc(IDNEXTPAGE);
+										}
 									}
 								} else if(delta <= -w){
 									m_gestureBeginPos.x = INT_MIN;
 									m_gestureBeginPos.y = INT_MIN;
-									if(dwDist > 0){
-										callFunc(IDNEXTFILE);
+									if (CGrTxtLayout::OrientationType::Vertical == m_doc.GetConstLayout().GetOrientation()) {
+										if(dwDist > 0){
+											callFunc(IDNEXTFILE);
+										} else {
+											callFunc(IDNEXTPAGE);
+										}
 									} else {
-										callFunc(IDNEXTPAGE);
+										if(dwDist > 0){
+											callFunc(IDPREVFILE);
+										} else {
+											callFunc(IDPREVPAGE);
+										}
 									}
 								}
 							}
@@ -665,6 +681,7 @@ public:
 				}
 				param.SetBoolean(CGrTxtParam::PointsType::ShowHScroll     , m_bVisibleHScrollbar);
 				param.SetBoolean(CGrTxtParam::PointsType::ShowVScroll     , m_bVisibleVScrollbar);
+				//
 				int auto_save_mode[2] = {m_bBookMarkAutoSave ? 1 : 0, m_autoSaveInterval};
 				param.SetPoints(CGrTxtParam::PointsType::BookMarkAutoSave, auto_save_mode, sizeof(auto_save_mode)/sizeof(int));
 				param.SetBoolean(CGrTxtParam::PointsType::SelectionMode   , m_bSelectionMode    );
@@ -693,6 +710,7 @@ public:
 					if(CGrLupeWnd::SelectType::WindowPos == m_LupeWnd.GetSelectType()){ // ST_MousePos:カーソル位置を拡大する or ST_WindowPos:ウインドウ位置を拡大する
 						window_pos[0] |= 0x02;
 					}
+					//
 					switch(m_LupeWnd.GetZoom()){
 					case 150: window_pos[0] |= 0x04; break;
 					case 200: window_pos[0] |= 0x08; break;
@@ -703,6 +721,7 @@ public:
 					param.SetBoolean(CGrTxtParam::PointsType::FullScreen, m_bFullScreen);
 				}
 				param.SetPoints(CGrTxtParam::PointsType::WindowSize, reinterpret_cast<int*>(&wndp), sizeof(wndp)/sizeof(int));
+				//
 				auto i_page_mode = static_cast<int>(m_pageMode);
 				param.SetPoints(CGrTxtParam::PointsType::PageMode, &i_page_mode, 1);
 			}
@@ -756,7 +775,6 @@ public:
 			break;
 		case WM_MEASUREITEM:
 			TxtMiruTheme_MenuMeasureItem(hWnd, lParam);
-
 			break;
 		case WM_DRAWITEM:
 			TxtMiruTheme_MenuDrawItem(hWnd, lParam);
@@ -913,6 +931,7 @@ private:
 		bool bselect = m_txtCanvas.GetSelectTextPoint(tpb, tpe);
 		//
 		m_txtCanvas.Update();
+		//
 		if(bselect){
 			m_txtCanvas.SetBeginSelect(tpb);
 			m_txtCanvas.SetEndSelect(tpe);
@@ -1001,6 +1020,7 @@ private:
 	//   id      : メニューID
 	//   enabled : 選択可なら TRUE
 	void Menu_setEnabled(int id, BOOL enabled){ Menu_setStatus(id, enabled ? MFS_ENABLED : MFS_DISABLED ); }
+	//
 	pOnKeyCallbackFunc getKeyFunc(UINT vk, bool delay = false)
 	{
 		auto it=m_keyfunc_map.find(CGrKeyboardState(vk, delay));
@@ -1083,13 +1103,24 @@ private:
 		SCROLLINFO si = {sizeof(SCROLLINFO)}; /*si.nMin = 0; si.nPos = 0; */
 		si.fMask = SIF_RANGE | SIF_POS | SIF_PAGE;
 		si.nMax  = si.nPage = 2;
-		if(m_bSinglePage){
-			si.nPage = 1;
-			showScrollBar(m_bVisibleHScrollbar, si, SB_HORZ, m_totalPage-m_displayPage);
-			showScrollBar(m_bVisibleVScrollbar, si, SB_VERT, m_displayPage            );
+		if (CGrTxtLayout::OrientationType::Vertical == m_doc.GetConstLayout().GetOrientation()) {
+			if(m_bSinglePage){
+				si.nPage = 1;
+				showScrollBar(m_bVisibleHScrollbar, si, SB_HORZ, m_totalPage-m_displayPage);
+				showScrollBar(m_bVisibleVScrollbar, si, SB_VERT, m_displayPage            );
+			} else {
+				showScrollBar(m_bVisibleHScrollbar, si, SB_HORZ, m_totalPage-m_currentPage-1);
+				showScrollBar(m_bVisibleVScrollbar, si, SB_VERT, m_currentPage              );
+			}
 		} else {
-			showScrollBar(m_bVisibleHScrollbar, si, SB_HORZ, m_totalPage-m_currentPage-1);
-			showScrollBar(m_bVisibleVScrollbar, si, SB_VERT, m_currentPage              );
+			if(m_bSinglePage){
+				si.nPage = 1;
+				showScrollBar(m_bVisibleHScrollbar, si, SB_HORZ, m_displayPage);
+				showScrollBar(m_bVisibleVScrollbar, si, SB_VERT, m_displayPage);
+			} else {
+				showScrollBar(m_bVisibleHScrollbar, si, SB_HORZ, m_currentPage);
+				showScrollBar(m_bVisibleVScrollbar, si, SB_VERT, m_currentPage);
+			}
 		}
 	}
 	void addInt(std::tstring &str, int i)
@@ -1269,7 +1300,7 @@ private:
 			UpdateCmdUI();
 			break;
 		case TxtDocMessage::UPDATE_KEYBORD: loadKeyMap(); break;
-		case TxtDocMessage::UPDATE_CONFIG: /* through */// refresh(); break;
+		case TxtDocMessage::UPDATE_CONFIG: /* through */
 		case TxtDocMessage::UPDATE_LAYOUT: refresh(); break;
 		case TxtDocMessage::UPDATE_STYLE_LIST: SetStyleMenu(); break;
 		case TxtDocMessage::GOTO_NPAGE:
@@ -1277,7 +1308,7 @@ private:
 			::SetFocus(m_hWnd);
 			break;
 		default:
-			if (IDRECENTFILE + 1 + 1 <= id && id <= IDRECENTFILE + 1 + 10) {
+			if(IDRECENTFILE + 1 + 1 <= id && id <= IDRECENTFILE + 1 + 10){
 				// 最近使ったファイルを メニューから開く
 				int num = id - (IDRECENTFILE + 1 + 1);
 				int index = static_cast<int>(m_openFileList.size())-num-1;
@@ -1326,20 +1357,35 @@ private:
 		si.fMask  = SIF_RANGE | SIF_PAGE | SIF_POS | SIF_TRACKPOS;
 		::GetScrollInfo(hwnd, SB_HORZ, &si);
 
-		if (!m_bSinglePage) {
-			si.nMax -= 1;
-		}
-		switch(code){
-		case SB_LINEUP       : NextPage(                      ); break;
-		case SB_LINEDOWN     : PrevPage(                      ); break;
-		case SB_THUMBPOSITION: GotoPage(si.nMax - pos         ); break;
-		case SB_THUMBTRACK   : GotoPage(si.nMax - si.nTrackPos); break;
-		case SB_PAGEUP       : NextPage(                      ); break;
-		case SB_PAGEDOWN     : PrevPage(                      ); break;
-		case SB_TOP          : GotoPage(m_totalPage           ); break;
-		case SB_BOTTOM       : GotoPage(0                     ); break;
-		case SB_ENDSCROLL    : break;
-		default: break;
+		if (CGrTxtLayout::OrientationType::Vertical == m_doc.GetConstLayout().GetOrientation()) {
+			if(!m_bSinglePage){
+				si.nMax -= 1;
+			}
+			switch(code){
+			case SB_LINEUP       : NextPage(                      ); break;
+			case SB_LINEDOWN     : PrevPage(                      ); break;
+			case SB_THUMBPOSITION: GotoPage(si.nMax - pos         ); break;
+			case SB_THUMBTRACK   : GotoPage(si.nMax - si.nTrackPos); break;
+			case SB_PAGEUP       : NextPage(                      ); break;
+			case SB_PAGEDOWN     : PrevPage(                      ); break;
+			case SB_TOP          : GotoPage(m_totalPage           ); break;
+			case SB_BOTTOM       : GotoPage(0                     ); break;
+			case SB_ENDSCROLL    : break;
+			default: break;
+			}
+		} else {
+			switch(code){
+			case SB_LINEUP       : PrevPage(            ); break;
+			case SB_LINEDOWN     : NextPage(            ); break;
+			case SB_THUMBPOSITION: GotoPage(pos         ); break;
+			case SB_THUMBTRACK   : GotoPage(si.nTrackPos); break;
+			case SB_PAGEUP       : PrevPage(            ); break;
+			case SB_PAGEDOWN     : NextPage(            ); break;
+			case SB_TOP          : GotoPage(0           ); break;
+			case SB_BOTTOM       : GotoPage(m_totalPage ); break;
+			case SB_ENDSCROLL    : break;
+			default: break;
+			}
 		}
 	}
 	void OnVScroll(HWND hwnd, HWND hwndCtl, UINT code, int pos)
@@ -1523,9 +1569,9 @@ private:
 		GetClientRect(m_hWnd, &rect);
 		int center = rect.left + (rect.right - rect.left) / 2;
 		if(pos.x < center){
-			NextPage();
+			LeftPage();
 		} else {
-			PrevPage();
+			RightPage();
 		}
 	}
 	void OnLButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlags)
@@ -1964,6 +2010,7 @@ private:
 			}
 		} while(0);
 	}
+	//
 	void SetPageMode(PAGE_MODE pm)
 	{
 		Menu_setChecked(IDRPAGEMODENORMAL      , FALSE);
@@ -2249,7 +2296,6 @@ private:
 					::SetWindowPos(m_hWnd, HWND_TOP, 0,0,0,0, SWP_NOSIZE|SWP_NOMOVE);
 				}
 			}
-
 			break;
 		}
 		switch(to_mode){
@@ -2356,6 +2402,7 @@ private:
 			GESTURECONFIG gc = { 0, GC_ALLGESTURES, 0 };
 			CGrGesture::Gesture().SetGestureConfig(m_hWnd, 0, 1, &gc, sizeof(GESTURECONFIG));
 		}
+		//
 		CGrTxtMiru::theApp().InstallDLLFunc(CGrTxtMiru::DLLFncType::TxtFuncBookmark, &m_dlgLink);
 		const auto &param = CGrTxtMiru::theApp().Param();
 		// 最近使ったファイルの一覧読み込み
@@ -2390,6 +2437,7 @@ private:
 		m_autoSaveInterval  = auto_save_mode[1];
 		Menu_setChecked(IDBOOKMARKAUTOSAVE, m_bBookMarkAutoSave);
 		Menu_setEnabled(IDBOOKMARKSAVEAS, false);
+		//
 		m_bKeyRepeat = param.GetBoolean(CGrTxtParam::PointsType::KeyRepeat);
 		//
 		m_bSelectionMode = param.GetBoolean(CGrTxtParam::PointsType::SelectionMode);
@@ -2400,6 +2448,7 @@ private:
 		if(link_pos[0] == 1){
 			ShowLinkPos();
 		}
+		//
 		param.GetPoints(CGrTxtParam::PointsType::FavoritePos, link_pos, sizeof(link_pos)/sizeof(int));
 		if(link_pos[0] == 1){
 			ShowBookPos();
@@ -2439,11 +2488,14 @@ private:
 		SetRecentMenu();
 		SetPreParserMenu();
 		SetStyleMenu();
+		//
 		CGrTxtMiruMenu::Load();
 		CGrTxtMiruMenu::ConvertMenuString(getMenu(), TxtMiru::l_TxtMiruFuncMenuIDList);
+		//
 		int i_page_mode;
 		param.GetPoints(CGrTxtParam::PointsType::PageMode, &i_page_mode, 1);
 		SetPageMode((PAGE_MODE)i_page_mode);
+		//
 		int ikeyPressInterval = 0;
 		param.GetPoints(CGrTxtParam::PointsType::KeyInterval, &ikeyPressInterval, 1);
 		CGrMouseEvent::SetLongPressTime(ikeyPressInterval);
@@ -2507,7 +2559,6 @@ private:
 		}
 		::RevokeDragDrop(m_hWnd);
 		CloseAozoraList(m_hWnd);
-		//
 		::PostQuitMessage(0);
 	}
 private:
@@ -2591,12 +2642,20 @@ private:
 		SetSpSelectionMode(false);
 		m_currentPage = max(min(page, m_doc.GetTotalPage()), 0);
 		m_displayPage = m_currentPage;
-		if (m_bSinglePage) {
-			if (m_displayPage % 2 == 0) {
-				m_windowOffsetX = m_windowWidth;
-			}
-			else {
-				m_windowOffsetX = 0;
+		if(m_bSinglePage){
+			auto orientation = m_doc.GetConstLayout().GetOrientation();
+			if(CGrTxtLayout::OrientationType::Vertical == orientation){
+				if(m_displayPage % 2 == 0){
+					m_windowOffsetX = m_windowWidth;
+				} else {
+					m_windowOffsetX = 0;
+				}
+			} else {
+				if(m_displayPage % 2 == 0){
+					m_windowOffsetX = 0;
+				} else {
+					m_windowOffsetX = m_windowWidth;
+				}
 			}
 			m_LupeWnd.SetCanvasOffset(m_windowOffsetX, m_windowOffsetY);
 		}
@@ -2754,26 +2813,40 @@ private:
 		nextfile(-1);
 	}
 	//
-	void NextPage() {
-		if (m_bSinglePage) {
-			if ((m_displayPage + 1) <= m_totalPage) {
-				GotoPage(m_displayPage + 1);
-			}
+	void LeftPage() {
+		if (CGrTxtLayout::OrientationType::Vertical == m_doc.GetConstLayout().GetOrientation()) {
+			NextPage();
 		}
 		else {
-			if ((m_currentPage + 2) <= m_totalPage) {
+			PrevPage();
+		}
+	}
+	void RightPage() {
+		if (CGrTxtLayout::OrientationType::Vertical == m_doc.GetConstLayout().GetOrientation()) {
+			PrevPage();
+		}
+		else {
+			NextPage();
+		}
+	}
+	void NextPage(){
+		if(m_bSinglePage){
+			if((m_displayPage + 1) <= m_totalPage){
+				GotoPage(m_displayPage + 1);
+			}
+		} else {
+			if((m_currentPage + 2) <= m_totalPage){
 				GotoPage(m_currentPage + 2);
 			}
 		}
 	}
-	void PrevPage() {
-		if (m_bSinglePage) {
-			if (m_displayPage >= 1) {
+	void PrevPage(){
+		if(m_bSinglePage){
+			if(m_displayPage >= 1){
 				GotoPage(m_displayPage - 1);
 			}
-		}
-		else {
-			if (m_currentPage >= 2) {
+		} else {
+			if(m_currentPage >= 2){
 				GotoPage(m_currentPage - 2);
 			}
 		}
@@ -2956,7 +3029,6 @@ private:
 		} else {
 			m_doc.ToString(str, tpb, tpe);
 		}
-
 		// 移動可能な共有メモリを確保する。
 		auto hMem = ::GlobalAlloc(GMEM_DDESHARE | GMEM_MOVEABLE | GMEM_ZEROINIT, sizeof(TCHAR)*(str.size()+1));
 		if(!hMem){ return; } // メモリ確保に失敗
@@ -3004,14 +3076,18 @@ private:
 				_stprintf_s(iniFileName, _T("%s/%s.ini"), CGrTxtMiru::GetDataPath(), CGrTxtMiru::AppName());
 				param.Save(iniFileName);
 			}
+			//
 			int auto_save_mode[2] = {};
 			param.GetPoints(CGrTxtParam::PointsType::BookMarkAutoSave, auto_save_mode, sizeof(auto_save_mode)/sizeof(int));
 			m_bBookMarkAutoSave = (auto_save_mode[0] == 1);
 			m_autoSaveInterval  = auto_save_mode[1];
 			Menu_setChecked(IDBOOKMARKAUTOSAVE, m_bBookMarkAutoSave);
+			//
 			m_bKeyRepeat = param.GetBoolean(CGrTxtParam::PointsType::KeyRepeat);
+			//
 			CGrTxtMiruMenu::Load(); 
 			CGrTxtMiruMenu::ConvertMenuString(getMenu(), TxtMiru::l_TxtMiruFuncMenuIDList);
+			//
 			int ikeyPressInterval = 0;
 			param.GetPoints(CGrTxtParam::PointsType::KeyInterval, &ikeyPressInterval, 1);
 			CGrMouseEvent::SetLongPressTime(ikeyPressInterval);

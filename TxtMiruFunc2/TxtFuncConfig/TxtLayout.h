@@ -30,7 +30,7 @@ public:
 	//
 	virtual void print(FILE *fp) const;
 	//
-	virtual LPCTSTR LayoutType() const = NULL;
+	virtual LPCTSTR LayoutType() const = 0;
 	void GetLayoutName(std::tstring &name) const { name = m_layoutName; }
 	void SetLayoutName(LPCTSTR name){ m_layoutName = name; }
 	//

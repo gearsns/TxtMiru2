@@ -52,7 +52,7 @@ static void openLayout(CGrTxtLayout &layout, LPCTSTR type, LPCTSTR lpFileName)
 {
 	layout.Open(lpFileName);
 }
-static void saveUpdate(HWND hwnd, CGrTxtLayout &layout, LPCTSTR type)
+static void saveUpdate(HWND hwnd, CGrTxtLayout &layout, LPCTSTR type, bool bAutoUpdateLayout)
 {
 	std::tstring filename;
 	layout.GetFileName(filename);
@@ -62,12 +62,13 @@ static void saveUpdate(HWND hwnd, CGrTxtLayout &layout, LPCTSTR type)
 	} else {
 		layout.Save();
 	}
-
-	auto &&param = CGrTxtFunc::Param();
-	param.SetText(CGrTxtFuncIParam::TextType::LayoutFile, filename.c_str());
-	param.SetText(CGrTxtFuncIParam::TextType::LayoutType, layout.LayoutType());
-	param.UpdateLayout(GetParent(hwnd));
-	::SendMessage(GetParent(hwnd), WM_COMMAND, (WPARAM)TxtDocMessage::UPDATE_LAYOUT, (LPARAM)0);
+	if (bAutoUpdateLayout) {
+		auto&& param = CGrTxtFunc::Param();
+		param.SetText(CGrTxtFuncIParam::TextType::LayoutFile, filename.c_str());
+		param.SetText(CGrTxtFuncIParam::TextType::LayoutType, layout.LayoutType());
+		param.UpdateLayout(GetParent(hwnd));
+		::SendMessage(GetParent(hwnd), WM_COMMAND, (WPARAM)TxtDocMessage::UPDATE_LAYOUT, (LPARAM)0);
+	}
 }
 //
 static int calcPos(int pos, int ws, int ps)
@@ -594,12 +595,17 @@ private:
 		}
 		void refresh(CGrCustomLayoutSettingDlg &dlg);
 	} m_li;
+	bool m_bAutoUpdateLayout = false;
 	void Calc(int id);
 	void getLayoutName(std::tstring &name);
 public:
 	CGrCustomLayoutSettingDlg(LPCTSTR type, LPCTSTR name, LPCTSTR lpFileName);
 	virtual ~CGrCustomLayoutSettingDlg();
 	virtual int DoModal(HWND hWnd);
+	void SetAutoUpdateLayout(bool bAutoUpdateLayout)
+	{
+		m_bAutoUpdateLayout = bAutoUpdateLayout;
+	}
 protected:
 	// オーバーライド可能なウィンドウ(ダイアログ)プロシージャ
 	virtual LRESULT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -882,6 +888,15 @@ void CGrCustomLayoutSettingDlg::getLayoutName(std::tstring &name)
 BOOL CGrCustomLayoutSettingDlg::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 {
 	SetWindowPosCenter();
+	{
+		RECT rect;
+		GetWindowRect(m_hWnd, &rect);
+		RECT parent_rect;
+		GetWindowRect(GetParent(m_hWnd), &parent_rect);
+		if (rect.left < parent_rect.left) {
+			SetWindowPos(m_hWnd, 0, parent_rect.left, rect.top, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+		}
+	}
 
 	auto hIcon = static_cast<HICON>(LoadImage(CGrTxtFunc::GetDllModuleHandle(), MAKEINTRESOURCE(IDI_APP), IMAGE_ICON, 32, 32, LR_SHARED));
 	SendMessage(hwnd, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(hIcon));
@@ -897,9 +912,7 @@ BOOL CGrCustomLayoutSettingDlg::OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM l
 	::EnableDlgItemID(m_hWnd,  IDC_EDIT_NOMBRE       , FALSE);
 	::EnableDlgItemID(m_hWnd,  IDC_EDIT_RUNNING_HEADS, FALSE);
 	::EnableDlgItemID(m_hWnd,  IDCALC                , FALSE);
-	//
 	openLayout(m_layout, m_type.c_str(), m_filename.c_str());
-	//
 	::setImageWindowPos(m_hWnd);
 	RECT win_rect;
 	::GetWindowRect(m_hWnd, &win_rect);
@@ -989,7 +1002,7 @@ void CGrCustomLayoutSettingDlg::setTxtLayout()
 	layout.lines      = (layout.right - layout.left) / max(m_li.lsNote.width+m_li.lsNote.space, 1);
 	m_layout.AddLayout(CGrTxtLayout::LayoutListType::Note, layout);
 
-	saveUpdate(m_hWnd, m_layout, lpName);
+	saveUpdate(m_hWnd, m_layout, lpName, m_bAutoUpdateLayout);
 }
 
 void CGrCustomLayoutSettingDlg::Calc(int id)
@@ -1213,7 +1226,14 @@ void CGrCustomLayoutSettingDlg::OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT 
 int CGrCustomTxtLayout::ConfigurationDlg(HWND hWnd, LPCTSTR type, LPCTSTR name, LPCTSTR lpFileName)
 {
 	CGrCustomLayoutSettingDlg dlg(type, name, lpFileName);
-	dlg.DoModal(hWnd);
-	return 0;
+	return dlg.DoModal(hWnd);
 }
 /////
+int DoModalLayoutSetting(HWND hWnd, LPCTSTR type, LPCTSTR name, LPCTSTR lpFileName, bool bAutoUpdateLayout)
+{
+	CGrCustomLayoutSettingDlg dlg(type, name, lpFileName);
+	if (bAutoUpdateLayout) {
+		dlg.SetAutoUpdateLayout(bAutoUpdateLayout);
+	}
+	return dlg.DoModal(hWnd);
+}
